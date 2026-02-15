@@ -1,19 +1,21 @@
 import { NavLink } from "react-router-dom";
 import "./AdminLayout.css";
 
-const Sidebar = () => {
+const Navbar = () => {
   return (
-    <aside className="admin-sidebar">
-      <h2 className="logo">AgroLanka</h2>
+    <header className="admin-navbar">
+      <div className="nav-left">
+        <h2 className="logo">AgroLanka</h2>
+      </div>
 
-      <nav>
+      <nav className="nav-links">
         <NavLink to="/admin/dashboard">Dashboard</NavLink>
         <NavLink to="/admin/asc">ASC Centers</NavLink>
         <NavLink to="/admin/staff">Staff</NavLink>
         <NavLink to="/admin/assignment">Assignments</NavLink>
       </nav>
-    </aside>
+    </header>
   );
 };
 
-export default Sidebar;
+export default Navbar;

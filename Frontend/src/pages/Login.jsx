@@ -1,0 +1,87 @@
+import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate, Link } from 'react-router-dom';
+import Navbar from '../components/Navbar';
+import './Auth.css';
+
+const Login = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState('');
+    const { login } = useAuth();
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        console.log('🔑 Submitting login form...');
+        const res = await login(email, password);
+        console.log('📋 Login result:', res);
+        if (res.success) {
+            console.log('✅ Login successful, user role:', res.user?.role);
+            // Check role and redirect (roles are uppercase in backend)
+            if (res.user && res.user.role === 'FARMER') {
+                console.log('🚜 Redirecting to farmer dashboard...');
+                navigate('/farmer-dashboard');
+            } else if (res.user && res.user.role === 'ADMIN') {
+                console.log('👨‍💼 Redirecting to admin panel...');
+                navigate('/admin');
+            } else {
+                console.log('🏠 Redirecting to home...');
+                navigate('/'); // Default fallback
+            }
+        } else {
+            console.error('❌ Login failed:', res.message);
+            setError(res.message);
+        }
+    };
+
+    return (
+        <div className="auth-page">
+            <Navbar />
+            <div className="auth-container">
+                <div className="auth-card">
+                    <h2>Login to AgroLanka</h2>
+                    {error && <div className="alert-error">{error}</div>}
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label>Email Address</label>
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>Password</label>
+                            <div className="password-input-wrapper">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    className="password-toggle"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    aria-label={showPassword ? "Hide password" : "Show password"}
+                                >
+                                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                                </button>
+                            </div>
+                        </div>
+                        <button type="submit" className="btn btn-primary btn-block">Login</button>
+                    </form>
+                    <p className="auth-footer">
+                        Don't have an account? <Link to="/register">Sign Up</Link>
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default Login;

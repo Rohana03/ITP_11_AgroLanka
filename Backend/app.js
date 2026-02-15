@@ -31,8 +31,19 @@ require("dotenv").config({ path: path.join(__dirname, ".env") });
 
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 const app = express();
+
+// Enable CORS for all routes (or specific origin)
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
+
+// Middleware for parsing JSON and URL-encoded data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 console.log("MONGO_URI →", process.env.MONGO_URI);
 console.log("PORT →", process.env.PORT);
@@ -44,6 +55,10 @@ if (!process.env.MONGO_URI) {
 
 app.get("/", (req, res) => res.send("It is working"));
 
+// Register routes BEFORE connecting to database
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/ascs", require("./routes/ascRoutes"));
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
@@ -53,5 +68,3 @@ mongoose
     });
   })
   .catch((err) => console.error("❌ DB error:", err));
-
-  app.use("/api/auth", require("./routes/authRoutes"));

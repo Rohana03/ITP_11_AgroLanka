@@ -11,15 +11,30 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true
     },
+    email: {
+      type: String,
+      required: true,
+      unique: true
+    },
+    nic: {
+      type: String,
+      required: [true, "Please add a NIC number"],
+      unique: true,
+    },
     password: {
       type: String,
-      required: true
+      required: [true, "Please add a password"],
     },
     role: {
       type: String,
-      enum: ["ADMIN", "ASC_OFFICER", "STORE_OFFICER", "FARMER"],
-      default: "FARMER"
-    }
+      enum: ["FARMER", "ASC_OFFICER", "STORE_OFFICER", "ADMIN"],
+      default: "FARMER",
+    },
+    assignedAsc: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'ASC',
+      default: null
+    },
   },
   { timestamps: true }
 );
