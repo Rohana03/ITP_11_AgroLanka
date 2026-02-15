@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import './Auth.css';
 
@@ -11,6 +11,8 @@ const Login = () => {
     const [error, setError] = useState('');
     const { login } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+    const successMessage = location.state?.message;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -27,6 +29,18 @@ const Login = () => {
             } else if (res.user && res.user.role === 'ADMIN') {
                 console.log('👨‍💼 Redirecting to admin panel...');
                 navigate('/admin');
+            } else if (res.user && res.user.role === 'FINANCIAL_OFFICER') {
+                navigate('/financial-dashboard');
+            } else if (res.user && res.user.role === 'CROP_OFFICER') {
+                navigate('/crop-dashboard');
+            } else if (res.user && res.user.role === 'PRODUCT_MANAGER') {
+                navigate('/product-dashboard');
+            } else if (res.user && res.user.role === 'MACHINERY_OFFICER') {
+                navigate('/machinery-dashboard');
+            } else if (res.user && res.user.role === 'ASC_OFFICER') {
+                navigate('/asc-dashboard');
+            } else if (res.user && res.user.role === 'STORE_OFFICER') {
+                navigate('/product-dashboard'); // Fallback to product dashboard
             } else {
                 console.log('🏠 Redirecting to home...');
                 navigate('/'); // Default fallback
@@ -43,6 +57,7 @@ const Login = () => {
             <div className="auth-container">
                 <div className="auth-card">
                     <h2>Login to AgroLanka</h2>
+                    {successMessage && <div className="alert-success" style={{ backgroundColor: '#d4edda', color: '#155724', padding: '10px', borderRadius: '4px', marginBottom: '15px', textAlign: 'center' }}>{successMessage}</div>}
                     {error && <div className="alert-error">{error}</div>}
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">

@@ -11,14 +11,10 @@ const ManageOfficers = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
 
-    // Form state for new officer
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        password: '',
-        nic: '',
-        role: 'ASC_OFFICER'
-    });
+    // Filter state
+    const [searchTerm, setSearchTerm] = useState('');
+    const [roleFilter, setRoleFilter] = useState('ALL');
+    const [statusFilter, setStatusFilter] = useState('ALL');
 
     useEffect(() => {
         fetchData();
@@ -42,35 +38,6 @@ const ManageOfficers = () => {
         } catch (error) {
             console.error('Error fetching data:', error);
             setLoading(false);
-        }
-    };
-
-    const handleFormChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const handleRegister = async (e) => {
-        e.preventDefault();
-        setMessage('');
-        setError('');
-        try {
-            const response = await fetch('http://localhost:5000/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                setMessage(`Officer ${formData.name} registered successfully!`);
-                setFormData({ name: '', email: '', password: '', nic: '', role: 'ASC_OFFICER' });
-                fetchData(); // Refresh list
-            } else {
-                setError(data.message || 'Registration failed');
-            }
-        } catch (err) {
-            setError('Server error during registration');
         }
     };
 
@@ -110,27 +77,56 @@ const ManageOfficers = () => {
                 <header className="dashboard-header">
                     <div className="header-left">
                         <h1>Staff & Allocation Management</h1>
-                        <p>Register new officers and reallocate them across regions</p>
+                        <p>Manage existing agricultural officers and their regional allocations</p>
                     </div>
                 </header>
 
                 <div className="dashboard-content">
-                    {/* Registration Section */}
-                    <div className="dashboard-section" style={{ backgroundColor: '#fff', padding: '24px', borderRadius: '12px', marginBottom: '32px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-                        <h3>Register New Agricultural Officer</h3>
-                        <form onSubmit={handleRegister} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginTop: '20px' }}>
-                            <input type="text" name="name" placeholder="Full Name" className="form-control" value={formData.name} onChange={handleFormChange} required style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ddd' }} />
-                            <input type="email" name="email" placeholder="Email Address" className="form-control" value={formData.email} onChange={handleFormChange} required style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ddd' }} />
-                            <input type="password" name="password" placeholder="Temp Password" className="form-control" value={formData.password} onChange={handleFormChange} required style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ddd' }} />
-                            <input type="text" name="nic" placeholder="NIC Number" className="form-control" value={formData.nic} onChange={handleFormChange} required style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ddd' }} />
-                            <select name="role" className="form-control" value={formData.role} onChange={handleFormChange} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ddd' }}>
-                                <option value="ASC_OFFICER">ASC Officer</option>
-                                <option value="STORE_OFFICER">Agri-Store Officer</option>
-                            </select>
-                            <button type="submit" className="btn btn-primary" style={{ backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>Register Staff</button>
-                        </form>
-                        {message && <p style={{ color: '#059669', marginTop: '10px', fontWeight: '600' }}>✅ {message}</p>}
-                        {error && <p style={{ color: '#dc2626', marginTop: '10px', fontWeight: '600' }}>❌ {error}</p>}
+                    {/* Filtering Section */}
+                    <div className="dashboard-section" style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '12px', marginBottom: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
+                            <div style={{ flex: '1', minWidth: '250px' }}>
+                                <label style={{ fontSize: '0.85rem', fontWeight: '600', color: '#64748b', marginBottom: '5px', display: 'block' }}>Search by Name or Email</label>
+                                <input
+                                    type="text"
+                                    placeholder="Search staff..."
+                                    className="form-control"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0' }}
+                                />
+                            </div>
+                            <div style={{ width: '180px' }}>
+                                <label style={{ fontSize: '0.85rem', fontWeight: '600', color: '#64748b', marginBottom: '5px', display: 'block' }}>Filter by Role</label>
+                                <select
+                                    className="form-control"
+                                    value={roleFilter}
+                                    onChange={(e) => setRoleFilter(e.target.value)}
+                                    style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0' }}
+                                >
+                                    <option value="ALL">All Roles</option>
+                                    <option value="ASC_OFFICER">ASC Officer</option>
+                                    <option value="STORE_OFFICER">Store Officer</option>
+                                    <option value="FINANCIAL_OFFICER">Financial Officer</option>
+                                    <option value="CROP_OFFICER">Crop Officer</option>
+                                    <option value="PRODUCT_MANAGER">Product Manager</option>
+                                    <option value="MACHINERY_OFFICER">Machinery Officer</option>
+                                </select>
+                            </div>
+                            <div style={{ width: '180px' }}>
+                                <label style={{ fontSize: '0.85rem', fontWeight: '600', color: '#64748b', marginBottom: '5px', display: 'block' }}>Allocation Status</label>
+                                <select
+                                    className="form-control"
+                                    value={statusFilter}
+                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                    style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0' }}
+                                >
+                                    <option value="ALL">All Status</option>
+                                    <option value="ALLOCATED">Allocated</option>
+                                    <option value="UNALLOCATED">Unallocated</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="dashboard-section">
@@ -146,8 +142,16 @@ const ManageOfficers = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {officers.length > 0 ? (
-                                        officers.map(officer => (
+                                    {officers
+                                        .filter(officer => {
+                                            const matchesSearch = officer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                                officer.email.toLowerCase().includes(searchTerm.toLowerCase());
+                                            const matchesRole = roleFilter === 'ALL' || officer.role === roleFilter;
+                                            const matchesStatus = statusFilter === 'ALL' ||
+                                                (statusFilter === 'ALLOCATED' ? officer.assignedAsc : !officer.assignedAsc);
+                                            return matchesSearch && matchesRole && matchesStatus;
+                                        })
+                                        .map(officer => (
                                             <tr key={officer._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                                                 <td style={{ padding: '16px' }}>
                                                     <div style={{ fontWeight: '600', color: '#1e293b' }}>{officer.name}</div>
@@ -184,14 +188,22 @@ const ManageOfficers = () => {
                                                     </select>
                                                 </td>
                                             </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan="4" style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
-                                                No agricultural officers found in system.
-                                            </td>
-                                        </tr>
-                                    )}
+                                        ))}
+
+                                    {officers.filter(officer => {
+                                        const matchesSearch = officer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                            officer.email.toLowerCase().includes(searchTerm.toLowerCase());
+                                        const matchesRole = roleFilter === 'ALL' || officer.role === roleFilter;
+                                        const matchesStatus = statusFilter === 'ALL' ||
+                                            (statusFilter === 'ALLOCATED' ? officer.assignedAsc : !officer.assignedAsc);
+                                        return matchesSearch && matchesRole && matchesStatus;
+                                    }).length === 0 && (
+                                            <tr>
+                                                <td colSpan="4" style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
+                                                    No officers match the current filters.
+                                                </td>
+                                            </tr>
+                                        )}
                                 </tbody>
                             </table>
                         </div>

@@ -68,11 +68,7 @@ export const AuthProvider = ({ children }) => {
         console.log('📥 Register response:', data);
 
         if (response.ok) {
-            localStorage.setItem('token', data.token);
-            setToken(data.token);
-            setUser(data);
-            console.log('✅ User state set:', data);
-            console.log('✅ User role:', data.role);
+            console.log('✅ Registration successful');
             return { success: true };
         } else {
             console.error('❌ Registration failed:', data.message);

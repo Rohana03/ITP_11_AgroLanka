@@ -14,6 +14,11 @@ import RegisterCrop from './pages/RegisterCrop';
 import FinancialAssistance from './pages/FinancialAssistance';
 import MachineryService from './pages/MachineryService';
 import AgriculturalProducts from './pages/AgriculturalProducts';
+import FinancialDashboard from './pages/FinancialDashboard';
+import CropDashboard from './pages/CropDashboard';
+import ProductDashboard from './pages/ProductDashboard';
+import MachineryDashboard from './pages/MachineryDashboard';
+import ASCDashboard from './pages/ASCDashboard';
 import './App.css';
 
 function App() {
@@ -39,6 +44,13 @@ function App() {
             <Route path="/farmer/financial-aid" element={<ProtectedRoute><FinancialAssistance /></ProtectedRoute>} />
             <Route path="/farmer/machinery" element={<ProtectedRoute><MachineryService /></ProtectedRoute>} />
             <Route path="/farmer/products" element={<ProtectedRoute><AgriculturalProducts /></ProtectedRoute>} />
+
+            {/* Officer routes */}
+            <Route path="/financial-dashboard" element={<ProtectedRoute><FinancialDashboard /></ProtectedRoute>} />
+            <Route path="/crop-dashboard" element={<ProtectedRoute><CropDashboard /></ProtectedRoute>} />
+            <Route path="/product-dashboard" element={<ProtectedRoute><ProductDashboard /></ProtectedRoute>} />
+            <Route path="/machinery-dashboard" element={<ProtectedRoute><MachineryDashboard /></ProtectedRoute>} />
+            <Route path="/asc-dashboard" element={<ProtectedRoute><ASCDashboard /></ProtectedRoute>} />
           </Routes>
         </Router>
       </LanguageProvider>

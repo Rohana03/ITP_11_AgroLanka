@@ -37,7 +37,7 @@ const app = express();
 
 // Enable CORS for all routes (or specific origin)
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: ["http://localhost:5173", "http://localhost:5174"],
   credentials: true
 }));
 
@@ -58,6 +58,7 @@ app.get("/", (req, res) => res.send("It is working"));
 // Register routes BEFORE connecting to database
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/ascs", require("./routes/ascRoutes"));
+app.use("/api/admin", require("./routes/adminRoutes"));
 
 mongoose
   .connect(process.env.MONGO_URI)

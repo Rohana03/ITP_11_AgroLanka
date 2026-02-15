@@ -27,9 +27,23 @@ const PublicRoute = ({ children }) => {
         } else if (user.role === 'ADMIN') {
             console.log('👨‍💼 PublicRoute - Redirecting to admin panel');
             return <Navigate to="/admin" replace />;
+        } else if (user.role === 'FINANCIAL_OFFICER') {
+            return <Navigate to="/financial-dashboard" replace />;
+        } else if (user.role === 'CROP_OFFICER') {
+            return <Navigate to="/crop-dashboard" replace />;
+        } else if (user.role === 'PRODUCT_MANAGER') {
+            return <Navigate to="/product-dashboard" replace />;
+        } else if (user.role === 'MACHINERY_OFFICER') {
+            return <Navigate to="/machinery-dashboard" replace />;
+        } else if (user.role === 'ASC_OFFICER') {
+            return <Navigate to="/asc-dashboard" replace />;
+        } else if (user.role === 'STORE_OFFICER') {
+            return <Navigate to="/product-dashboard" replace />;
         } else {
-            console.log('🏠 PublicRoute - Redirecting to home');
-            return <Navigate to="/" replace />;
+            console.log('🏠 PublicRoute - No specific dashboard for role, showing public page or home');
+            // If they are logged in but role isn't handled, we might want to let them see the landing page
+            // or redirect to a common dashboard. Re-directing to "/" here would cause a loop if path is already "/"
+            return children;
         }
     }
 

@@ -11,11 +11,6 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true
     },
-    email: {
-      type: String,
-      required: true,
-      unique: true
-    },
     nic: {
       type: String,
       required: [true, "Please add a NIC number"],
@@ -27,7 +22,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["FARMER", "ASC_OFFICER", "STORE_OFFICER", "ADMIN"],
+      enum: ["FARMER", "ASC_OFFICER", "STORE_OFFICER", "ADMIN", "FINANCIAL_OFFICER", "CROP_OFFICER", "PRODUCT_MANAGER", "MACHINERY_OFFICER"],
       default: "FARMER",
     },
     assignedAsc: {

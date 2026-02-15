@@ -22,18 +22,8 @@ const Register = () => {
         const res = await register(name, email, nic, password, role);
         console.log('📋 Registration result:', res);
         if (res.success) {
-            console.log('✅ Registration successful, redirecting based on role:', role);
-            // Redirect based on role
-            if (role === 'FARMER') {
-                console.log('🚜 Redirecting to farmer dashboard...');
-                navigate('/farmer-dashboard');
-            } else if (role === 'ADMIN') {
-                console.log('👨‍💼 Redirecting to admin panel...');
-                navigate('/admin');
-            } else {
-                console.log('🏠 Redirecting to home...');
-                navigate('/');
-            }
+            console.log('✅ Registration successful, redirecting to login...');
+            navigate('/login', { state: { message: 'Registration successful! Please login with your credentials.' } });
         } else {
             console.error('❌ Registration failed:', res.message);
             setError(res.message);
@@ -100,6 +90,10 @@ const Register = () => {
                                 <option value="FARMER">Farmer</option>
                                 <option value="ASC_OFFICER">ASC Officer</option>
                                 <option value="STORE_OFFICER">Store Officer</option>
+                                <option value="FINANCIAL_OFFICER">Financial Officer</option>
+                                <option value="CROP_OFFICER">Crop Officer</option>
+                                <option value="PRODUCT_MANAGER">Product Seller/Buyer</option>
+                                <option value="MACHINERY_OFFICER">Machinery & Service Officer</option>
                                 {/* Admin registration should typically be restricted, but keeping here for demo if needed */}
                             </select>
                         </div>

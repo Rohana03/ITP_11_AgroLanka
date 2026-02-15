@@ -2,7 +2,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-const { protect } = require("../middleware/authMiddleware");
+const { protect, authorize } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
@@ -74,7 +74,7 @@ router.post("/login", async (req, res) => {
 
   try {
     // Check for user email
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate('assignedAsc', 'name district');
 
     if (user && (await bcrypt.compare(password, user.password))) {
       res.json({
