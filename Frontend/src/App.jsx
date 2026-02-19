@@ -19,6 +19,7 @@ import CropDashboard from './pages/CropDashboard';
 import ProductDashboard from './pages/ProductDashboard';
 import MachineryDashboard from './pages/MachineryDashboard';
 import ASCDashboard from './pages/ASCDashboard';
+import MyCrops from './pages/MyCrops';
 import './App.css';
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
             {/* Farmer routes */}
             <Route path="/farmer-dashboard" element={<ProtectedRoute><FarmerDashboard /></ProtectedRoute>} />
             <Route path="/farmer/register-crop" element={<ProtectedRoute><RegisterCrop /></ProtectedRoute>} />
+            <Route path="/farmer/my-crops" element={<ProtectedRoute><MyCrops /></ProtectedRoute>} />
             <Route path="/farmer/financial-aid" element={<ProtectedRoute><FinancialAssistance /></ProtectedRoute>} />
             <Route path="/farmer/machinery" element={<ProtectedRoute><MachineryService /></ProtectedRoute>} />
             <Route path="/farmer/products" element={<ProtectedRoute><AgriculturalProducts /></ProtectedRoute>} />

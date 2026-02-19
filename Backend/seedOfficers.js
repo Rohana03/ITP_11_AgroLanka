@@ -35,6 +35,78 @@ const officers = [
         password: "Officer123",
         role: "ASC_OFFICER",
     },
+    {
+        name: "Paddy Officer",
+        email: "paddy@agrolanka.com",
+        nic: "911234567V",
+        password: "Officer123",
+        role: "CROP_OFFICER",
+        specialization: "Paddy"
+    },
+    {
+        name: "Veggie Officer",
+        email: "veggie@agrolanka.com",
+        nic: "921234567V",
+        password: "Officer123",
+        role: "CROP_OFFICER",
+        specialization: "Vegetables"
+    },
+    {
+        name: "Coconut Officer",
+        email: "coconut@agrolanka.com",
+        nic: "931234567V",
+        password: "Officer123",
+        role: "CROP_OFFICER",
+        specialization: "Coconut"
+    },
+    {
+        name: "Tea Officer",
+        email: "tea@agrolanka.com",
+        nic: "941234567V",
+        password: "Officer123",
+        role: "CROP_OFFICER",
+        specialization: "Tea"
+    },
+    {
+        name: "Rubber Officer",
+        email: "rubber@agrolanka.com",
+        nic: "951234567V",
+        password: "Officer123",
+        role: "CROP_OFFICER",
+        specialization: "Rubber"
+    },
+    {
+        name: "Coffee Officer",
+        email: "coffee@agrolanka.com",
+        nic: "961234567V",
+        password: "Officer123",
+        role: "CROP_OFFICER",
+        specialization: "Coffee"
+    },
+    {
+        name: "Fruit Officer",
+        email: "fruit@agrolanka.com",
+        nic: "971234567V",
+        password: "Officer123",
+        role: "CROP_OFFICER",
+        specialization: "Fruits"
+    },
+    {
+        name: "Spice Officer",
+        email: "spice@agrolanka.com",
+        nic: "981234567V",
+        password: "Officer123",
+        role: "CROP_OFFICER",
+        specialization: "Spices"
+    },
+    {
+        name: "Generic Officer",
+        email: "other@agrolanka.com",
+        nic: "991234567V",
+        password: "Officer123",
+        role: "CROP_OFFICER",
+        specialization: "Other"
+    },
 ];
 
 const seedOfficers = async () => {
@@ -43,23 +115,23 @@ const seedOfficers = async () => {
         console.log("✅ MongoDB Connected");
 
         // Clear existing officers except admin
-        await User.deleteMany({ role: { $in: ["ASC_OFFICER", "STORE_OFFICER"] } });
+        await User.deleteMany({ role: { $in: ["ASC_OFFICER", "STORE_OFFICER", "CROP_OFFICER"] } });
         console.log("🗑️  Previous officers deleted");
 
         const salt = await bcrypt.genSalt(10);
         const hashedPass = await bcrypt.hash("Officer123", salt);
 
-        // Get some ASCs to assign
-        const ascs = await ASC.find().limit(4);
+        // Get ASCs to assign
+        const ascs = await ASC.find();
 
-        if (ascs.length < 4) {
-            console.error("❌ Not enough ASCs found. Please run seedASC.js first.");
+        if (ascs.length === 0) {
+            console.error("❌ No ASCs found. Please run seedASC.js first.");
             process.exit(1);
         }
 
         for (let i = 0; i < officers.length; i++) {
             const officer = officers[i];
-            const asc = ascs[i];
+            const asc = ascs[i % ascs.length]; // Use round-robin if more officers than ASCs
 
             const newUser = await User.create({
                 ...officer,

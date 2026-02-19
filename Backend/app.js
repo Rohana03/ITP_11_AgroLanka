@@ -59,6 +59,8 @@ app.get("/", (req, res) => res.send("It is working"));
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/ascs", require("./routes/ascRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
+app.use("/api/crops", require("./routes/cropRoutes"));
+app.use("/api/loans", require("./routes/loanRoutes"));
 
 mongoose
   .connect(process.env.MONGO_URI)

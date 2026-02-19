@@ -11,15 +11,37 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [role, setRole] = useState('FARMER');
+    const [assignedAsc, setAssignedAsc] = useState('');
+    const [selectedDistrict, setSelectedDistrict] = useState('');
+    const [specialization, setSpecialization] = useState('');
+    const [ascs, setAscs] = useState([]);
+    const [districts, setDistricts] = useState([]);
     const [error, setError] = useState('');
     const { register } = useAuth();
     const navigate = useNavigate();
 
+    React.useEffect(() => {
+        const fetchAscs = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/ascs');
+                const data = await response.json();
+                setAscs(data);
+
+                // Get unique districts
+                const uniqueDistricts = [...new Set(data.map(asc => asc.district))].sort();
+                setDistricts(uniqueDistricts);
+            } catch (err) {
+                console.error('Error fetching ASCs:', err);
+            }
+        };
+        fetchAscs();
+    }, []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-        console.log('📝 Submitting registration form...', { role });
-        const res = await register(name, email, nic, password, role);
+        console.log('📝 Submitting registration form...', { role, assignedAsc, specialization });
+        const res = await register(name, email, nic, password, role, assignedAsc, specialization);
         console.log('📋 Registration result:', res);
         if (res.success) {
             console.log('✅ Registration successful, redirecting to login...');
@@ -97,6 +119,64 @@ const Register = () => {
                                 {/* Admin registration should typically be restricted, but keeping here for demo if needed */}
                             </select>
                         </div>
+
+                        {(role === 'FARMER' || role === 'ASC_OFFICER' || role === 'STORE_OFFICER' || role === 'FINANCIAL_OFFICER' || role === 'CROP_OFFICER' || role === 'PRODUCT_MANAGER' || role === 'MACHINERY_OFFICER') && (
+                            <>
+                                <div className="form-group">
+                                    <label>District</label>
+                                    <select
+                                        value={selectedDistrict}
+                                        onChange={(e) => {
+                                            setSelectedDistrict(e.target.value);
+                                            setAssignedAsc(''); // Reset center when district changes
+                                        }}
+                                        required={role === 'FARMER'}
+                                    >
+                                        <option value="">Select District</option>
+                                        {districts.map(district => (
+                                            <option key={district} value={district}>{district}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Nearest ASC Center (Agrarian Service Center)</label>
+                                    <select
+                                        value={assignedAsc}
+                                        onChange={(e) => setAssignedAsc(e.target.value)}
+                                        required={role === 'FARMER'}
+                                        disabled={!selectedDistrict}
+                                    >
+                                        <option value="">{selectedDistrict ? 'Select ASC Center' : 'Select District first'}</option>
+                                        {ascs
+                                            .filter(asc => asc.district === selectedDistrict)
+                                            .map(asc => (
+                                                <option key={asc._id} value={asc._id}>{asc.name}</option>
+                                            ))
+                                        }
+                                    </select>
+                                </div>
+                            </>
+                        )}
+
+                        {role === 'CROP_OFFICER' && (
+                            <div className="form-group">
+                                <label>Specific Crop Side/Specialization (Sri Lanka)</label>
+                                <select
+                                    value={specialization}
+                                    onChange={(e) => setSpecialization(e.target.value)}
+                                    required
+                                >
+                                    <option value="">Select Specialization</option>
+                                    <option value="Paddy (වී)">Paddy (වී)</option>
+                                    <option value="Vegetables (එළවළු)">Vegetables (එළවළු)</option>
+                                    <option value="Fruits (පලතුරු)">Fruits (පලතුරු)</option>
+                                    <option value="Spices (කුළුබඩු)">Spices (කුළුබඩු)</option>
+                                    <option value="Export Crops (අපනයන බෝග)">Export Crops (අපනයන බෝග)</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        )}
                         <button type="submit" className="btn btn-primary btn-block">Sign Up</button>
                     </form>
                     <p className="auth-footer">

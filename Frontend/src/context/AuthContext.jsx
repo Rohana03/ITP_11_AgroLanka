@@ -56,12 +56,12 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const register = async (name, email, nic, password, role) => {
-        console.log('📝 Register attempt:', { name, email, role });
+    const register = async (name, email, nic, password, role, assignedAsc, specialization) => {
+        console.log('📝 Register attempt:', { name, email, role, assignedAsc, specialization });
         const response = await fetch('http://localhost:5000/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, nic, password, role })
+            body: JSON.stringify({ name, email, nic, password, role, assignedAsc, specialization })
         });
 
         const data = await response.json();
@@ -82,8 +82,12 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
+    const updateUser = (userData) => {
+        setUser(userData);
+    };
+
     return (
-        <AuthContext.Provider value={{ user, token, login, register, logout, loading }}>
+        <AuthContext.Provider value={{ user, token, login, register, logout, loading, updateUser }}>
             {children}
         </AuthContext.Provider>
     );

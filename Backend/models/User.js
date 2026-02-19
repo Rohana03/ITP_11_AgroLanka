@@ -30,6 +30,10 @@ const userSchema = new mongoose.Schema(
       ref: 'ASC',
       default: null
     },
+    specialization: {
+      type: String,
+      default: null
+    },
   },
   { timestamps: true }
 );

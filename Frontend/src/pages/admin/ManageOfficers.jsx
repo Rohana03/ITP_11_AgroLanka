@@ -179,7 +179,7 @@ const ManageOfficers = () => {
                                                         onChange={(e) => handleAssign(officer._id, e.target.value)}
                                                         style={{ padding: '8px', borderRadius: '6px', border: '1px solid #e2e8f0', width: '100%', maxWidth: '220px' }}
                                                     >
-                                                        <option value="">Select Center...</option>
+                                                        <option value="">-- Unallocate Staff --</option>
                                                         {ascs.map(asc => (
                                                             <option key={asc._id} value={asc._id}>
                                                                 {asc.name} ({asc.district})
