@@ -42,8 +42,9 @@ app.use(cors({
 }));
 
 // Middleware for parsing JSON and URL-encoded data
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Increased limit to 10mb to support Base64 image uploads
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 console.log("MONGO_URI →", process.env.MONGO_URI);
 console.log("PORT →", process.env.PORT);
@@ -67,6 +68,7 @@ app.use("/api/loans", require("./routes/loanRoutes"));
 app.use("/api/compensation", require("./routes/compensationRoutes"));
 app.use("/api/machinery", require("./routes/machineryRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
+app.use("/api/purchases", require("./routes/purchaseRoutes"));
 
 mongoose
   .connect(process.env.MONGO_URI)

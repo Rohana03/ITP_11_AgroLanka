@@ -58,7 +58,7 @@ const AdminProductReview = () => {
             <div className="dashboard-container">
                 <header className="dashboard-header">
                     <div className="header-left">
-                        <button className="back-btn" onClick={() => navigate('/admin-dashboard')} style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', marginBottom: '10px' }}>
+                        <button className="back-btn" onClick={() => navigate('/admin')} style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', marginBottom: '10px' }}>
                             ← Back to Dashboard
                         </button>
                         <h1>📦 Product Approval Queue</h1>
@@ -100,8 +100,8 @@ const AdminProductReview = () => {
                                                 </div>
                                             </td>
                                             <td style={{ padding: '12px' }}>
-                                                <div style={{ fontWeight: '500' }}>{p.manager?.name}</div>
-                                                <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{p.manager?.email}</div>
+                                                <div style={{ fontWeight: '500' }}>{p.seller?.name}</div>
+                                                <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{p.seller?.email}</div>
                                             </td>
                                             <td style={{ padding: '12px' }}>{p.category}</td>
                                             <td style={{ padding: '12px' }}>LKR {p.price}</td>

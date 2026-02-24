@@ -163,11 +163,16 @@ const FarmerDashboard = () => {
                         <p>Request machinery and agricultural services.</p>
                     </div>
 
-                    {/* Block 4: Agricultural products */}
                     <div className="dashboard-card" onClick={() => navigate('/farmer/products')}>
                         <div className="card-icon">🛒</div>
                         <h3>Agricultural Products</h3>
                         <p>Explore and buy agricultural products.</p>
+                    </div>
+
+                    <div className="dashboard-card" onClick={() => navigate('/farmer/sell-harvest')}>
+                        <div className="card-icon">💰</div>
+                        <h3>Sell Harvest</h3>
+                        <p>List your harvested crops for sale to registered buyers.</p>
                     </div>
                 </div>
             </div>

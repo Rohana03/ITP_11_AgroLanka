@@ -19,6 +19,7 @@ import CropDashboard from './pages/CropDashboard';
 import ProductDashboard from './pages/ProductDashboard';
 import MachineryDashboard from './pages/MachineryDashboard';
 import AdminProductReview from './pages/AdminProductReview';
+import SellHarvest from './pages/SellHarvest';
 import ASCDashboard from './pages/ASCDashboard';
 import MyCrops from './pages/MyCrops';
 import './App.css';
@@ -48,6 +49,7 @@ function App() {
             <Route path="/farmer/financial-aid" element={<ProtectedRoute><FinancialAssistance /></ProtectedRoute>} />
             <Route path="/farmer/machinery" element={<ProtectedRoute><MachineryService /></ProtectedRoute>} />
             <Route path="/farmer/products" element={<ProtectedRoute><AgriculturalProducts /></ProtectedRoute>} />
+            <Route path="/farmer/sell-harvest" element={<ProtectedRoute><SellHarvest /></ProtectedRoute>} />
 
             {/* Officer routes */}
             <Route path="/financial-dashboard" element={<ProtectedRoute><FinancialDashboard /></ProtectedRoute>} />

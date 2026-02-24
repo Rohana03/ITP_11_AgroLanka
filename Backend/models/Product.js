@@ -37,9 +37,14 @@ const productSchema = new mongoose.Schema(
             type: [String],
             required: true,
         },
-        manager: {
+        seller: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
+            required: true,
+        },
+        sellerRole: {
+            type: String,
+            enum: ["PRODUCT_MANAGER", "FARMER"],
             required: true,
         },
         status: {

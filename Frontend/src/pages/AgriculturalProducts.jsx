@@ -119,7 +119,7 @@ const AgriculturalProducts = () => {
                                         {product.description}
                                     </p>
                                     <div style={{ fontSize: '0.8rem', color: '#3b82f6', marginBottom: '10px' }}>
-                                        👤 Sold by: {product.manager?.name}
+                                        👤 Sold by: {product.seller?.name || 'Authorized Seller'}
                                     </div>
                                     <div className="product-footer" style={{ borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
                                         <span className="product-price" style={{ fontWeight: '700', color: '#059669' }}>
