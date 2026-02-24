@@ -5,17 +5,12 @@ import Navbar from '../components/Navbar';
 import './FarmerPages.css';
 
 const RegisterCrop = () => {
-<<<<<<< HEAD
     const { user } = useAuth();
-=======
-    useAuth();
->>>>>>> 9b47020 (solved)
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         cropType: '',
         variety: '',
         landSize: '',
-<<<<<<< HEAD
         season: '',
         location: user?.assignedAsc?.district || '',
         soilType: '',
@@ -67,16 +62,6 @@ const RegisterCrop = () => {
         fetchAscs();
     }, [user]);
 
-=======
-        plantingDate: '',
-        expectedHarvest: '',
-        location: '',
-        soilType: ''
-    });
-    const [success, setSuccess] = useState('');
-    const [error, setError] = useState('');
-
->>>>>>> 9b47020 (solved)
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -89,7 +74,6 @@ const RegisterCrop = () => {
         setError('');
         setSuccess('');
 
-<<<<<<< HEAD
         try {
             const response = await fetch('http://localhost:5000/api/crops', {
                 method: 'POST',
@@ -113,16 +97,6 @@ const RegisterCrop = () => {
         } catch (err) {
             setError('Server error during crop registration');
         }
-=======
-        // TODO: Send to backend API
-        console.log('Crop registration data:', formData);
-
-        // Simulated success
-        setSuccess('Crop registered successfully!');
-        setTimeout(() => {
-            navigate('/farmer-dashboard');
-        }, 2000);
->>>>>>> 9b47020 (solved)
     };
 
     return (
@@ -133,16 +107,11 @@ const RegisterCrop = () => {
                     <button className="back-btn" onClick={() => navigate('/farmer-dashboard')}>
                         ← Back to Dashboard
                     </button>
-<<<<<<< HEAD
                     <h1>🌱 Crop Registration Request</h1>
                     <p>Submit your crop details for officer review and approval</p>
                     <button className="view-btn" onClick={() => navigate('/farmer/my-crops')}>
                         View my requests →
                     </button>
-=======
-                    <h1>🌱 Register New Crop</h1>
-                    <p>Register your crop details for better management and support</p>
->>>>>>> 9b47020 (solved)
                 </div>
 
                 <div className="form-card">
@@ -161,16 +130,12 @@ const RegisterCrop = () => {
                                     <option value="spices">Spices (කුළුබඩු)</option>
                                     <option value="tea">Tea (තේ)</option>
                                     <option value="coconut">Coconut (පොල්)</option>
-<<<<<<< HEAD
                                     <option value="rubber">Rubber (රබර්)</option>
                                     <option value="coffee">Coffee (කෝපි)</option>
-=======
->>>>>>> 9b47020 (solved)
                                     <option value="other">Other</option>
                                 </select>
                             </div>
 
-<<<<<<< HEAD
                             {['rice', 'vegetables', 'fruits', 'spices', 'other'].includes(formData.cropType) && (
                                 <div className="form-group">
                                     <label>Variety *</label>
@@ -184,19 +149,6 @@ const RegisterCrop = () => {
                                     />
                                 </div>
                             )}
-=======
-                            <div className="form-group">
-                                <label>Variety *</label>
-                                <input
-                                    type="text"
-                                    name="variety"
-                                    value={formData.variety}
-                                    onChange={handleChange}
-                                    placeholder="e.g., Basmati, Red Lady"
-                                    required
-                                />
-                            </div>
->>>>>>> 9b47020 (solved)
                         </div>
 
                         <div className="form-row">
@@ -226,7 +178,6 @@ const RegisterCrop = () => {
                             </div>
                         </div>
 
-<<<<<<< HEAD
                         {formData.cropType === 'rice' && (
                             <div className="form-group" style={{ marginBottom: '20px' }}>
                                 <label>Season *</label>
@@ -278,42 +229,6 @@ const RegisterCrop = () => {
                                 }
                             </select>
                             <small className="form-text text-muted">Select the center where you will receive support and services.</small>
-=======
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label>Planting Date *</label>
-                                <input
-                                    type="date"
-                                    name="plantingDate"
-                                    value={formData.plantingDate}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Expected Harvest Date *</label>
-                                <input
-                                    type="date"
-                                    name="expectedHarvest"
-                                    value={formData.expectedHarvest}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div className="form-group">
-                            <label>Location/District *</label>
-                            <input
-                                type="text"
-                                name="location"
-                                value={formData.location}
-                                onChange={handleChange}
-                                placeholder="e.g., Anuradhapura"
-                                required
-                            />
->>>>>>> 9b47020 (solved)
                         </div>
 
                         <div className="form-actions">
@@ -321,11 +236,7 @@ const RegisterCrop = () => {
                                 Cancel
                             </button>
                             <button type="submit" className="btn btn-primary">
-<<<<<<< HEAD
                                 Submit Request
-=======
-                                Register Crop
->>>>>>> 9b47020 (solved)
                             </button>
                         </div>
                     </form>

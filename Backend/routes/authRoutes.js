@@ -2,11 +2,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-<<<<<<< HEAD
 const { protect, authorize } = require("../middleware/authMiddleware");
-=======
-const { protect } = require("../middleware/authMiddleware");
->>>>>>> 9b47020 (solved)
 
 const router = express.Router();
 
@@ -21,11 +17,7 @@ const generateToken = (id) => {
 // @route   POST /api/auth/register
 // @access  Public
 router.post("/register", async (req, res) => {
-<<<<<<< HEAD
   const { name, email, nic, password, role, assignedAsc, specialization } = req.body;
-=======
-  const { name, email, nic, password, role } = req.body;
->>>>>>> 9b47020 (solved)
 
   try {
     if (!name || !email || !nic || !password) {
@@ -54,13 +46,9 @@ router.post("/register", async (req, res) => {
       email,
       nic,
       password: hashedPassword,
-<<<<<<< HEAD
       role: role || 'FARMER', // Default role
       assignedAsc: assignedAsc || null,
       specialization: specialization || null
-=======
-      role: role || 'FARMER' // Default role
->>>>>>> 9b47020 (solved)
     });
 
     if (user) {
@@ -70,11 +58,8 @@ router.post("/register", async (req, res) => {
         email: user.email,
         nic: user.nic,
         role: user.role,
-<<<<<<< HEAD
         assignedAsc: user.assignedAsc,
         specialization: user.specialization,
-=======
->>>>>>> 9b47020 (solved)
         token: generateToken(user.id),
       });
     } else {
@@ -93,11 +78,7 @@ router.post("/login", async (req, res) => {
 
   try {
     // Check for user email
-<<<<<<< HEAD
     const user = await User.findOne({ email }).populate('assignedAsc', 'name district');
-=======
-    const user = await User.findOne({ email });
->>>>>>> 9b47020 (solved)
 
     if (user && (await bcrypt.compare(password, user.password))) {
       res.json({
@@ -105,11 +86,8 @@ router.post("/login", async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
-<<<<<<< HEAD
         assignedAsc: user.assignedAsc,
         specialization: user.specialization,
-=======
->>>>>>> 9b47020 (solved)
         token: generateToken(user.id),
       });
     } else {
@@ -124,7 +102,6 @@ router.post("/login", async (req, res) => {
 // @route   GET /api/auth/me
 // @access  Private
 router.get("/me", protect, async (req, res) => {
-<<<<<<< HEAD
   const user = await User.findById(req.user._id).select('-password').populate('assignedAsc', 'name district');
   res.json(user);
 });
@@ -152,9 +129,6 @@ router.put("/update-asc", protect, async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-=======
-  res.json(req.user);
->>>>>>> 9b47020 (solved)
 });
 
 // TEMP: create admin

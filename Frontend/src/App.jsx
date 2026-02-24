@@ -14,15 +14,12 @@ import RegisterCrop from './pages/RegisterCrop';
 import FinancialAssistance from './pages/FinancialAssistance';
 import MachineryService from './pages/MachineryService';
 import AgriculturalProducts from './pages/AgriculturalProducts';
-<<<<<<< HEAD
 import FinancialDashboard from './pages/FinancialDashboard';
 import CropDashboard from './pages/CropDashboard';
 import ProductDashboard from './pages/ProductDashboard';
 import MachineryDashboard from './pages/MachineryDashboard';
 import ASCDashboard from './pages/ASCDashboard';
 import MyCrops from './pages/MyCrops';
-=======
->>>>>>> 9b47020 (solved)
 import './App.css';
 
 function App() {
@@ -45,7 +42,6 @@ function App() {
             {/* Farmer routes */}
             <Route path="/farmer-dashboard" element={<ProtectedRoute><FarmerDashboard /></ProtectedRoute>} />
             <Route path="/farmer/register-crop" element={<ProtectedRoute><RegisterCrop /></ProtectedRoute>} />
-<<<<<<< HEAD
             <Route path="/farmer/my-crops" element={<ProtectedRoute><MyCrops /></ProtectedRoute>} />
             <Route path="/farmer/financial-aid" element={<ProtectedRoute><FinancialAssistance /></ProtectedRoute>} />
             <Route path="/farmer/machinery" element={<ProtectedRoute><MachineryService /></ProtectedRoute>} />
@@ -57,11 +53,6 @@ function App() {
             <Route path="/product-dashboard" element={<ProtectedRoute><ProductDashboard /></ProtectedRoute>} />
             <Route path="/machinery-dashboard" element={<ProtectedRoute><MachineryDashboard /></ProtectedRoute>} />
             <Route path="/asc-dashboard" element={<ProtectedRoute><ASCDashboard /></ProtectedRoute>} />
-=======
-            <Route path="/farmer/financial-aid" element={<ProtectedRoute><FinancialAssistance /></ProtectedRoute>} />
-            <Route path="/farmer/machinery" element={<ProtectedRoute><MachineryService /></ProtectedRoute>} />
-            <Route path="/farmer/products" element={<ProtectedRoute><AgriculturalProducts /></ProtectedRoute>} />
->>>>>>> 9b47020 (solved)
           </Routes>
         </Router>
       </LanguageProvider>

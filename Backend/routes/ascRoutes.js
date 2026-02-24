@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ASC = require('../models/ASC');
+const User = require('../models/User');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 // @desc    Get all ASCs
@@ -8,16 +9,12 @@ const { protect, authorize } = require('../middleware/authMiddleware');
 // @access  Public (or Protected based on requirement, usually public for selection)
 router.get('/', async (req, res) => {
     try {
-<<<<<<< HEAD
         const ascs = await ASC.find()
             .populate({
                 path: 'assignedOfficers',
                 select: 'name email role nic'
             })
             .sort({ district: 1, name: 1 });
-=======
-        const ascs = await ASC.find().sort({ district: 1, name: 1 });
->>>>>>> 9b47020 (solved)
         res.status(200).json(ascs);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -34,6 +31,36 @@ router.get('/:id', async (req, res) => {
             return res.status(404).json({ message: 'ASC not found' });
         }
         res.status(200).json(asc);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// @desc    Get all staff assigned to an ASC center
+// @route   GET /api/ascs/:id/staff
+// @access  Private (Officer/Admin)
+router.get('/:id/staff', protect, async (req, res) => {
+    try {
+        const staff = await User.find({
+            assignedAsc: req.params.id,
+            role: { $ne: 'FARMER' }
+        }).select('-password');
+        res.status(200).json(staff);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// @desc    Get all farmers registered under an ASC center
+// @route   GET /api/ascs/:id/farmers
+// @access  Private (Officer/Admin)
+router.get('/:id/farmers', protect, async (req, res) => {
+    try {
+        const farmers = await User.find({
+            assignedAsc: req.params.id,
+            role: 'FARMER'
+        }).select('-password');
+        res.status(200).json(farmers);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

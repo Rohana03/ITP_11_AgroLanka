@@ -1,27 +1,18 @@
 .admin-dashboard {
     min-height: 100vh;
-<<<<<<< HEAD
     background-color: #f1f5f9;
-=======
-    background-color: #f8fafc;
->>>>>>> 9b47020 (solved)
 }
 
 .dashboard-container {
     max-width: 1200px;
     margin: 0 auto;
-<<<<<<< HEAD
     padding: 32px 24px;
-=======
-    padding: 40px 24px;
->>>>>>> 9b47020 (solved)
 }
 
 .dashboard-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-<<<<<<< HEAD
     margin-bottom: 32px;
     background: #fff;
     padding: 24px 32px;
@@ -111,62 +102,10 @@
 }
 
 .role-admin {
-=======
-    margin-bottom: 40px;
-    background: #fff;
-    padding: 24px;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.header-left h1 {
-    font-size: 1.8rem;
-    color: #1e293b;
-    margin-bottom: 8px;
-}
-
-.role-badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 50px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.role-admin {
-    background-color: #fee2e2;
-    color: #991b1b;
-}
-
-.role-farmer {
->>>>>>> 9b47020 (solved)
     background-color: #dcfce7;
     color: #166534;
 }
 
-<<<<<<< HEAD
-=======
-.role-asc_officer,
-.role-store_officer {
-    background-color: #e0f2fe;
-    color: #075985;
-}
-
-.dashboard-section {
-    margin-bottom: 40px;
-}
-
-.dashboard-section h2 {
-    font-size: 1.5rem;
-    color: #334155;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #e2e8f0;
-}
-
->>>>>>> 9b47020 (solved)
 .action-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -175,7 +114,6 @@
 
 .action-card {
     background: #fff;
-<<<<<<< HEAD
     padding: 32px;
     border-radius: 20px;
     border: 1px solid #e2e8f0;
@@ -194,23 +132,10 @@
 .card-icon {
     font-size: 2.5rem;
     margin-bottom: 20px;
-=======
-    padding: 24px;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
-    border: 1px solid #e2e8f0;
-}
-
-.action-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
->>>>>>> 9b47020 (solved)
 }
 
 .action-card h3 {
     font-size: 1.25rem;
-<<<<<<< HEAD
     font-weight: 700;
     color: #0f172a;
     margin-bottom: 12px;
@@ -260,30 +185,3 @@
     background: #2563eb;
     color: #fff;
 }
-=======
-    color: #0f172a;
-    margin-bottom: 8px;
-}
-
-.action-card p {
-    color: #64748b;
-    margin-bottom: 20px;
-    font-size: 0.95rem;
-}
-
-.btn-sm {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-    background-color: #f1f5f9;
-    color: #334155;
-    border-radius: 6px;
-    font-weight: 600;
-    width: 100%;
-    transition: background-color 0.2s;
-}
-
-.btn-sm:hover {
-    background-color: #e2e8f0;
-    color: #0f172a;
-}
->>>>>>> 9b47020 (solved)

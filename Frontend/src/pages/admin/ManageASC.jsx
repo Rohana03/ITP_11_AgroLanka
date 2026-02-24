@@ -4,25 +4,17 @@ import Navbar from '../../components/Navbar';
 import '../AdminDashboard.css'; // Reusing dashboard styles for consistency
 
 const ManageASC = () => {
-<<<<<<< HEAD
     const { token } = useAuth();
-=======
-    useAuth();
->>>>>>> 9b47020 (solved)
     const [ascs, setAscs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterDistrict, setFilterDistrict] = useState('');
 
-<<<<<<< HEAD
     useEffect(() => {
         fetchASCs();
     }, []);
 
     const fetchASCs = async () => {
-=======
-    const fetchASCs = React.useCallback(async () => {
->>>>>>> 9b47020 (solved)
         try {
             const response = await fetch('http://localhost:5000/api/ascs');
             const data = await response.json();
@@ -32,18 +24,7 @@ const ManageASC = () => {
             console.error('Error fetching ASCs:', error);
             setLoading(false);
         }
-<<<<<<< HEAD
     };
-=======
-    }, []);
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            fetchASCs();
-        }, 0);
-        return () => clearTimeout(timer);
-    }, [fetchASCs]);
->>>>>>> 9b47020 (solved)
 
     // Get unique districts for filter
     const districts = [...new Set(ascs.map(asc => asc.district))].sort();
@@ -96,10 +77,7 @@ const ManageASC = () => {
                                     <th style={{ padding: '12px' }}>Code</th>
                                     <th style={{ padding: '12px' }}>Name</th>
                                     <th style={{ padding: '12px' }}>District</th>
-<<<<<<< HEAD
                                     <th style={{ padding: '12px' }}>Assigned Staff</th>
-=======
->>>>>>> 9b47020 (solved)
                                     <th style={{ padding: '12px' }}>Actions</th>
                                 </tr>
                             </thead>
@@ -111,7 +89,6 @@ const ManageASC = () => {
                                             <td style={{ padding: '12px' }}>{asc.name}</td>
                                             <td style={{ padding: '12px' }}>{asc.district}</td>
                                             <td style={{ padding: '12px' }}>
-<<<<<<< HEAD
                                                 {asc.assignedOfficers && asc.assignedOfficers.length > 0 ? (
                                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
                                                         {asc.assignedOfficers.map(off => (
@@ -133,19 +110,12 @@ const ManageASC = () => {
                                             </td>
                                             <td style={{ padding: '12px' }}>
                                                 <button className="btn-small" style={{ marginRight: '5px' }}>View</button>
-=======
-                                                <button className="btn-small" style={{ marginRight: '5px' }}>Edit</button>
->>>>>>> 9b47020 (solved)
                                             </td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-<<<<<<< HEAD
                                         <td colSpan="5" style={{ padding: '20px', textAlign: 'center' }}>No ASCs found matching criteria</td>
-=======
-                                        <td colSpan="4" style={{ padding: '20px', textAlign: 'center' }}>No ASCs found matching criteria</td>
->>>>>>> 9b47020 (solved)
                                     </tr>
                                 )}
                             </tbody>

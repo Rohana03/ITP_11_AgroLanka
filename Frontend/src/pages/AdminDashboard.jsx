@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
-=======
-import React from 'react';
->>>>>>> 9b47020 (solved)
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
@@ -11,7 +7,6 @@ import './AdminDashboard.css';
 const AdminDashboard = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
-<<<<<<< HEAD
     const [stats, setStats] = useState({ ascCount: 0, officerCount: 0 });
 
     useEffect(() => {
@@ -38,8 +33,6 @@ const AdminDashboard = () => {
             console.error('Error fetching dashboard stats:', error);
         }
     };
-=======
->>>>>>> 9b47020 (solved)
 
     if (!user) {
         return (
@@ -63,7 +56,6 @@ const AdminDashboard = () => {
             <div className="dashboard-container">
                 <header className="dashboard-header">
                     <div className="header-left">
-<<<<<<< HEAD
                         <h1>Ministry of Agriculture Control Panel</h1>
                         <p className="welcome-text">Welcome back, <strong>{user.name}</strong></p>
                     </div>
@@ -137,79 +129,6 @@ const AdminDashboard = () => {
                         <div className="dashboard-section">
                             <h2>Portal Dashboard</h2>
                             <p>You are logged in as {user.role.replace('_', ' ')}</p>
-=======
-                        <h1>Welcome, {user.name}</h1>
-                        <span className={`role-badge role-${user.role.toLowerCase()}`}>
-                            {user.role.replace('_', ' ')}
-                        </span>
-                    </div>
-                    <button onClick={handleLogout} className="btn btn-outline">Logout</button>
-                </header>
-
-                <div className="dashboard-content">
-                    {/* Role-based content */}
-                    {user.role === 'ADMIN' && (
-                        <div className="dashboard-section">
-                            <h2>System Administration</h2>
-                            <div className="action-grid">
-                                <div className="action-card" onClick={() => navigate('/admin/ascs')}>
-                                    <h3>Manage ASCs</h3>
-                                    <p>View and manage Agrarian Service Centers.</p>
-                                    <button className="btn btn-sm">View Centers</button>
-                                </div>
-                                <div className="action-card" onClick={() => navigate('/admin/officers')}>
-                                    <h3>Officer Allocation</h3>
-                                    <p>Assign officers to specific ASCs.</p>
-                                    <button className="btn btn-sm">Manage Staff</button>
-                                </div>
-                                <div className="action-card">
-                                    <h3>Manage Users</h3>
-                                    <p>View, edit, and delete system users.</p>
-                                    <button className="btn btn-sm">Go to Users</button>
-                                </div>
-                                <div className="action-card">
-                                    <h3>System Settings</h3>
-                                    <p>Configure global application settings.</p>
-                                    <button className="btn btn-sm">Settings</button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {user.role === 'FARMER' && (
-                        <div className="dashboard-section">
-                            <h2>Farmer Portal</h2>
-                            <div className="action-grid">
-                                <div className="action-card">
-                                    <h3>My Crops</h3>
-                                    <p>Manage your crop listings and harvest data.</p>
-                                    <button className="btn btn-sm">View Crops</button>
-                                </div>
-                                <div className="action-card">
-                                    <h3>Market Prices</h3>
-                                    <p>Check current market prices for vegetables.</p>
-                                    <button className="btn btn-sm">View Prices</button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {(user.role === 'ASC_OFFICER' || user.role === 'STORE_OFFICER') && (
-                        <div className="dashboard-section">
-                            <h2>Officer Portal</h2>
-                            <div className="action-grid">
-                                <div className="action-card">
-                                    <h3>Pending Approvals</h3>
-                                    <p>Review farmer requests and listings.</p>
-                                    <button className="btn btn-sm">Review</button>
-                                </div>
-                                <div className="action-card">
-                                    <h3>Reports</h3>
-                                    <p>Generate regional agricultural reports.</p>
-                                    <button className="btn btn-sm">Reports</button>
-                                </div>
-                            </div>
->>>>>>> 9b47020 (solved)
                         </div>
                     )}
                 </div>

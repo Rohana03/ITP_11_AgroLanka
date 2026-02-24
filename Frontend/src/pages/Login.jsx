@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-<<<<<<< HEAD
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-=======
-import { useNavigate, Link } from 'react-router-dom';
->>>>>>> 9b47020 (solved)
 import Navbar from '../components/Navbar';
 import './Auth.css';
 
@@ -15,16 +11,12 @@ const Login = () => {
     const [error, setError] = useState('');
     const { login } = useAuth();
     const navigate = useNavigate();
-<<<<<<< HEAD
     const location = useLocation();
     const successMessage = location.state?.message;
-=======
->>>>>>> 9b47020 (solved)
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-<<<<<<< HEAD
         console.log('🔑 Submitting login form...');
         const res = await login(email, password);
         console.log('📋 Login result:', res);
@@ -55,19 +47,6 @@ const Login = () => {
             }
         } else {
             console.error('❌ Login failed:', res.message);
-=======
-        const res = await login(email, password);
-        if (res.success) {
-            // Check role and redirect (roles are uppercase in backend)
-            if (res.user && res.user.role === 'FARMER') {
-                navigate('/farmer-dashboard');
-            } else if (res.user && res.user.role === 'ADMIN') {
-                navigate('/admin');
-            } else {
-                navigate('/'); // Default fallback
-            }
-        } else {
->>>>>>> 9b47020 (solved)
             setError(res.message);
         }
     };
@@ -78,10 +57,7 @@ const Login = () => {
             <div className="auth-container">
                 <div className="auth-card">
                     <h2>Login to AgroLanka</h2>
-<<<<<<< HEAD
                     {successMessage && <div className="alert-success" style={{ backgroundColor: '#d4edda', color: '#155724', padding: '10px', borderRadius: '4px', marginBottom: '15px', textAlign: 'center' }}>{successMessage}</div>}
-=======
->>>>>>> 9b47020 (solved)
                     {error && <div className="alert-error">{error}</div>}
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">

@@ -3,11 +3,7 @@ import { translations } from '../utils/translations';
 
 const LanguageContext = createContext();
 
-<<<<<<< HEAD
 export const LanguageProvider = ({ children }) => {
-=======
-const LanguageProvider = ({ children }) => {
->>>>>>> 9b47020 (solved)
     const [language, setLanguage] = useState('en'); // Default to English
 
     const switchLanguage = (lang) => {
@@ -32,10 +28,4 @@ const LanguageProvider = ({ children }) => {
     );
 };
 
-<<<<<<< HEAD
 export const useLanguage = () => useContext(LanguageContext);
-=======
-const useLanguage = () => useContext(LanguageContext);
-
-export { LanguageProvider, useLanguage };
->>>>>>> 9b47020 (solved)

@@ -39,6 +39,22 @@ const loanSchema = new mongoose.Schema({
     termsAccepted: {
         type: Boolean,
         required: true
+    },
+    totalPaid: {
+        type: Number,
+        default: 0
+    },
+    totalPayable: {
+        type: Number
+    },
+    monthlyInstallment: {
+        type: Number
+    },
+    nextPaymentDate: {
+        type: Date
+    },
+    approvedDate: {
+        type: Date
     }
 }, { timestamps: true });
 
