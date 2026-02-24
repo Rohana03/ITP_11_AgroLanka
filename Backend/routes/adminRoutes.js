@@ -10,7 +10,11 @@ const { protect, authorize } = require('../middleware/authMiddleware');
 router.get('/officers', protect, authorize('ADMIN'), async (req, res) => {
     try {
         const officers = await User.find({
+<<<<<<< HEAD
             role: { $in: ['ASC_OFFICER', 'STORE_OFFICER', 'FINANCIAL_OFFICER', 'CROP_OFFICER', 'PRODUCT_MANAGER', 'MACHINERY_OFFICER'] }
+=======
+            role: { $in: ['ASC_OFFICER', 'STORE_OFFICER'] }
+>>>>>>> 9b47020 (solved)
         })
             .select('-password')
             .populate('assignedAsc', 'name code district');
@@ -34,7 +38,11 @@ router.put('/assign-officer', protect, authorize('ADMIN'), async (req, res) => {
         }
 
         // Verify role
+<<<<<<< HEAD
         if (!['ASC_OFFICER', 'STORE_OFFICER', 'FINANCIAL_OFFICER', 'CROP_OFFICER', 'PRODUCT_MANAGER', 'MACHINERY_OFFICER'].includes(user.role)) {
+=======
+        if (!['ASC_OFFICER', 'STORE_OFFICER'].includes(user.role)) {
+>>>>>>> 9b47020 (solved)
             return res.status(400).json({ message: 'User is not an officer' });
         }
 

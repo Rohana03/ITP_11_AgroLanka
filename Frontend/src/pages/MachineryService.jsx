@@ -5,7 +5,11 @@ import Navbar from '../components/Navbar';
 import './FarmerPages.css';
 
 const MachineryService = () => {
+<<<<<<< HEAD
     const { user } = useAuth();
+=======
+    useAuth();
+>>>>>>> 9b47020 (solved)
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         serviceType: '',

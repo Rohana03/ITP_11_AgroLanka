@@ -9,6 +9,7 @@ const ManageOfficers = () => {
     const [ascs, setAscs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState('');
+<<<<<<< HEAD
     const [error, setError] = useState('');
 
     // Filter state
@@ -21,6 +22,10 @@ const ManageOfficers = () => {
     }, []);
 
     const fetchData = async () => {
+=======
+
+    const fetchData = React.useCallback(async () => {
+>>>>>>> 9b47020 (solved)
         try {
             const [officersRes, ascsRes] = await Promise.all([
                 fetch('http://localhost:5000/api/admin/officers', {
@@ -39,7 +44,18 @@ const ManageOfficers = () => {
             console.error('Error fetching data:', error);
             setLoading(false);
         }
+<<<<<<< HEAD
     };
+=======
+    }, [token]);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchData();
+        }, 0);
+        return () => clearTimeout(timer);
+    }, [fetchData]);
+>>>>>>> 9b47020 (solved)
 
     const handleAssign = async (userId, ascId) => {
         try {
@@ -59,7 +75,11 @@ const ManageOfficers = () => {
                 setOfficers(officers.map(off =>
                     off._id === userId ? { ...off, assignedAsc: data.assignedAsc } : off
                 ));
+<<<<<<< HEAD
                 setMessage(`Staff reallocation successful!`);
+=======
+                setMessage(`Officer assigned successfully!`);
+>>>>>>> 9b47020 (solved)
                 setTimeout(() => setMessage(''), 3000);
             } else {
                 alert(data.message);
@@ -73,6 +93,7 @@ const ManageOfficers = () => {
     return (
         <div className="admin-dashboard">
             <Navbar />
+<<<<<<< HEAD
             <div className="dashboard-container">
                 <header className="dashboard-header">
                     <div className="header-left">
@@ -209,6 +230,76 @@ const ManageOfficers = () => {
                         </div>
                     </div>
                 </div>
+=======
+            <div className="dashboard-content">
+                <header className="dashboard-header">
+                    <h1>Officer Allocation</h1>
+                    <p>Assign Agricultural Officers to Service Centers</p>
+                </header>
+
+                {message && <div className="alert-success" style={{ padding: '10px', backgroundColor: '#d4edda', color: '#155724', marginBottom: '1rem', borderRadius: '4px' }}>{message}</div>}
+
+                {loading ? (
+                    <p>Loading Data...</p>
+                ) : (
+                    <div className="data-table-container">
+                        <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                                <tr style={{ backgroundColor: '#2c3e50', color: 'white', textAlign: 'left' }}>
+                                    <th style={{ padding: '12px' }}>Name</th>
+                                    <th style={{ padding: '12px' }}>Email</th>
+                                    <th style={{ padding: '12px' }}>Role</th>
+                                    <th style={{ padding: '12px' }}>Current Assignment</th>
+                                    <th style={{ padding: '12px' }}>Assign To</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {officers.length > 0 ? (
+                                    officers.map(officer => (
+                                        <tr key={officer._id} style={{ borderBottom: '1px solid #ddd' }}>
+                                            <td style={{ padding: '12px' }}>{officer.name}</td>
+                                            <td style={{ padding: '12px' }}>{officer.email}</td>
+                                            <td style={{ padding: '12px' }}>
+                                                <span className={`badge badge-${officer.role.toLowerCase()}`} style={{ padding: '4px 8px', borderRadius: '4px', backgroundColor: '#e2e6ea' }}>
+                                                    {officer.role.replace('_', ' ')}
+                                                </span>
+                                            </td>
+                                            <td style={{ padding: '12px' }}>
+                                                {officer.assignedAsc ? (
+                                                    <span style={{ fontWeight: 'bold', color: '#27ae60' }}>
+                                                        {officer.assignedAsc.name} ({officer.assignedAsc.district})
+                                                    </span>
+                                                ) : (
+                                                    <span style={{ color: '#e74c3c' }}>Unassigned</span>
+                                                )}
+                                            </td>
+                                            <td style={{ padding: '12px' }}>
+                                                <select
+                                                    className="form-control"
+                                                    value={officer.assignedAsc?._id || ''}
+                                                    onChange={(e) => handleAssign(officer._id, e.target.value)}
+                                                    style={{ maxWidth: '200px' }}
+                                                >
+                                                    <option value="">Select ASC...</option>
+                                                    {ascs.map(asc => (
+                                                        <option key={asc._id} value={asc._id}>
+                                                            {asc.name} - {asc.district}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="5" style={{ padding: '20px', textAlign: 'center' }}>No Officers found. Register some users with role "ASC OFFICER" first.</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+>>>>>>> 9b47020 (solved)
             </div>
         </div>
     );

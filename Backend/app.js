@@ -35,6 +35,7 @@ const cors = require("cors");
 
 const app = express();
 
+<<<<<<< HEAD
 // Enable CORS for all routes (or specific origin)
 app.use(cors({
   origin: ["http://localhost:5173", "http://localhost:5174"],
@@ -44,6 +45,12 @@ app.use(cors({
 // Middleware for parsing JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+=======
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+>>>>>>> 9b47020 (solved)
 
 console.log("MONGO_URI →", process.env.MONGO_URI);
 console.log("PORT →", process.env.PORT);
@@ -71,3 +78,13 @@ mongoose
     });
   })
   .catch((err) => console.error("❌ DB error:", err));
+<<<<<<< HEAD
+=======
+
+// Routes
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/ascs", require("./routes/ascRoutes"));
+app.use("/api/admin", require("./routes/adminRoutes"));
+
+const PORT = process.env.PORT || 5000;
+>>>>>>> 9b47020 (solved)

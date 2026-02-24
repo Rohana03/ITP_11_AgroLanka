@@ -11,15 +11,19 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [role, setRole] = useState('FARMER');
+<<<<<<< HEAD
     const [assignedAsc, setAssignedAsc] = useState('');
     const [selectedDistrict, setSelectedDistrict] = useState('');
     const [specialization, setSpecialization] = useState('');
     const [ascs, setAscs] = useState([]);
     const [districts, setDistricts] = useState([]);
+=======
+>>>>>>> 9b47020 (solved)
     const [error, setError] = useState('');
     const { register } = useAuth();
     const navigate = useNavigate();
 
+<<<<<<< HEAD
     React.useEffect(() => {
         const fetchAscs = async () => {
             try {
@@ -48,6 +52,22 @@ const Register = () => {
             navigate('/login', { state: { message: 'Registration successful! Please login with your credentials.' } });
         } else {
             console.error('❌ Registration failed:', res.message);
+=======
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        const res = await register(name, email, nic, password, role);
+        if (res.success) {
+            // Redirect based on role
+            if (role === 'FARMER') {
+                navigate('/farmer-dashboard');
+            } else if (role === 'ADMIN') {
+                navigate('/admin');
+            } else {
+                navigate('/');
+            }
+        } else {
+>>>>>>> 9b47020 (solved)
             setError(res.message);
         }
     };
@@ -112,6 +132,7 @@ const Register = () => {
                                 <option value="FARMER">Farmer</option>
                                 <option value="ASC_OFFICER">ASC Officer</option>
                                 <option value="STORE_OFFICER">Store Officer</option>
+<<<<<<< HEAD
                                 <option value="FINANCIAL_OFFICER">Financial Officer</option>
                                 <option value="CROP_OFFICER">Crop Officer</option>
                                 <option value="PRODUCT_MANAGER">Product Seller/Buyer</option>
@@ -177,6 +198,11 @@ const Register = () => {
                                 </select>
                             </div>
                         )}
+=======
+                                {/* Admin registration should typically be restricted, but keeping here for demo if needed */}
+                            </select>
+                        </div>
+>>>>>>> 9b47020 (solved)
                         <button type="submit" className="btn btn-primary btn-block">Sign Up</button>
                     </form>
                     <p className="auth-footer">

@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar';
 import './FarmerDashboard.css'; // We will create this css file next
 
 const FarmerDashboard = () => {
+<<<<<<< HEAD
     const { user, updateUser } = useAuth();
     const navigate = useNavigate();
     const [ascs, setAscs] = React.useState([]);
@@ -54,6 +55,12 @@ const FarmerDashboard = () => {
         }
     };
 
+=======
+    const { user } = useAuth();
+    const navigate = useNavigate();
+
+    // Fallback if user is null (shouldn't happen if protected, but good for safety)
+>>>>>>> 9b47020 (solved)
     if (!user) {
         return <div>Loading...</div>;
     }
@@ -63,6 +70,7 @@ const FarmerDashboard = () => {
             <Navbar />
             <div className="dashboard-container">
                 <header className="dashboard-header">
+<<<<<<< HEAD
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
                             <h1>Welcome, {user.name || 'Farmer'}! 🌾</h1>
@@ -139,6 +147,10 @@ const FarmerDashboard = () => {
                             )}
                         </div>
                     </div>
+=======
+                    <h1>Welcome, {user.name || 'Farmer'}! 🌾</h1>
+                    <p>Manage your agricultural activities efficiently.</p>
+>>>>>>> 9b47020 (solved)
                 </header>
 
                 <div className="dashboard-grid">

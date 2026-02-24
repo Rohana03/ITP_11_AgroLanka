@@ -10,16 +10,22 @@ import { useAuth } from '../context/AuthContext';
 const PublicRoute = ({ children }) => {
     const { user, loading } = useAuth();
 
+<<<<<<< HEAD
     console.log('🔓 PublicRoute - Loading:', loading, 'User:', user);
 
     // Show nothing while checking authentication status
     if (loading) {
         console.log('⏳ PublicRoute - Still loading...');
+=======
+    // Show nothing while checking authentication status
+    if (loading) {
+>>>>>>> 9b47020 (solved)
         return <div>Loading...</div>;
     }
 
     // If user is logged in, redirect to their dashboard based on role
     if (user) {
+<<<<<<< HEAD
         console.log('👤 PublicRoute - User logged in, role:', user.role);
         if (user.role === 'FARMER') {
             console.log('🚜 PublicRoute - Redirecting to farmer dashboard');
@@ -48,6 +54,17 @@ const PublicRoute = ({ children }) => {
     }
 
     console.log('✅ PublicRoute - Rendering public page');
+=======
+        if (user.role === 'FARMER') {
+            return <Navigate to="/farmer-dashboard" replace />;
+        } else if (user.role === 'ADMIN') {
+            return <Navigate to="/admin" replace />;
+        } else {
+            return <Navigate to="/" replace />;
+        }
+    }
+
+>>>>>>> 9b47020 (solved)
     // If not logged in, allow access to public page
     return children;
 };

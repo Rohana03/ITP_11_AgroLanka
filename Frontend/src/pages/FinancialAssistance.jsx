@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -12,12 +13,28 @@ const FinancialAssistance = () => {
     const [interestRate, setInterestRate] = useState(8);
     const [monthlyInstallment, setMonthlyInstallment] = useState(null);
     const [termsAccepted, setTermsAccepted] = useState(false);
+=======
+import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import Navbar from '../components/Navbar';
+import './FarmerPages.css';
+
+const FinancialAssistance = () => {
+    useAuth();
+    const navigate = useNavigate();
+    const [activeTab, setActiveTab] = useState('loan'); // 'loan' or 'compensation'
+>>>>>>> 9b47020 (solved)
 
     const [loanData, setLoanData] = useState({
         loanAmount: '',
         purpose: '',
         repaymentPeriod: '',
         collateral: '',
+<<<<<<< HEAD
+=======
+        monthlyIncome: ''
+>>>>>>> 9b47020 (solved)
     });
 
     const [compensationData, setCompensationData] = useState({
@@ -32,6 +49,7 @@ const FinancialAssistance = () => {
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
 
+<<<<<<< HEAD
     useEffect(() => {
         fetchInterestRate();
     }, []);
@@ -76,6 +94,13 @@ const FinancialAssistance = () => {
         // EMI formula: [P x r x (1+r)^n]/[(1+r)^n-1]
         const emi = (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
         setMonthlyInstallment(emi.toFixed(2));
+=======
+    const handleLoanChange = (e) => {
+        setLoanData({
+            ...loanData,
+            [e.target.name]: e.target.value
+        });
+>>>>>>> 9b47020 (solved)
     };
 
     const handleCompensationChange = (e) => {
@@ -96,6 +121,7 @@ const FinancialAssistance = () => {
         e.preventDefault();
         setError('');
         setSuccess('');
+<<<<<<< HEAD
 
         if (!termsAccepted) {
             setError('Please accept the terms and conditions to proceed.');
@@ -117,6 +143,10 @@ const FinancialAssistance = () => {
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to submit loan application.');
         }
+=======
+        console.log('Loan application data:', loanData);
+        setSuccess('Loan application submitted successfully!');
+>>>>>>> 9b47020 (solved)
     };
 
     const handleCompensationSubmit = async (e) => {
@@ -168,6 +198,7 @@ const FinancialAssistance = () => {
                             <div className="form-row">
                                 <div className="form-group">
                                     <label>Loan Amount (LKR) *</label>
+<<<<<<< HEAD
                                     <select
                                         name="loanAmount"
                                         value={loanData.loanAmount}
@@ -197,10 +228,32 @@ const FinancialAssistance = () => {
                                         <option value="18">18 Months</option>
                                         <option value="36">36 Months</option>
                                         <option value="48">48 Months</option>
+=======
+                                    <input
+                                        type="number"
+                                        name="loanAmount"
+                                        value={loanData.loanAmount}
+                                        onChange={handleLoanChange}
+                                        placeholder="e.g., 500000"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Repayment Period *</label>
+                                    <select name="repaymentPeriod" value={loanData.repaymentPeriod} onChange={handleLoanChange} required>
+                                        <option value="">Select period</option>
+                                        <option value="6months">6 Months</option>
+                                        <option value="1year">1 Year</option>
+                                        <option value="2years">2 Years</option>
+                                        <option value="3years">3 Years</option>
+                                        <option value="5years">5 Years</option>
+>>>>>>> 9b47020 (solved)
                                     </select>
                                 </div>
                             </div>
 
+<<<<<<< HEAD
                             <div className="form-row">
                                 <div className="form-group">
                                     <label>Current Interest Rate (%)</label>
@@ -224,6 +277,31 @@ const FinancialAssistance = () => {
                                         <option value="other">Other</option>
                                     </select>
                                 </div>
+=======
+                            <div className="form-group">
+                                <label>Purpose of Loan *</label>
+                                <select name="purpose" value={loanData.purpose} onChange={handleLoanChange} required>
+                                    <option value="">Select purpose</option>
+                                    <option value="seeds">Purchase Seeds</option>
+                                    <option value="fertilizer">Purchase Fertilizer</option>
+                                    <option value="equipment">Purchase Equipment</option>
+                                    <option value="land">Land Development</option>
+                                    <option value="livestock">Livestock Purchase</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Monthly Income (LKR) *</label>
+                                <input
+                                    type="number"
+                                    name="monthlyIncome"
+                                    value={loanData.monthlyIncome}
+                                    onChange={handleLoanChange}
+                                    placeholder="e.g., 50000"
+                                    required
+                                />
+>>>>>>> 9b47020 (solved)
                             </div>
 
                             <div className="form-group">
@@ -233,11 +311,16 @@ const FinancialAssistance = () => {
                                     value={loanData.collateral}
                                     onChange={handleLoanChange}
                                     placeholder="Describe any assets you can provide as collateral"
+<<<<<<< HEAD
                                     rows="3"
+=======
+                                    rows="4"
+>>>>>>> 9b47020 (solved)
                                     required
                                 />
                             </div>
 
+<<<<<<< HEAD
                             <div className="calculation-section" style={{ margin: '20px 0', padding: '15px', backgroundColor: '#f0f9ff', borderRadius: '8px', border: '1px solid #bae6fd' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <div>
@@ -270,11 +353,17 @@ const FinancialAssistance = () => {
                                 </label>
                             </div>
 
+=======
+>>>>>>> 9b47020 (solved)
                             <div className="form-actions">
                                 <button type="button" className="btn btn-outline" onClick={() => navigate('/farmer-dashboard')}>
                                     Cancel
                                 </button>
+<<<<<<< HEAD
                                 <button type="submit" className="btn btn-primary" disabled={!termsAccepted}>
+=======
+                                <button type="submit" className="btn btn-primary">
+>>>>>>> 9b47020 (solved)
                                     Submit Loan Application
                                 </button>
                             </div>
