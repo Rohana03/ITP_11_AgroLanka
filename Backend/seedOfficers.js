@@ -15,13 +15,6 @@ const officers = [
         role: "ASC_OFFICER",
     },
     {
-        name: "Sunil Silva",
-        email: "sunil.store@agrolanka.com",
-        nic: "881234567V",
-        password: "Officer123",
-        role: "STORE_OFFICER",
-    },
-    {
         name: "Nimali Fernando",
         email: "nimali.asc@agrolanka.com",
         nic: "901234567V",
@@ -115,7 +108,7 @@ const seedOfficers = async () => {
         console.log("✅ MongoDB Connected");
 
         // Clear existing officers except admin
-        await User.deleteMany({ role: { $in: ["ASC_OFFICER", "STORE_OFFICER", "CROP_OFFICER"] } });
+        await User.deleteMany({ role: { $in: ["ASC_OFFICER", "CROP_OFFICER"] } });
         console.log("🗑️  Previous officers deleted");
 
         const salt = await bcrypt.genSalt(10);

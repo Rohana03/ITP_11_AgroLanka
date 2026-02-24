@@ -6,26 +6,17 @@ import './FarmerDashboard.css'; // Reusing styles for consistency
 
 const FinancialDashboard = () => {
     const { user, token } = useAuth();
-<<<<<<< HEAD
     const [activeTab, setActiveTab] = useState('loans'); // 'loans', 'compensation', or 'repayments'
-=======
-    const [activeTab, setActiveTab] = useState('loans'); // 'loans' or 'compensation'
->>>>>>> 81b5ac5a89c5d06098e5da377668e0fef5a84300
     const [interestRate, setInterestRate] = useState(8);
     const [newRate, setNewRate] = useState('');
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
     const [loans, setLoans] = useState([]);
     const [compensations, setCompensations] = useState([]);
-<<<<<<< HEAD
     const [repayments, setRepayments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedClaim, setSelectedClaim] = useState(null);
     const [selectedRepayment, setSelectedRepayment] = useState(null);
-=======
-    const [loading, setLoading] = useState(true);
-    const [selectedClaim, setSelectedClaim] = useState(null);
->>>>>>> 81b5ac5a89c5d06098e5da377668e0fef5a84300
     const [claimUpdateData, setClaimUpdateData] = useState({ status: '', estimatedLoss: '' });
 
     useEffect(() => {
@@ -37,11 +28,7 @@ const FinancialDashboard = () => {
 
     const fetchAllData = async () => {
         setLoading(true);
-<<<<<<< HEAD
         await Promise.all([fetchLoans(), fetchCompensations(), fetchRepayments()]);
-=======
-        await Promise.all([fetchLoans(), fetchCompensations()]);
->>>>>>> 81b5ac5a89c5d06098e5da377668e0fef5a84300
         setLoading(false);
     };
 
@@ -75,7 +62,6 @@ const FinancialDashboard = () => {
             setCompensations(res.data);
         } catch (err) {
             console.error("Error fetching compensations:", err);
-<<<<<<< HEAD
         }
     };
 
@@ -87,8 +73,6 @@ const FinancialDashboard = () => {
             setRepayments(res.data);
         } catch (err) {
             console.error("Error fetching repayments:", err);
-=======
->>>>>>> 81b5ac5a89c5d06098e5da377668e0fef5a84300
         }
     };
 
@@ -126,7 +110,6 @@ const FinancialDashboard = () => {
         }
     };
 
-<<<<<<< HEAD
     const handleRepaymentVerify = async (id, status, notes = '') => {
         try {
             await axios.patch(`http://localhost:5000/api/loans/repayments/${id}/verify`, {
@@ -143,8 +126,6 @@ const FinancialDashboard = () => {
         }
     };
 
-=======
->>>>>>> 81b5ac5a89c5d06098e5da377668e0fef5a84300
     const handleClaimClick = (claim) => {
         setSelectedClaim(claim);
         setClaimUpdateData({
@@ -189,24 +170,15 @@ const FinancialDashboard = () => {
                 </header>
 
                 {/* Tab Navigation */}
-<<<<<<< HEAD
                 <div className="tabs" style={{ marginBottom: '20px', display: 'flex', gap: '5px' }}>
                     <button
                         className={`tab ${activeTab === 'loans' ? 'active' : ''}`}
                         onClick={() => setActiveTab('loans')}
                         style={{ padding: '10px 20px', border: 'none', background: activeTab === 'loans' ? '#10b981' : '#f3f4f6', color: activeTab === 'loans' ? 'white' : '#374151', borderRadius: '5px 5px 0 0', cursor: 'pointer', fontWeight: 'bold' }}
-=======
-                <div className="tabs" style={{ marginBottom: '20px' }}>
-                    <button
-                        className={`tab ${activeTab === 'loans' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('loans')}
-                        style={{ padding: '10px 20px', border: 'none', background: activeTab === 'loans' ? '#10b981' : '#f3f4f6', color: activeTab === 'loans' ? 'white' : '#374151', borderRadius: '5px 5px 0 0', cursor: 'pointer', fontWeight: 'bold', marginRight: '5px' }}
->>>>>>> 81b5ac5a89c5d06098e5da377668e0fef5a84300
                     >
                         💳 Loan Applications
                     </button>
                     <button
-<<<<<<< HEAD
                         className={`tab ${activeTab === 'repayments' ? 'active' : ''}`}
                         onClick={() => setActiveTab('repayments')}
                         style={{ padding: '10px 20px', border: 'none', background: activeTab === 'repayments' ? '#10b981' : '#f3f4f6', color: activeTab === 'repayments' ? 'white' : '#374151', borderRadius: '5px 5px 0 0', cursor: 'pointer', fontWeight: 'bold' }}
@@ -214,8 +186,6 @@ const FinancialDashboard = () => {
                         🧾 Verified Repayments
                     </button>
                     <button
-=======
->>>>>>> 81b5ac5a89c5d06098e5da377668e0fef5a84300
                         className={`tab ${activeTab === 'compensation' ? 'active' : ''}`}
                         onClick={() => setActiveTab('compensation')}
                         style={{ padding: '10px 20px', border: 'none', background: activeTab === 'compensation' ? '#10b981' : '#f3f4f6', color: activeTab === 'compensation' ? 'white' : '#374151', borderRadius: '5px 5px 0 0', cursor: 'pointer', fontWeight: 'bold' }}
@@ -266,19 +236,14 @@ const FinancialDashboard = () => {
                                             <tr style={{ borderBottom: '2px solid #eee' }}>
                                                 <th style={{ padding: '10px' }}>Farmer</th>
                                                 <th style={{ padding: '10px' }}>Amount</th>
-<<<<<<< HEAD
                                                 <th style={{ padding: '10px' }}>Progress</th>
                                                 <th style={{ padding: '10px' }}>Next Due</th>
-=======
-                                                <th style={{ padding: '10px' }}>Period</th>
->>>>>>> 81b5ac5a89c5d06098e5da377668e0fef5a84300
                                                 <th style={{ padding: '10px' }}>Status</th>
                                                 <th style={{ padding: '10px' }}>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {loans.map(loan => (
-<<<<<<< HEAD
                                                 <tr key={loan._id} style={{
                                                     borderBottom: '1px solid #f9f9f9',
                                                     backgroundColor: loan.isOverdue ? '#fff1f2' : 'transparent'
@@ -299,15 +264,6 @@ const FinancialDashboard = () => {
                                                     <td style={{ padding: '10px' }}>
                                                         {loan.nextPaymentDate ? new Date(loan.nextPaymentDate).toLocaleDateString() : 'N/A'}
                                                     </td>
-=======
-                                                <tr key={loan._id} style={{ borderBottom: '1px solid #f9f9f9' }}>
-                                                    <td style={{ padding: '10px' }}>
-                                                        <strong>{loan.farmer?.name}</strong><br />
-                                                        <small>{loan.farmer?.nic}</small>
-                                                    </td>
-                                                    <td style={{ padding: '10px' }}>LKR {loan.amount?.toLocaleString()}</td>
-                                                    <td style={{ padding: '10px' }}>{loan.repaymentPeriod} m</td>
->>>>>>> 81b5ac5a89c5d06098e5da377668e0fef5a84300
                                                     <td style={{ padding: '10px' }}>
                                                         <span style={{
                                                             padding: '2px 8px',
@@ -344,7 +300,6 @@ const FinancialDashboard = () => {
                                 )}
                             </div>
                         </div>
-<<<<<<< HEAD
                     ) : activeTab === 'repayments' ? (
                         <div className="dashboard-card" style={{ gridColumn: 'span 2' }}>
                             <div className="card-icon">🧾</div>
@@ -404,8 +359,6 @@ const FinancialDashboard = () => {
                                 )}
                             </div>
                         </div>
-=======
->>>>>>> 81b5ac5a89c5d06098e5da377668e0fef5a84300
                     ) : (
                         <div className="dashboard-card" style={{ gridColumn: 'span 2' }}>
                             <div className="card-icon">📋</div>
@@ -471,7 +424,6 @@ const FinancialDashboard = () => {
                     )}
                 </div>
 
-<<<<<<< HEAD
                 {/* Repayment Verification Modal */}
                 {selectedRepayment && (
                     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
@@ -624,77 +576,6 @@ const FinancialDashboard = () => {
                         </div>
                     </div>
                 )}
-=======
-                {/* Claim Modal/Details Overlay */}
-                {selectedClaim && (
-                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
-                        <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '12px', width: '90%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-                                <h2>Process Compensation Claim</h2>
-                                <button onClick={() => setSelectedClaim(null)} style={{ border: 'none', background: 'none', fontSize: '24px', cursor: 'pointer' }}>&times;</button>
-                            </div>
-
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                                <div>
-                                    <h4>Claim Details</h4>
-                                    <p><strong>Farmer:</strong> {selectedClaim.farmer?.name} ({selectedClaim.farmer?.nic})</p>
-                                    <p><strong>Crop:</strong> {selectedClaim.crop?.cropType} - {selectedClaim.crop?.variety}</p>
-                                    <p><strong>Damage Type:</strong> {selectedClaim.damageType}</p>
-                                    <p><strong>Affected Area:</strong> {selectedClaim.affectedArea} Acres</p>
-                                    <p><strong>Description:</strong> {selectedClaim.damageDescription}</p>
-                                    <p><strong>Incident Date:</strong> {new Date(selectedClaim.incidentDate).toLocaleDateString()}</p>
-                                </div>
-                                <div>
-                                    <h4>Evidence Photos</h4>
-                                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                                        {selectedClaim.evidenceFiles?.length > 0 ? selectedClaim.evidenceFiles.map((file, idx) => (
-                                            <a key={idx} href={`http://localhost:5000/${file.replace(/\\/g, '/')}`} target="_blank" rel="noopener noreferrer">
-                                                <img
-                                                    src={`http://localhost:5000/${file.replace(/\\/g, '/')}`}
-                                                    alt="Evidence"
-                                                    style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #ddd' }}
-                                                />
-                                            </a>
-                                        )) : <p>No evidence files provided.</p>}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <form onSubmit={handleClaimUpdateSubmit} style={{ marginTop: '30px', padding: '20px', backgroundColor: '#f8fafc', borderRadius: '8px' }}>
-                                <h4 style={{ marginBottom: '15px' }}>Officer Assessment</h4>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                                    <div className="form-group">
-                                        <label>Estimated Loss (LKR) *</label>
-                                        <input
-                                            type="number"
-                                            value={claimUpdateData.estimatedLoss}
-                                            onChange={(e) => setClaimUpdateData({ ...claimUpdateData, estimatedLoss: e.target.value })}
-                                            required
-                                            style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #cbd5e1' }}
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Action/Status *</label>
-                                        <select
-                                            value={claimUpdateData.status}
-                                            onChange={(e) => setClaimUpdateData({ ...claimUpdateData, status: e.target.value })}
-                                            style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #cbd5e1' }}
-                                        >
-                                            <option value="PENDING">Keep Pending</option>
-                                            <option value="APPROVED">Approve Claim</option>
-                                            <option value="REJECTED">Reject Claim</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div style={{ marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                                    <button type="button" onClick={() => setSelectedClaim(null)} className="btn btn-outline">Cancel</button>
-                                    <button type="submit" className="btn btn-primary">Update Claim</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                )}
->>>>>>> 81b5ac5a89c5d06098e5da377668e0fef5a84300
             </div>
         </div>
     );

@@ -14,6 +14,7 @@ const Register = () => {
     const [assignedAsc, setAssignedAsc] = useState('');
     const [selectedDistrict, setSelectedDistrict] = useState('');
     const [specialization, setSpecialization] = useState('');
+    const [serviceDistricts, setServiceDistricts] = useState([]);
     const [ascs, setAscs] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [error, setError] = useState('');
@@ -39,9 +40,12 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
-        console.log('📝 Submitting registration form...', { role, assignedAsc, specialization });
-        const res = await register(name, email, nic, password, role, assignedAsc, specialization);
+        if (role === 'PRODUCT_MANAGER' && serviceDistricts.length === 0) {
+            setError('Please select at least one service district.');
+            return;
+        }
+        console.log('📝 Submitting registration form...', { role, assignedAsc, specialization, serviceDistricts });
+        const res = await register(name, email, nic, password, role, assignedAsc, specialization, serviceDistricts);
         console.log('📋 Registration result:', res);
         if (res.success) {
             console.log('✅ Registration successful, redirecting to login...');
@@ -111,7 +115,6 @@ const Register = () => {
                             <select value={role} onChange={(e) => setRole(e.target.value)}>
                                 <option value="FARMER">Farmer</option>
                                 <option value="ASC_OFFICER">ASC Officer</option>
-                                <option value="STORE_OFFICER">Store Officer</option>
                                 <option value="FINANCIAL_OFFICER">Financial Officer</option>
                                 <option value="CROP_OFFICER">Crop Officer</option>
                                 <option value="PRODUCT_MANAGER">Product Seller/Buyer</option>
@@ -120,7 +123,43 @@ const Register = () => {
                             </select>
                         </div>
 
-                        {(role === 'FARMER' || role === 'ASC_OFFICER' || role === 'STORE_OFFICER' || role === 'FINANCIAL_OFFICER' || role === 'CROP_OFFICER' || role === 'PRODUCT_MANAGER' || role === 'MACHINERY_OFFICER') && (
+                        {(role === 'PRODUCT_MANAGER') && (
+                            <div className="form-group">
+                                <label style={{ marginBottom: '10px', display: 'block' }}>Service Districts (Select all that apply) *</label>
+                                <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
+                                    gap: '10px',
+                                    padding: '15px',
+                                    backgroundColor: '#f9fafb',
+                                    borderRadius: '8px',
+                                    border: '1px solid #e5e7eb',
+                                    maxHeight: '200px',
+                                    overflowY: 'auto'
+                                }}>
+                                    {districts.map(district => (
+                                        <label key={district} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px' }}>
+                                            <input
+                                                type="checkbox"
+                                                value={district}
+                                                checked={serviceDistricts.includes(district)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setServiceDistricts([...serviceDistricts, district]);
+                                                    } else {
+                                                        setServiceDistricts(serviceDistricts.filter(d => d !== district));
+                                                    }
+                                                }}
+                                            />
+                                            {district}
+                                        </label>
+                                    ))}
+                                </div>
+                                {serviceDistricts.length === 0 && <small style={{ color: '#ef4444' }}>Please select at least one district.</small>}
+                            </div>
+                        )}
+
+                        {(role !== 'PRODUCT_MANAGER' && (role === 'FARMER' || role === 'ASC_OFFICER' || role === 'STORE_OFFICER' || role === 'FINANCIAL_OFFICER' || role === 'CROP_OFFICER' || role === 'MACHINERY_OFFICER')) && (
                             <>
                                 <div className="form-group">
                                     <label>District</label>

@@ -17,7 +17,7 @@ const generateToken = (id) => {
 // @route   POST /api/auth/register
 // @access  Public
 router.post("/register", async (req, res) => {
-  const { name, email, nic, password, role, assignedAsc, specialization } = req.body;
+  const { name, email, nic, password, role, assignedAsc, specialization, serviceDistricts } = req.body;
 
   try {
     if (!name || !email || !nic || !password) {
@@ -48,7 +48,8 @@ router.post("/register", async (req, res) => {
       password: hashedPassword,
       role: role || 'FARMER', // Default role
       assignedAsc: assignedAsc || null,
-      specialization: specialization || null
+      specialization: specialization || null,
+      serviceDistricts: serviceDistricts || []
     });
 
     if (user) {
@@ -60,6 +61,7 @@ router.post("/register", async (req, res) => {
         role: user.role,
         assignedAsc: user.assignedAsc,
         specialization: user.specialization,
+        serviceDistricts: user.serviceDistricts,
         token: generateToken(user.id),
       });
     } else {
@@ -88,6 +90,7 @@ router.post("/login", async (req, res) => {
         role: user.role,
         assignedAsc: user.assignedAsc,
         specialization: user.specialization,
+        serviceDistricts: user.serviceDistricts,
         token: generateToken(user.id),
       });
     } else {
@@ -104,6 +107,31 @@ router.post("/login", async (req, res) => {
 router.get("/me", protect, async (req, res) => {
   const user = await User.findById(req.user._id).select('-password').populate('assignedAsc', 'name district');
   res.json(user);
+});
+
+// @desc    Update user's service districts
+// @route   PUT /api/auth/update-districts
+// @access  Private
+router.put("/update-districts", protect, async (req, res) => {
+  try {
+    const { serviceDistricts } = req.body;
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.serviceDistricts = serviceDistricts || [];
+    await user.save();
+
+    const updatedUser = await User.findById(user._id)
+      .select("-password")
+      .populate("assignedAsc", "name district");
+
+    res.json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 // @desc    Update user's assigned ASC

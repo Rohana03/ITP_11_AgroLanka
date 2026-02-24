@@ -65,10 +65,8 @@ app.use("/api/admin", require("./routes/adminRoutes"));
 app.use("/api/crops", require("./routes/cropRoutes"));
 app.use("/api/loans", require("./routes/loanRoutes"));
 app.use("/api/compensation", require("./routes/compensationRoutes"));
-<<<<<<< HEAD
 app.use("/api/machinery", require("./routes/machineryRoutes"));
-=======
->>>>>>> 81b5ac5a89c5d06098e5da377668e0fef5a84300
+app.use("/api/products", require("./routes/productRoutes"));
 
 mongoose
   .connect(process.env.MONGO_URI)

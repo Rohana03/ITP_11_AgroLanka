@@ -39,8 +39,6 @@ const Login = () => {
                 navigate('/machinery-dashboard');
             } else if (res.user && res.user.role === 'ASC_OFFICER') {
                 navigate('/asc-dashboard');
-            } else if (res.user && res.user.role === 'STORE_OFFICER') {
-                navigate('/product-dashboard'); // Fallback to product dashboard
             } else {
                 console.log('🏠 Redirecting to home...');
                 navigate('/'); // Default fallback

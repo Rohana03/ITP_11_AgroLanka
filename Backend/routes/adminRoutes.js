@@ -10,7 +10,7 @@ const { protect, authorize } = require('../middleware/authMiddleware');
 router.get('/officers', protect, authorize('ADMIN'), async (req, res) => {
     try {
         const officers = await User.find({
-            role: { $in: ['ASC_OFFICER', 'STORE_OFFICER', 'FINANCIAL_OFFICER', 'CROP_OFFICER', 'PRODUCT_MANAGER', 'MACHINERY_OFFICER'] }
+            role: { $in: ['ASC_OFFICER', 'FINANCIAL_OFFICER', 'CROP_OFFICER', 'MACHINERY_OFFICER'] }
         })
             .select('-password')
             .populate('assignedAsc', 'name code district');
@@ -34,8 +34,8 @@ router.put('/assign-officer', protect, authorize('ADMIN'), async (req, res) => {
         }
 
         // Verify role
-        if (!['ASC_OFFICER', 'STORE_OFFICER', 'FINANCIAL_OFFICER', 'CROP_OFFICER', 'PRODUCT_MANAGER', 'MACHINERY_OFFICER'].includes(user.role)) {
-            return res.status(400).json({ message: 'User is not an officer' });
+        if (!['ASC_OFFICER', 'FINANCIAL_OFFICER', 'CROP_OFFICER', 'MACHINERY_OFFICER'].includes(user.role)) {
+            return res.status(400).json({ message: 'User is not an officer or cannot be managed by Admin' });
         }
 
         // If assigning to an ASC, verify ASC exists

@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["FARMER", "ASC_OFFICER", "STORE_OFFICER", "ADMIN", "FINANCIAL_OFFICER", "CROP_OFFICER", "PRODUCT_MANAGER", "MACHINERY_OFFICER"],
+      enum: ["FARMER", "ASC_OFFICER", "ADMIN", "FINANCIAL_OFFICER", "CROP_OFFICER", "PRODUCT_MANAGER", "MACHINERY_OFFICER"],
       default: "FARMER",
     },
     assignedAsc: {
@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema(
     specialization: {
       type: String,
       default: null
+    },
+    serviceDistricts: {
+      type: [String],
+      default: []
     },
   },
   { timestamps: true }

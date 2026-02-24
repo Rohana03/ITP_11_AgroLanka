@@ -18,6 +18,7 @@ import FinancialDashboard from './pages/FinancialDashboard';
 import CropDashboard from './pages/CropDashboard';
 import ProductDashboard from './pages/ProductDashboard';
 import MachineryDashboard from './pages/MachineryDashboard';
+import AdminProductReview from './pages/AdminProductReview';
 import ASCDashboard from './pages/ASCDashboard';
 import MyCrops from './pages/MyCrops';
 import './App.css';
@@ -38,6 +39,7 @@ function App() {
             <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/ascs" element={<ProtectedRoute><ManageASC /></ProtectedRoute>} />
             <Route path="/admin/officers" element={<ProtectedRoute><ManageOfficers /></ProtectedRoute>} />
+            <Route path="/admin/products/review" element={<ProtectedRoute><AdminProductReview /></ProtectedRoute>} />
 
             {/* Farmer routes */}
             <Route path="/farmer-dashboard" element={<ProtectedRoute><FarmerDashboard /></ProtectedRoute>} />

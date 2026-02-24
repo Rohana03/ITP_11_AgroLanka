@@ -37,8 +37,6 @@ const PublicRoute = ({ children }) => {
             return <Navigate to="/machinery-dashboard" replace />;
         } else if (user.role === 'ASC_OFFICER') {
             return <Navigate to="/asc-dashboard" replace />;
-        } else if (user.role === 'STORE_OFFICER') {
-            return <Navigate to="/product-dashboard" replace />;
         } else {
             console.log('🏠 PublicRoute - No specific dashboard for role, showing public page or home');
             // If they are logged in but role isn't handled, we might want to let them see the landing page

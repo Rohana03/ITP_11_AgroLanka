@@ -106,10 +106,8 @@ const ManageOfficers = () => {
                                 >
                                     <option value="ALL">All Roles</option>
                                     <option value="ASC_OFFICER">ASC Officer</option>
-                                    <option value="STORE_OFFICER">Store Officer</option>
                                     <option value="FINANCIAL_OFFICER">Financial Officer</option>
                                     <option value="CROP_OFFICER">Crop Officer</option>
-                                    <option value="PRODUCT_MANAGER">Product Manager</option>
                                     <option value="MACHINERY_OFFICER">Machinery Officer</option>
                                 </select>
                             </div>

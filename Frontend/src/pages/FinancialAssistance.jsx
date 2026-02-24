@@ -14,16 +14,12 @@ const FinancialAssistance = () => {
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [crops, setCrops] = useState([]);
     const [myClaims, setMyClaims] = useState([]);
-<<<<<<< HEAD
     const [myLoans, setMyLoans] = useState([]);
     const [loadingClaims, setLoadingClaims] = useState(false);
     const [loadingLoans, setLoadingLoans] = useState(false);
     const [selectedLoan, setSelectedLoan] = useState(null);
     const [repaymentAmount, setRepaymentAmount] = useState('');
     const [repaymentReceipt, setRepaymentReceipt] = useState(null);
-=======
-    const [loadingClaims, setLoadingClaims] = useState(false);
->>>>>>> 81b5ac5a89c5d06098e5da377668e0fef5a84300
 
     const [loanData, setLoanData] = useState({
         loanAmount: '',
@@ -49,10 +45,7 @@ const FinancialAssistance = () => {
         if (user && user.role === 'FARMER') {
             fetchCrops();
             fetchMyClaims();
-<<<<<<< HEAD
             fetchMyLoans();
-=======
->>>>>>> 81b5ac5a89c5d06098e5da377668e0fef5a84300
         }
     }, [user]);
 
@@ -61,10 +54,6 @@ const FinancialAssistance = () => {
             const res = await axios.get('http://localhost:5000/api/crops', {
                 headers: { Authorization: `Bearer ${token}` }
             });
-<<<<<<< HEAD
-=======
-            // Only show approved crops for compensation
->>>>>>> 81b5ac5a89c5d06098e5da377668e0fef5a84300
             const approvedCrops = res.data.filter(crop => crop.status === 'APPROVED');
             setCrops(approvedCrops);
         } catch (err) {
@@ -85,7 +74,6 @@ const FinancialAssistance = () => {
             setLoadingClaims(false);
         }
     };
-<<<<<<< HEAD
 
     const fetchMyLoans = async () => {
         try {
@@ -100,8 +88,6 @@ const FinancialAssistance = () => {
             setLoadingLoans(false);
         }
     };
-=======
->>>>>>> 81b5ac5a89c5d06098e5da377668e0fef5a84300
 
     const fetchInterestRate = async () => {
         try {
@@ -247,11 +233,7 @@ const FinancialAssistance = () => {
                 }
             }
 
-<<<<<<< HEAD
             await axios.post('http://localhost:5000/api/compensation', formData, {
-=======
-            const res = await axios.post('http://localhost:5000/api/compensation', formData, {
->>>>>>> 81b5ac5a89c5d06098e5da377668e0fef5a84300
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${token}`
@@ -259,11 +241,7 @@ const FinancialAssistance = () => {
             });
 
             setSuccess('Compensation claim submitted successfully!');
-<<<<<<< HEAD
             fetchMyClaims();
-=======
-            fetchMyClaims(); // Refresh history
->>>>>>> 81b5ac5a89c5d06098e5da377668e0fef5a84300
             setCompensationData({
                 crop: '',
                 damageType: '',
@@ -272,10 +250,6 @@ const FinancialAssistance = () => {
                 incidentDate: '',
                 evidenceFiles: null
             });
-<<<<<<< HEAD
-=======
-            // Reset file input manually if needed, or by re-rendering
->>>>>>> 81b5ac5a89c5d06098e5da377668e0fef5a84300
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to submit compensation claim.');
         }
@@ -626,7 +600,6 @@ const FinancialAssistance = () => {
                     </div>
                 )}
 
-<<<<<<< HEAD
                 {/* Repayment Submission Modal */}
                 {selectedLoan && (
                     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
@@ -668,10 +641,6 @@ const FinancialAssistance = () => {
 
                 {/* Claims History (Visible for both tabs if farmer) */}
                 {user?.role === 'FARMER' && (activeTab === 'loan' || activeTab === 'compensation') && (
-=======
-                {/* Claims History (Visible for both tabs if farmer) */}
-                {user?.role === 'FARMER' && (
->>>>>>> 81b5ac5a89c5d06098e5da377668e0fef5a84300
                     <div className="history-section" style={{ marginTop: '40px' }}>
                         <div className="section-header">
                             <h2>📜 Application History</h2>

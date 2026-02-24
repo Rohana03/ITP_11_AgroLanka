@@ -107,6 +107,12 @@ const AdminDashboard = () => {
                                         <p>Register officers and reallocate staff between different centers.</p>
                                         <button className="btn btn-sm">Manage Staff</button>
                                     </div>
+                                    <div className="action-card" onClick={() => navigate('/admin/products/review')}>
+                                        <div className="card-icon">📦</div>
+                                        <h3>Product Approval</h3>
+                                        <p>Review and approve regulated product listings from managers.</p>
+                                        <button className="btn btn-sm">Review Queue</button>
+                                    </div>
                                     <div className="action-card">
                                         <div className="card-icon">📊</div>
                                         <h3>Regional Reports</h3>
