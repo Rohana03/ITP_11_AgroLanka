@@ -320,6 +320,12 @@ const ProductDashboard = () => {
                                                 <select value={newProduct.category} onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}>
                                                     {categories.map(c => <option key={c} value={c}>{c}</option>)}
                                                 </select>
+                                                {['Crop Protection', 'Crop Nutrients', 'Animal Health & Nutrition'].includes(newProduct.category) && (
+                                                    <div style={{ marginTop: '8px', padding: '10px 14px', backgroundColor: '#fffbeb', border: '1px solid #f59e0b', borderRadius: '8px', color: '#92400e', fontSize: '0.82rem', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                                                        <span style={{ fontSize: '1rem' }}>⚠️</span>
+                                                        <span><strong>Admin Approval Required</strong> — This is a regulated category. Your listing will be held as <em>Pending</em> and will only go live after an admin reviews and approves it.</span>
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="form-group">
                                                 <label>Price (LKR)</label>

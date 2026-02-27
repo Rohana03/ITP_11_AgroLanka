@@ -17,7 +17,7 @@ const generateToken = (id) => {
 // @route   POST /api/auth/register
 // @access  Public
 router.post("/register", async (req, res) => {
-  const { name, email, nic, password, role, assignedAsc, specialization, serviceDistricts } = req.body;
+  const { name, email, nic, phone, password, role, assignedAsc, specialization, serviceDistricts } = req.body;
 
   try {
     if (!name || !email || !nic || !password) {
@@ -45,6 +45,7 @@ router.post("/register", async (req, res) => {
       name,
       email,
       nic,
+      phone: phone || "",
       password: hashedPassword,
       role: role || 'FARMER', // Default role
       assignedAsc: assignedAsc || null,
@@ -58,6 +59,7 @@ router.post("/register", async (req, res) => {
         name: user.name,
         email: user.email,
         nic: user.nic,
+        phone: user.phone,
         role: user.role,
         assignedAsc: user.assignedAsc,
         specialization: user.specialization,
@@ -87,6 +89,7 @@ router.post("/login", async (req, res) => {
         _id: user.id,
         name: user.name,
         email: user.email,
+        phone: user.phone,
         role: user.role,
         assignedAsc: user.assignedAsc,
         specialization: user.specialization,
@@ -147,6 +150,33 @@ router.put("/update-asc", protect, async (req, res) => {
     }
 
     user.assignedAsc = assignedAsc || null;
+    await user.save();
+
+    const updatedUser = await User.findById(user._id)
+      .select("-password")
+      .populate("assignedAsc", "name district");
+
+    res.json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// @desc    Update user profile (phone, name etc)
+// @route   PUT /api/auth/update-profile
+// @access  Private
+router.put("/update-profile", protect, async (req, res) => {
+  try {
+    const { name, phone } = req.body;
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (name) user.name = name;
+    if (phone !== undefined) user.phone = phone;
+
     await user.save();
 
     const updatedUser = await User.findById(user._id)

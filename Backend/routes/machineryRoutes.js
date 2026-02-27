@@ -106,6 +106,27 @@ router.get("/my-history", protect, authorize("FARMER"), async (req, res) => {
     }
 });
 
+// @desc    Get community rentals in farmer's ASC area (excluding their own)
+// @route   GET /api/machinery/community-rentals
+router.get("/community-rentals", protect, authorize("FARMER"), async (req, res) => {
+    try {
+        const ascId = req.user.assignedAsc?._id || req.user.assignedAsc;
+        if (!ascId) {
+            return res.status(400).json({ message: "Please select an ASC center in your profile first." });
+        }
+
+        const rentals = await FarmerMachinery.find({
+            asc: ascId,
+            status: "Available",
+            farmer: { $ne: req.user._id }
+        }).populate("farmer", "name email");
+
+        res.json(rentals);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 // --- Officer Routes ---
 
 // @desc    Get all regional requests and rentals (Machinery Officer)
@@ -183,4 +204,34 @@ router.post("/inventory", protect, authorize("MACHINERY_OFFICER", "ASC_OFFICER")
     }
 });
 
+// @desc    Update machinery inventory item (available count)
+// @route   PATCH /api/machinery/inventory/:id
+router.patch("/inventory/:id", protect, authorize("MACHINERY_OFFICER", "ASC_OFFICER"), async (req, res) => {
+    try {
+        const { availableCount } = req.body;
+        const item = await Machinery.findById(req.params.id);
+        if (!item) return res.status(404).json({ message: "Item not found" });
+
+        if (availableCount !== undefined) item.availableCount = availableCount;
+        await item.save();
+        res.json({ message: "Inventory updated!", item });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// @desc    Delete machinery inventory item
+// @route   DELETE /api/machinery/inventory/:id
+router.delete("/inventory/:id", protect, authorize("MACHINERY_OFFICER", "ASC_OFFICER"), async (req, res) => {
+    try {
+        const item = await Machinery.findById(req.params.id);
+        if (!item) return res.status(404).json({ message: "Item not found" });
+        await item.deleteOne();
+        res.json({ message: "Inventory item removed." });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 module.exports = router;
+

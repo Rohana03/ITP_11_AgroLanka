@@ -10,6 +10,7 @@ const MachineryService = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('request-machinery'); // 'request-machinery', 'request-service', 'rent-out'
     const [availableMachinery, setAvailableMachinery] = useState([]);
+    const [communityRentals, setCommunityRentals] = useState([]);
     const [history, setHistory] = useState({ machineryRequests: [], serviceRequests: [], myRentals: [] });
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState('');
@@ -43,8 +44,20 @@ const MachineryService = () => {
         if (user && token) {
             fetchAvailableMachinery();
             fetchHistory();
+            fetchCommunityRentals();
         }
     }, [user, token]);
+
+    const fetchCommunityRentals = async () => {
+        try {
+            const res = await axios.get('http://localhost:5000/api/machinery/community-rentals', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setCommunityRentals(res.data);
+        } catch (err) {
+            console.error("Error fetching community rentals:", err);
+        }
+    };
 
     const fetchAvailableMachinery = async () => {
         try {
@@ -150,6 +163,12 @@ const MachineryService = () => {
                         onClick={() => setActiveTab('rent-out')}
                     >
                         💰 Rent My Machinery
+                    </button>
+                    <button
+                        className={`tab ${activeTab === 'community-marketplace' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('community-marketplace')}
+                    >
+                        🤝 Community Marketplace
                     </button>
                 </div>
 
@@ -288,6 +307,43 @@ const MachineryService = () => {
 
                             <button type="submit" className="btn btn-primary">List Machinery for Rent</button>
                         </form>
+                    )}
+
+                    {activeTab === 'community-marketplace' && (
+                        <div>
+                            <h2>🤝 Community Marketplace</h2>
+                            <p className="section-desc">Rent machinery from other farmers in your local ASC area</p>
+
+                            {communityRentals.length === 0 ? (
+                                <div style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
+                                    <div style={{ fontSize: '3rem', marginBottom: '10px' }}>🌾</div>
+                                    <p>No community machinery listed in your area yet.</p>
+                                </div>
+                            ) : (
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px', marginTop: '20px' }}>
+                                    {communityRentals.map(rental => (
+                                        <div key={rental._id} style={{ padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', backgroundColor: '#fff' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                                                <h4 style={{ margin: 0, color: '#1e293b' }}>{rental.machineryType}</h4>
+                                                <span style={{ backgroundColor: '#f0fdf4', color: '#166534', padding: '3px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '600' }}>Available</span>
+                                            </div>
+                                            <div style={{ fontSize: '0.9rem', color: '#475569', lineHeight: '1.6' }}>
+                                                <div>👤 <strong>{rental.farmer?.name}</strong></div>
+                                                <div>📞 <strong>{rental.contactNumber}</strong></div>
+                                                <div style={{ marginTop: '8px', color: '#166534', fontWeight: '700', fontSize: '1.05rem' }}>LKR {rental.rentPerDay?.toLocaleString()} <span style={{ fontSize: '0.8rem', fontWeight: '400' }}>/ day</span></div>
+                                                <div style={{ marginTop: '10px', fontSize: '0.82rem', color: '#64748b', fontStyle: 'italic' }}>"{rental.description}"</div>
+                                            </div>
+                                            <button
+                                                onClick={() => window.location.href = `tel:${rental.contactNumber}`}
+                                                style={{ width: '100%', marginTop: '15px', backgroundColor: '#3b82f6', color: 'white', border: 'none', padding: '8px', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}
+                                            >
+                                                📞 Call Farmer
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     )}
                 </div>
 

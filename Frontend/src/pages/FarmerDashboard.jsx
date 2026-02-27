@@ -12,6 +12,8 @@ const FarmerDashboard = () => {
     const [selectedDistrict, setSelectedDistrict] = React.useState('');
     const [selectedAsc, setSelectedAsc] = React.useState('');
     const [isEditingAsc, setIsEditingAsc] = React.useState(false);
+    const [isEditingPhone, setIsEditingPhone] = React.useState(false);
+    const [newPhone, setNewPhone] = React.useState(user?.phone || '');
     const [saving, setSaving] = React.useState(false);
 
     React.useEffect(() => {
@@ -49,6 +51,30 @@ const FarmerDashboard = () => {
             }
         } catch (err) {
             console.error('Error updating ASC:', err);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleUpdateProfile = async () => {
+        setSaving(true);
+        try {
+            const response = await fetch('http://localhost:5000/api/auth/update-profile', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({ phone: newPhone })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                updateUser(data);
+                setIsEditingPhone(false);
+            }
+        } catch (err) {
+            console.error('Error updating profile:', err);
         } finally {
             setSaving(false);
         }
@@ -129,6 +155,62 @@ const FarmerDashboard = () => {
                                         </button>
                                         <button
                                             onClick={() => setIsEditingAsc(false)}
+                                            disabled={saving}
+                                            style={{ backgroundColor: '#cbd5e1', color: '#334155', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', flex: 1 }}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Phone Status Card */}
+                        <div className="asc-status-card" style={{
+                            backgroundColor: '#fff',
+                            padding: '15px 20px',
+                            borderRadius: '12px',
+                            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                            border: '1px solid #e2e8f0',
+                            maxWidth: '350px',
+                            marginLeft: '15px'
+                        }}>
+                            {!isEditingPhone ? (
+                                <>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                        <span style={{ fontSize: '0.85rem', fontWeight: '600', color: '#64748b' }}>PHONE NUMBER</span>
+                                        <button
+                                            onClick={() => setIsEditingPhone(true)}
+                                            style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', fontSize: '0.85rem' }}
+                                        >
+                                            Edit
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <div style={{ fontWeight: '700', color: '#1e293b' }}>📞 {user.phone || 'Not added'}</div>
+                                        <div style={{ fontSize: '0.85rem', color: '#64748b' }}>Primary Contact</div>
+                                    </div>
+                                </>
+                            ) : (
+                                <div>
+                                    <div style={{ fontSize: '0.85rem', fontWeight: '600', color: '#64748b', marginBottom: '10px' }}>UPDATE PHONE</div>
+                                    <input
+                                        type="text"
+                                        value={newPhone}
+                                        onChange={(e) => setNewPhone(e.target.value)}
+                                        placeholder="Enter phone number"
+                                        style={{ width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                                    />
+                                    <div style={{ display: 'flex', gap: '10px' }}>
+                                        <button
+                                            onClick={handleUpdateProfile}
+                                            disabled={saving}
+                                            style={{ backgroundColor: '#10b981', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', flex: 1 }}
+                                        >
+                                            {saving ? '...' : 'Save'}
+                                        </button>
+                                        <button
+                                            onClick={() => { setIsEditingPhone(false); setNewPhone(user.phone || ''); }}
                                             disabled={saving}
                                             style={{ backgroundColor: '#cbd5e1', color: '#334155', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', flex: 1 }}
                                         >

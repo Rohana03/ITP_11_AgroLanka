@@ -8,6 +8,7 @@ const Register = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [nic, setNic] = useState('');
+    const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [role, setRole] = useState('FARMER');
@@ -45,7 +46,7 @@ const Register = () => {
             return;
         }
         console.log('📝 Submitting registration form...', { role, assignedAsc, specialization, serviceDistricts });
-        const res = await register(name, email, nic, password, role, assignedAsc, specialization, serviceDistricts);
+        const res = await register(name, email, nic, phone, password, role, assignedAsc, specialization, serviceDistricts);
         console.log('📋 Registration result:', res);
         if (res.success) {
             console.log('✅ Registration successful, redirecting to login...');
@@ -88,6 +89,16 @@ const Register = () => {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>Phone Number (Contact No)</label>
+                            <input
+                                type="text"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                placeholder="e.g. 0771234567"
                                 required
                             />
                         </div>
