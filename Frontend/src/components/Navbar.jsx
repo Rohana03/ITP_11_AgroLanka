@@ -1,12 +1,20 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
 const Navbar = () => {
     const { language, switchLanguage, t } = useLanguage();
-    const { user, logout } = useAuth(); // Import useAuth here, make sure to add import at top
+    const { user, logout } = useAuth();
+    const location = useLocation();
+
+    const handleServicesClick = (e) => {
+        if (location.pathname === '/') {
+            e.preventDefault();
+            document.getElementById('services-showcase')?.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
 
     return (
         <nav className="navbar">
@@ -17,7 +25,7 @@ const Navbar = () => {
                 <div className="navbar-menu">
                     <Link to="/" className="navbar-item">{t('navbar.home')}</Link>
                     <Link to="/about" className="navbar-item">{t('navbar.about')}</Link>
-                    <Link to="/services" className="navbar-item">{t('navbar.services')}</Link>
+                    <Link to="/services" className="navbar-item" onClick={handleServicesClick}>{t('navbar.services')}</Link>
                     <Link to="/contact" className="navbar-item">{t('navbar.contact')}</Link>
                     {user && <Link to="/admin" className="navbar-item">Dashboard</Link>}
                 </div>

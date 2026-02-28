@@ -117,6 +117,60 @@ const MachineryDashboard = () => {
         }
     };
 
+    const generateCSV = () => {
+        let csvContent = "data:text/csv;charset=utf-8,";
+        let headers = "";
+        let rows = [];
+
+        if (activeTab === 'machinery-requests') {
+            headers = "Farmer Name,Email,NIC,Machinery,Type,Request Date,Duration (Days),Location,Land Size (Ac),Notes,Status";
+            rows = data.machineryRequests.map(r => [
+                r.farmer?.name, r.farmer?.email, r.farmer?.nic || 'N/A',
+                r.machinery?.name, r.machinery?.type,
+                new Date(r.requestDate).toLocaleDateString(),
+                r.duration, r.location, r.landSize,
+                `"${(r.additionalNotes || '').replace(/"/g, '""')}"`,
+                r.status
+            ]);
+        } else if (activeTab === 'service-requests') {
+            headers = "Farmer Name,Email,NIC,Service Type,Request Date,Location,Description,Status";
+            rows = data.serviceRequests.map(s => [
+                s.farmer?.name, s.farmer?.email, s.farmer?.nic || 'N/A',
+                s.serviceType,
+                new Date(s.requestDate).toLocaleDateString(),
+                s.location,
+                `"${(s.description || '').replace(/"/g, '""')}"`,
+                s.status
+            ]);
+        } else if (activeTab === 'farmer-rentals') {
+            headers = "Farmer Name,Email,Machinery Type,Rent Per Day,Contact Number,Description";
+            rows = data.farmerRentals.map(f => [
+                f.farmer?.name, f.farmer?.email,
+                f.machineryType, f.rentPerDay, f.contactNumber,
+                `"${(f.description || '').replace(/"/g, '""')}"`
+            ]);
+        } else if (activeTab === 'inventory') {
+            headers = "Item Name,Type,Total Count,Available Count,Status";
+            rows = data.inventory.map(i => [
+                i.name, i.type, i.totalCount, i.availableCount,
+                i.availableCount > 0 ? 'Available' : 'Booked'
+            ]);
+        }
+
+        csvContent += headers + "\r\n" + rows.map(e => e.join(",")).join("\r\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `Machinery_${activeTab}_Report.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    const generatePDF = () => {
+        window.print();
+    };
+
     // Derived stats
     const pendingMachinery = data.machineryRequests.filter(r => r.status === 'PENDING').length;
     const pendingService = data.serviceRequests.filter(r => r.status === 'PENDING').length;
@@ -135,11 +189,30 @@ const MachineryDashboard = () => {
 
     return (
         <div className="farmer-dashboard-page">
+            <style>
+                {`
+                    @media print {
+                        .navbar, .dashboard-header p, .dashboard-header div, 
+                        .dashboard-grid, .summary-stats-container, 
+                        button, form, .tabs-container { display: none !important; }
+                        .dashboard-container { padding: 0 !important; max-width: 100% !important; }
+                        table { width: 100% !important; border: 1px solid #ccc !important; font-size: 10px !important; }
+                        th, td { padding: 8px !important; }
+                        .print-header { display: block !important; margin-bottom: 20px; text-align: center; }
+                        h1 { font-size: 18px !important; margin-bottom: 5px !important; }
+                    }
+                    .print-header { display: none; }
+                `}
+            </style>
             <Navbar />
             <div className="dashboard-container">
+                <div className="print-header">
+                    <h2 style={{ color: '#2e7d32', margin: 0 }}>AgroLanka - Agrarian Service Center</h2>
+                    <p style={{ color: '#64748b', fontSize: '14px' }}>{user?.assignedAsc?.name} Dashboard Report | {new Date().toLocaleDateString()}</p>
+                </div>
 
                 {/* Header */}
-                <header className="dashboard-header">
+                <header className="dashboard-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div className="header-info">
                         <h1>Machinery &amp; Service Dashboard 🚜</h1>
                         <p>Welcome, {user?.name}! Manage equipment and field services for your ASC center.</p>
@@ -153,6 +226,14 @@ const MachineryDashboard = () => {
                                 <span style={{ color: '#9a3412', fontWeight: '500' }}>⚠️ No ASC Center allocated. Please contact Admin.</span>
                             </div>
                         )}
+                    </div>
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                        <button onClick={generateCSV} style={{ padding: '10px 18px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            📊 Export CSV
+                        </button>
+                        <button onClick={generatePDF} style={{ padding: '10px 18px', backgroundColor: '#f59e0b', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            📄 Export PDF
+                        </button>
                     </div>
                 </header>
 

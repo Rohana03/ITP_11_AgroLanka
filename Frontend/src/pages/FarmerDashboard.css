@@ -5,7 +5,7 @@
 }
 
 .dashboard-container {
-    max-width: 1200px;
+    max-width: 95%;
     margin: 0 auto;
     padding: 2rem;
 }
@@ -33,37 +33,95 @@
 }
 
 .dashboard-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 280px;
+    perspective: 1000px;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
     cursor: pointer;
+}
+
+.card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
     text-align: center;
-    border: 1px solid #e1e1e1;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
 }
 
-.dashboard-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    border-color: #2ecc71;
+.dashboard-card:hover .card-inner {
+    transform: rotateY(180deg);
 }
 
-.card-icon {
-    font-size: 3rem;
+.card-front,
+.card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.card-front {
+    background-color: white;
+}
+
+.card-back {
+    background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+    color: white;
+    transform: rotateY(180deg);
+}
+
+.card-back h3 {
+    color: white !important;
+    font-size: 1.4rem;
     margin-bottom: 1rem;
 }
 
-.dashboard-card h3 {
-    margin-bottom: 0.5rem;
-    color: #2c3e50;
-    font-weight: 600;
-}
-
-.dashboard-card p {
-    color: #7f8c8d;
+.card-back p {
+    color: rgba(255, 255, 255, 0.9) !important;
     font-size: 0.95rem;
     line-height: 1.5;
+}
+
+.go-btn {
+    margin-top: 20px;
+    padding: 8px 20px;
+    background: white;
+    color: #1b5e20;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.card-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1.2rem;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.card-front h3 {
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.card-front p {
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.4;
 }
 
 @media (max-width: 768px) {

@@ -226,35 +226,82 @@ const FarmerDashboard = () => {
                 <div className="dashboard-grid">
                     {/* Block 1: Register Crop */}
                     <div className="dashboard-card" onClick={() => navigate('/farmer/register-crop')}>
-                        <div className="card-icon">🌱</div>
-                        <h3>Register Crop</h3>
-                        <p>Register your new crops for the season.</p>
+                        <div className="card-inner">
+                            <div className="card-front">
+                                <div className="card-icon">🌱</div>
+                                <h3>Register Crop</h3>
+                                <p>Register your new crops for the season.</p>
+                            </div>
+                            <div className="card-back">
+                                <h3>Register Crop</h3>
+                                <p>Notify the ASC about your new seasonal cultivation to access benefits.</p>
+                                <div className="go-btn">Manage Now →</div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Block 2: Financial Assistance and Compensation */}
                     <div className="dashboard-card" onClick={() => navigate('/farmer/financial-aid')}>
-                        <div className="card-icon">💰</div>
-                        <h3>Financial Assistance</h3>
-                        <p>Apply for compensation and financial aid.</p>
+                        <div className="card-inner">
+                            <div className="card-front">
+                                <div className="card-icon">💰</div>
+                                <h3>Financial Assistance</h3>
+                                <p>Apply for compensation and financial aid.</p>
+                            </div>
+                            <div className="card-back">
+                                <h3>Financial Aid</h3>
+                                <p>Get support for crop damages or seasonal cultivation loans.</p>
+                                <div className="go-btn">View Schemes →</div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Block 3: Machinery and Service */}
                     <div className="dashboard-card" onClick={() => navigate('/farmer/machinery')}>
-                        <div className="card-icon">🚜</div>
-                        <h3>Machinery & Services</h3>
-                        <p>Request machinery and agricultural services.</p>
+                        <div className="card-inner">
+                            <div className="card-front">
+                                <div className="card-icon">🚜</div>
+                                <h3>Machinery & Services</h3>
+                                <p>Request machinery and agricultural services.</p>
+                            </div>
+                            <div className="card-back">
+                                <h3>Machinery Hub</h3>
+                                <p>Rent tractors and harvesters from your ASC or community.</p>
+                                <div className="go-btn">Book Now →</div>
+                            </div>
+                        </div>
                     </div>
 
+                    {/* Block 4: Agricultural Products */}
                     <div className="dashboard-card" onClick={() => navigate('/farmer/products')}>
-                        <div className="card-icon">🛒</div>
-                        <h3>Agricultural Products</h3>
-                        <p>Explore and buy agricultural products.</p>
+                        <div className="card-inner">
+                            <div className="card-front">
+                                <div className="card-icon">🛒</div>
+                                <h3>Agri Products</h3>
+                                <p>Explore and buy agricultural supplies.</p>
+                            </div>
+                            <div className="card-back">
+                                <h3>Supply Shop</h3>
+                                <p>Purchase seeds, fertilizers, and equipment from regional stores.</p>
+                                <div className="go-btn">Shop Now →</div>
+                            </div>
+                        </div>
                     </div>
 
+                    {/* Block 5: Sell Harvest */}
                     <div className="dashboard-card" onClick={() => navigate('/farmer/sell-harvest')}>
-                        <div className="card-icon">💰</div>
-                        <h3>Sell Harvest</h3>
-                        <p>List your harvested crops for sale to registered buyers.</p>
+                        <div className="card-inner">
+                            <div className="card-front">
+                                <div className="card-icon">📈</div>
+                                <h3>Sell Harvest</h3>
+                                <p>List your crops for sale to registered buyers.</p>
+                            </div>
+                            <div className="card-back">
+                                <h3>Marketplace</h3>
+                                <p>Connect directly with bulk buyers and get the best prices.</p>
+                                <div className="go-btn">List Crops →</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
