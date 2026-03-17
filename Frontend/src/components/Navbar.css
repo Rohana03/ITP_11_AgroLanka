@@ -95,3 +95,14 @@
     min-width: 60px;
     font-size: 0.9rem;
 }
+
+.btn-logout {
+    color: #dc2626 !important;
+    border-color: #dc2626 !important;
+}
+
+.btn-logout:hover {
+    background: rgba(220, 38, 38, 0.1) !important;
+    color: #b91c1c !important;
+    border-color: #b91c1c !important;
+}

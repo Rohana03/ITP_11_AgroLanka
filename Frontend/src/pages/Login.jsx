@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 import Navbar from '../components/Navbar';
 import './Auth.css';
 
@@ -10,6 +11,7 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const { login } = useAuth();
+    const { t } = useLanguage();
     const navigate = useNavigate();
     const location = useLocation();
     const successMessage = location.state?.message;
@@ -54,12 +56,12 @@ const Login = () => {
             <Navbar />
             <div className="auth-container">
                 <div className="auth-card">
-                    <h2>Login to AgroLanka</h2>
+                    <h2>{t('auth.loginTitle')}</h2>
                     {successMessage && <div className="alert-success" style={{ backgroundColor: '#d4edda', color: '#155724', padding: '10px', borderRadius: '4px', marginBottom: '15px', textAlign: 'center' }}>{successMessage}</div>}
                     {error && <div className="alert-error">{error}</div>}
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
-                            <label>Email Address</label>
+                            <label>{t('auth.email')}</label>
                             <input
                                 type="email"
                                 value={email}
@@ -68,7 +70,7 @@ const Login = () => {
                             />
                         </div>
                         <div className="form-group">
-                            <label>Password</label>
+                            <label>{t('auth.password')}</label>
                             <div className="password-input-wrapper">
                                 <input
                                     type={showPassword ? "text" : "password"}
@@ -80,16 +82,16 @@ const Login = () => {
                                     type="button"
                                     className="password-toggle"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    aria-label={showPassword ? "Hide password" : "Show password"}
+                                    aria-label={showPassword ? t('auth.hidePass') : t('auth.showPass')}
                                 >
                                     {showPassword ? '👁️' : '👁️‍🗨️'}
                                 </button>
                             </div>
                         </div>
-                        <button type="submit" className="btn btn-primary btn-block">Login</button>
+                        <button type="submit" className="btn btn-primary btn-block">{t('auth.loginBtn')}</button>
                     </form>
                     <p className="auth-footer">
-                        Don't have an account? <Link to="/register">Sign Up</Link>
+                        {t('auth.noAccount')} <Link to="/register">{t('auth.registerLink')}</Link>
                     </p>
                 </div>
             </div>

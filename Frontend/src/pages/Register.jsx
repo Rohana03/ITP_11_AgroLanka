@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 import Navbar from '../components/Navbar';
 import './Auth.css';
 
@@ -20,6 +21,7 @@ const Register = () => {
     const [districts, setDistricts] = useState([]);
     const [error, setError] = useState('');
     const { register } = useAuth();
+    const { t } = useLanguage();
     const navigate = useNavigate();
 
     React.useEffect(() => {
@@ -42,7 +44,7 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (role === 'PRODUCT_MANAGER' && serviceDistricts.length === 0) {
-            setError('Please select at least one service district.');
+            setError(t('auth.atLeastOne'));
             return;
         }
         console.log('📝 Submitting registration form...', { role, assignedAsc, specialization, serviceDistricts });
@@ -50,7 +52,7 @@ const Register = () => {
         console.log('📋 Registration result:', res);
         if (res.success) {
             console.log('✅ Registration successful, redirecting to login...');
-            navigate('/login', { state: { message: 'Registration successful! Please login with your credentials.' } });
+            navigate('/login', { state: { message: t('auth.successReg') } });
         } else {
             console.error('❌ Registration failed:', res.message);
             setError(res.message);
@@ -62,11 +64,11 @@ const Register = () => {
             <Navbar />
             <div className="auth-container">
                 <div className="auth-card">
-                    <h2>Create an Account</h2>
+                    <h2>{t('auth.registerTitle')}</h2>
                     {error && <div className="alert-error">{error}</div>}
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
-                            <label>Full Name</label>
+                            <label>{t('auth.fullName')}</label>
                             <input
                                 type="text"
                                 value={name}
@@ -75,7 +77,7 @@ const Register = () => {
                             />
                         </div>
                         <div className="form-group">
-                            <label>NIC Number</label>
+                            <label>{t('auth.nic')}</label>
                             <input
                                 type="text"
                                 value={nic}
@@ -84,7 +86,7 @@ const Register = () => {
                             />
                         </div>
                         <div className="form-group">
-                            <label>Email Address</label>
+                            <label>{t('auth.email')}</label>
                             <input
                                 type="email"
                                 value={email}
@@ -93,17 +95,17 @@ const Register = () => {
                             />
                         </div>
                         <div className="form-group">
-                            <label>Phone Number (Contact No)</label>
+                            <label>{t('auth.phone')}</label>
                             <input
                                 type="text"
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
-                                placeholder="e.g. 0771234567"
+                                placeholder={t('auth.enterPhone')}
                                 required
                             />
                         </div>
                         <div className="form-group">
-                            <label>Password</label>
+                            <label>{t('auth.password')}</label>
                             <div className="password-input-wrapper">
                                 <input
                                     type={showPassword ? "text" : "password"}
@@ -115,28 +117,27 @@ const Register = () => {
                                     type="button"
                                     className="password-toggle"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    aria-label={showPassword ? "Hide password" : "Show password"}
+                                    aria-label={showPassword ? t('auth.hidePass') : t('auth.showPass')}
                                 >
                                     {showPassword ? '👁️' : '👁️‍🗨️'}
                                 </button>
                             </div>
                         </div>
                         <div className="form-group">
-                            <label>I am a</label>
+                            <label>{t('auth.role')}</label>
                             <select value={role} onChange={(e) => setRole(e.target.value)}>
-                                <option value="FARMER">Farmer</option>
-                                <option value="ASC_OFFICER">ASC Officer</option>
-                                <option value="FINANCIAL_OFFICER">Financial Officer</option>
-                                <option value="CROP_OFFICER">Crop Officer</option>
-                                <option value="PRODUCT_MANAGER">Product Seller/Buyer</option>
-                                <option value="MACHINERY_OFFICER">Machinery & Service Officer</option>
-                                {/* Admin registration should typically be restricted, but keeping here for demo if needed */}
+                                <option value="FARMER">{t('dashboard.roleFarmer')}</option>
+                                <option value="ASC_OFFICER">{t('dashboard.roleAsc')}</option>
+                                <option value="FINANCIAL_OFFICER">{t('dashboard.roleFinancial')}</option>
+                                <option value="CROP_OFFICER">{t('dashboard.roleCrop')}</option>
+                                <option value="PRODUCT_MANAGER">{t('dashboard.roleProduct')}</option>
+                                <option value="MACHINERY_OFFICER">{t('dashboard.roleMachinery')}</option>
                             </select>
                         </div>
 
                         {(role === 'PRODUCT_MANAGER') && (
                             <div className="form-group">
-                                <label style={{ marginBottom: '10px', display: 'block' }}>Service Districts (Select all that apply) *</label>
+                                <label style={{ marginBottom: '10px', display: 'block' }}>{t('auth.serviceDistricts')} ({t('auth.selectDistricts')}) *</label>
                                 <div style={{
                                     display: 'grid',
                                     gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
@@ -166,14 +167,14 @@ const Register = () => {
                                         </label>
                                     ))}
                                 </div>
-                                {serviceDistricts.length === 0 && <small style={{ color: '#ef4444' }}>Please select at least one district.</small>}
+                                {serviceDistricts.length === 0 && <small style={{ color: '#ef4444' }}>{t('auth.atLeastOne')}</small>}
                             </div>
                         )}
 
                         {(role !== 'PRODUCT_MANAGER' && (role === 'FARMER' || role === 'ASC_OFFICER' || role === 'STORE_OFFICER' || role === 'FINANCIAL_OFFICER' || role === 'CROP_OFFICER' || role === 'MACHINERY_OFFICER')) && (
                             <>
                                 <div className="form-group">
-                                    <label>District</label>
+                                    <label>{t('auth.district')}</label>
                                     <select
                                         value={selectedDistrict}
                                         onChange={(e) => {
@@ -182,7 +183,7 @@ const Register = () => {
                                         }}
                                         required={role === 'FARMER'}
                                     >
-                                        <option value="">Select District</option>
+                                        <option value="">{t('auth.district')}</option>
                                         {districts.map(district => (
                                             <option key={district} value={district}>{district}</option>
                                         ))}
@@ -190,14 +191,14 @@ const Register = () => {
                                 </div>
 
                                 <div className="form-group">
-                                    <label>Nearest ASC Center (Agrarian Service Center)</label>
+                                    <label>{t('auth.asc')}</label>
                                     <select
                                         value={assignedAsc}
                                         onChange={(e) => setAssignedAsc(e.target.value)}
                                         required={role === 'FARMER'}
                                         disabled={!selectedDistrict}
                                     >
-                                        <option value="">{selectedDistrict ? 'Select ASC Center' : 'Select District first'}</option>
+                                        <option value="">{selectedDistrict ? t('auth.selectAsc') : t('auth.selectDistrictFirst')}</option>
                                         {ascs
                                             .filter(asc => asc.district === selectedDistrict)
                                             .map(asc => (
@@ -211,26 +212,26 @@ const Register = () => {
 
                         {role === 'CROP_OFFICER' && (
                             <div className="form-group">
-                                <label>Specific Crop Side/Specialization (Sri Lanka)</label>
+                                <label>{t('auth.specialization')}</label>
                                 <select
                                     value={specialization}
                                     onChange={(e) => setSpecialization(e.target.value)}
                                     required
                                 >
-                                    <option value="">Select Specialization</option>
-                                    <option value="Paddy (වී)">Paddy (වී)</option>
-                                    <option value="Vegetables (එළවළු)">Vegetables (එළවළු)</option>
-                                    <option value="Fruits (පලතුරු)">Fruits (පලතුරු)</option>
-                                    <option value="Spices (කුළුබඩු)">Spices (කුළුබඩු)</option>
-                                    <option value="Export Crops (අපනයන බෝග)">Export Crops (අපනයන බෝග)</option>
-                                    <option value="Other">Other</option>
+                                    <option value="">{t('auth.selectSpecialization')}</option>
+                                    <option value="Paddy (වී)">{t('auth.paddy')} (වී)</option>
+                                    <option value="Vegetables (එළවළු)">{t('auth.vegetables')} (එළවළු)</option>
+                                    <option value="Fruits (පලතුරු)">{t('auth.fruits')} (පලතුරු)</option>
+                                    <option value="Spices (කුළුබඩු)">{t('auth.spices')} (කුළුබඩු)</option>
+                                    <option value="Export Crops (අපනයන බෝග)">{t('auth.exportCrops')} (අපනයන බෝග)</option>
+                                    <option value="Other">{t('auth.other')}</option>
                                 </select>
                             </div>
                         )}
-                        <button type="submit" className="btn btn-primary btn-block">Sign Up</button>
+                        <button type="submit" className="btn btn-primary btn-block">{t('auth.registerBtn')}</button>
                     </form>
                     <p className="auth-footer">
-                        Already have an account? <Link to="/login">Login</Link>
+                        {t('auth.haveAccount')} <Link to="/login">{t('auth.loginLink')}</Link>
                     </p>
                 </div>
             </div>

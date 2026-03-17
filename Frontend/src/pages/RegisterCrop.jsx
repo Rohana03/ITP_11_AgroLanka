@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 import Navbar from '../components/Navbar';
 import './FarmerPages.css';
 
 const RegisterCrop = () => {
     const { user } = useAuth();
+    const { t } = useLanguage();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         cropType: '',
@@ -87,7 +89,7 @@ const RegisterCrop = () => {
             const data = await response.json();
 
             if (response.ok) {
-                setSuccess('Registration request submitted successfully! It is now pending officer approval.');
+                setSuccess(t('farmer_crop.successReg'));
                 setTimeout(() => {
                     navigate('/farmer-dashboard');
                 }, 3000);
@@ -105,12 +107,12 @@ const RegisterCrop = () => {
             <div className="page-container">
                 <div className="page-header">
                     <button className="back-btn" onClick={() => navigate('/farmer-dashboard')}>
-                        ← Back to Dashboard
+                        ← {t('common.back')}
                     </button>
-                    <h1>🌱 Crop Registration Request</h1>
-                    <p>Submit your crop details for officer review and approval</p>
+                    <h1>🌱 {t('farmer_crop.title')}</h1>
+                    <p>{t('farmer_crop.subtitle')}</p>
                     <button className="view-btn" onClick={() => navigate('/farmer/my-crops')}>
-                        View my requests →
+                        {t('farmer_crop.viewRequests')} →
                     </button>
                 </div>
 
@@ -121,30 +123,30 @@ const RegisterCrop = () => {
                     <form onSubmit={handleSubmit}>
                         <div className="form-row">
                             <div className="form-group">
-                                <label>Crop Type *</label>
+                                <label>{t('farmer_crop.cropType')} *</label>
                                 <select name="cropType" value={formData.cropType} onChange={handleChange} required>
-                                    <option value="">Select crop type</option>
-                                    <option value="rice">Rice (වී)</option>
-                                    <option value="vegetables">Vegetables (එළවළු)</option>
-                                    <option value="fruits">Fruits (පලතුරු)</option>
-                                    <option value="spices">Spices (කුළුබඩු)</option>
-                                    <option value="tea">Tea (තේ)</option>
-                                    <option value="coconut">Coconut (පොල්)</option>
-                                    <option value="rubber">Rubber (රබර්)</option>
-                                    <option value="coffee">Coffee (කෝපි)</option>
-                                    <option value="other">Other</option>
+                                    <option value="">{t('farmer_crop.selectType')}</option>
+                                    <option value="rice">{t('farmer_crop.rice')}</option>
+                                    <option value="vegetables">{t('farmer_crop.vegetables')}</option>
+                                    <option value="fruits">{t('farmer_crop.fruits')}</option>
+                                    <option value="spices">{t('farmer_crop.spices')}</option>
+                                    <option value="tea">{t('farmer_crop.tea')}</option>
+                                    <option value="coconut">{t('farmer_crop.coconut')}</option>
+                                    <option value="rubber">{t('farmer_crop.rubber')}</option>
+                                    <option value="coffee">{t('farmer_crop.coffee')}</option>
+                                    <option value="other">{t('auth.other')}</option>
                                 </select>
                             </div>
 
                             {['rice', 'vegetables', 'fruits', 'spices', 'other'].includes(formData.cropType) && (
                                 <div className="form-group">
-                                    <label>Variety *</label>
+                                    <label>{t('farmer_crop.variety')} *</label>
                                     <input
                                         type="text"
                                         name="variety"
                                         value={formData.variety}
                                         onChange={handleChange}
-                                        placeholder="Enter the variety of the selected crop"
+                                        placeholder={t('farmer_crop.varietyPlaceholder')}
                                         required
                                     />
                                 </div>
@@ -153,7 +155,7 @@ const RegisterCrop = () => {
 
                         <div className="form-row">
                             <div className="form-group">
-                                <label>Land Size (Acres) *</label>
+                                <label>{t('farmer_crop.landSize')} *</label>
                                 <input
                                     type="number"
                                     name="landSize"
@@ -164,33 +166,33 @@ const RegisterCrop = () => {
                                     required
                                 />
                             </div>
-
+ 
                             <div className="form-group">
-                                <label>Soil Type *</label>
+                                <label>{t('farmer_crop.soilType')} *</label>
                                 <select name="soilType" value={formData.soilType} onChange={handleChange} required>
-                                    <option value="">Select soil type</option>
-                                    <option value="clay">Clay</option>
-                                    <option value="sandy">Sandy</option>
-                                    <option value="loamy">Loamy</option>
-                                    <option value="silt">Silt</option>
-                                    <option value="peat">Peat</option>
+                                    <option value="">{t('farmer_crop.selectSoil')}</option>
+                                    <option value="clay">{t('farmer_crop.clay')}</option>
+                                    <option value="sandy">{t('farmer_crop.sandy')}</option>
+                                    <option value="loamy">{t('farmer_crop.loamy')}</option>
+                                    <option value="silt">{t('farmer_crop.silt')}</option>
+                                    <option value="peat">{t('farmer_crop.peat')}</option>
                                 </select>
                             </div>
                         </div>
 
                         {formData.cropType === 'rice' && (
                             <div className="form-group" style={{ marginBottom: '20px' }}>
-                                <label>Season *</label>
+                                <label>{t('farmer_crop.season')} *</label>
                                 <select name="season" value={formData.season} onChange={handleChange} required>
-                                    <option value="">Select season</option>
-                                    <option value="Yala">Yala (යල)</option>
-                                    <option value="Maha">Maha (මහ)</option>
+                                    <option value="">{t('farmer_crop.selectSeason')}</option>
+                                    <option value="Yala">{t('farmer_crop.yala')}</option>
+                                    <option value="Maha">{t('farmer_crop.maha')}</option>
                                 </select>
                             </div>
                         )}
 
                         <div className="form-group" style={{ marginBottom: '15px' }}>
-                            <label>District *</label>
+                            <label>{t('auth.district')} *</label>
                             <select
                                 value={selectedDistrict}
                                 onChange={(e) => {
@@ -204,7 +206,7 @@ const RegisterCrop = () => {
                                 }}
                                 required
                             >
-                                <option value="">Select District</option>
+                                <option value="">{t('auth.district')}</option>
                                 {districts.map(district => (
                                     <option key={district} value={district}>{district}</option>
                                 ))}
@@ -212,7 +214,7 @@ const RegisterCrop = () => {
                         </div>
 
                         <div className="form-group">
-                            <label>Assigned Agrarian Service Center (ASC) *</label>
+                            <label>{t('farmer_crop.selectAsc')} *</label>
                             <select
                                 name="assignedAsc"
                                 value={formData.assignedAsc}
@@ -220,7 +222,7 @@ const RegisterCrop = () => {
                                 required
                                 disabled={!selectedDistrict}
                             >
-                                <option value="">{selectedDistrict ? 'Select ASC Center' : 'Select District first'}</option>
+                                <option value="">{selectedDistrict ? t('farmer_crop.selectAsc') : t('farmer_crop.selectDistrictFirst')}</option>
                                 {ascs
                                     .filter(asc => asc.district === selectedDistrict)
                                     .map(asc => (
@@ -228,15 +230,15 @@ const RegisterCrop = () => {
                                     ))
                                 }
                             </select>
-                            <small className="form-text text-muted">Select the center where you will receive support and services.</small>
+                            <small className="form-text text-muted">{t('farmer_crop.supportNote')}</small>
                         </div>
 
                         <div className="form-actions">
                             <button type="button" className="btn btn-outline" onClick={() => navigate('/farmer-dashboard')}>
-                                Cancel
+                                {t('common.cancel')}
                             </button>
                             <button type="submit" className="btn btn-primary">
-                                Submit Request
+                                {t('common.save')}
                             </button>
                         </div>
                     </form>

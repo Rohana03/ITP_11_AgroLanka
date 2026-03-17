@@ -168,7 +168,122 @@ const MachineryDashboard = () => {
     };
 
     const generatePDF = () => {
-        window.print();
+        const ascName = user?.assignedAsc?.name || 'ASC Center';
+        const district = user?.assignedAsc?.district || '';
+        const date = new Date().toLocaleDateString('en-LK', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        const pendingMachineryRows = data.machineryRequests.filter(r => r.status === 'PENDING');
+        const pendingServiceRows = data.serviceRequests.filter(r => r.status === 'PENDING');
+        const availableInventory = data.inventory.filter(i => i.availableCount > 0);
+
+        const section = (title, icon, tableHTML) => `
+            <div class="section">
+                <h2 class="section-title">${icon} ${title}</h2>
+                ${tableHTML}
+            </div>`;
+
+        const emptyRow = (cols, msg) =>
+            `<tr><td colspan="${cols}" style="text-align:center;color:#94a3b8;padding:16px;font-style:italic;">${msg}</td></tr>`;
+
+        // Table 1: Pending Machinery Requests
+        const machineryRows = pendingMachineryRows.length > 0
+            ? pendingMachineryRows.map(r => `<tr>
+                <td>${r.farmer?.name || '-'}<br/><small>${r.farmer?.email || ''}</small><br/><small>NIC: ${r.farmer?.nic || '-'}</small></td>
+                <td>${r.machinery?.name || '-'}<br/><small>${r.machinery?.type || ''}</small></td>
+                <td>${new Date(r.requestDate).toLocaleDateString()}</td>
+                <td>${r.duration ? r.duration + ' day(s)' : '-'}</td>
+                <td>${r.location || '-'}</td>
+                <td>${r.landSize ? r.landSize + ' ac' : '-'}</td>
+                <td>${r.additionalNotes || '-'}</td>
+            </tr>`).join('')
+            : emptyRow(7, 'No pending machinery requests.');
+
+        const machineryTable = `<table><thead><tr><th>Farmer</th><th>Machinery</th><th>Date</th><th>Duration</th><th>Location</th><th>Land Size</th><th>Notes</th></tr></thead><tbody>${machineryRows}</tbody></table>`;
+
+        // Table 2: Pending Service Requests
+        const serviceRows = pendingServiceRows.length > 0
+            ? pendingServiceRows.map(r => `<tr>
+                <td>${r.farmer?.name || '-'}<br/><small>${r.farmer?.email || ''}</small><br/><small>NIC: ${r.farmer?.nic || '-'}</small></td>
+                <td>${r.serviceType || '-'}</td>
+                <td>${new Date(r.requestDate).toLocaleDateString()}</td>
+                <td>${r.location || '-'}</td>
+                <td>${r.description || '-'}</td>
+            </tr>`).join('')
+            : emptyRow(5, 'No pending service requests.');
+
+        const serviceTable = `<table><thead><tr><th>Farmer</th><th>Service Type</th><th>Date</th><th>Location</th><th>Description</th></tr></thead><tbody>${serviceRows}</tbody></table>`;
+
+        // Table 3: ASC Inventory (Available Items)
+        const inventoryRows = data.inventory.length > 0
+            ? data.inventory.map(i => `<tr>
+                <td>${i.name || '-'}</td>
+                <td>${i.type || '-'}</td>
+                <td style="text-align:center;"><strong>${i.totalCount}</strong></td>
+                <td style="text-align:center;color:${i.availableCount > 0 ? '#166534' : '#991b1b'};"><strong>${i.availableCount}</strong></td>
+                <td style="text-align:center;">${i.totalCount - i.availableCount}</td>
+                <td><strong>${i.availableCount > 0 ? '✅ Available' : '🔴 Fully Booked'}</strong></td>
+            </tr>`).join('')
+            : emptyRow(6, 'No inventory items recorded.');
+
+        const inventoryTable = `<table><thead><tr><th>Item Name</th><th>Type</th><th style="text-align:center;">Total</th><th style="text-align:center;">Available</th><th style="text-align:center;">Booked</th><th>Status</th></tr></thead><tbody>${inventoryRows}</tbody></table>`;
+
+        // Table 4: Farmer Listings
+        const farmerRows = data.farmerRentals.length > 0
+            ? data.farmerRentals.map(r => `<tr>
+                <td>${r.farmer?.name || '-'}<br/><small>${r.farmer?.email || ''}</small></td>
+                <td>${r.machineryType || '-'}</td>
+                <td>LKR ${r.rentPerDay?.toLocaleString() || '-'} / day</td>
+                <td>${r.contactNumber || '-'}</td>
+                <td>${r.description || '-'}</td>
+            </tr>`).join('')
+            : emptyRow(5, 'No farmer machinery listings in this area.');
+
+        const farmerTable = `<table><thead><tr><th>Farmer</th><th>Machinery Type</th><th>Rent Per Day</th><th>Contact</th><th>Description</th></tr></thead><tbody>${farmerRows}</tbody></table>`;
+
+        const html = `<!DOCTYPE html><html><head><title>Machinery & Service Report - ${ascName}</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 30px; color: #1e293b; font-size: 13px; }
+            .report-header { text-align: center; border-bottom: 3px solid #2e7d32; padding-bottom: 18px; margin-bottom: 24px; }
+            .report-header h1 { color: #2e7d32; font-size: 22px; margin: 0 0 6px 0; }
+            .report-header p { color: #64748b; margin: 4px 0; font-size: 12px; }
+            .summary-row { display: flex; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+            .summary-box { border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; flex: 1; min-width: 110px; text-align: center; }
+            .summary-box .num { font-size: 26px; font-weight: 800; color: #2e7d32; }
+            .summary-box .lbl { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+            .section { margin-bottom: 36px; }
+            .section-title { font-size: 15px; font-weight: 700; color: #1e293b; margin-bottom: 10px; padding: 8px 14px; background: #f1f5f9; border-left: 4px solid #2e7d32; border-radius: 4px; }
+            table { width: 100%; border-collapse: collapse; font-size: 11px; }
+            th { background: #2e7d32; color: white; padding: 9px 10px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; }
+            td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+            tr:nth-child(even) td { background: #f8fafc; }
+            small { color: #94a3b8; font-size: 9px; display: block; }
+            .footer { margin-top: 30px; text-align: center; font-size: 10px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 12px; }
+            @media print { body { margin: 15px; } .section { page-break-inside: avoid; } }
+        </style></head><body>
+        <div class="report-header">
+            <h1>🌾 AgroLanka - Agricultural Service Center</h1>
+            <p>${ascName}${district ? ' · ' + district + ' District' : ''}</p>
+            <p style="font-size:15px; font-weight:700; color:#1e293b; margin-top:8px;">Machinery &amp; Service Dashboard Report</p>
+            <p>Generated on: ${date} &nbsp;·&nbsp; Officer: ${user?.name || ''}</p>
+        </div>
+        <div class="summary-row">
+            <div class="summary-box"><div class="num">${pendingMachineryRows.length}</div><div class="lbl">Pending Machinery</div></div>
+            <div class="summary-box"><div class="num">${pendingServiceRows.length}</div><div class="lbl">Pending Services</div></div>
+            <div class="summary-box"><div class="num">${data.inventory.length}</div><div class="lbl">Inventory Items</div></div>
+            <div class="summary-box"><div class="num">${availableInventory.length}</div><div class="lbl">Available Items</div></div>
+            <div class="summary-box"><div class="num">${data.farmerRentals.length}</div><div class="lbl">Farmer Listings</div></div>
+        </div>
+        ${section('Pending Machinery Requests', '🚜', machineryTable)}
+        ${section('Pending Service Requests', '🔧', serviceTable)}
+        ${section('ASC Inventory', '📦', inventoryTable)}
+        ${section('Farmer Machinery Listings', '🌾', farmerTable)}
+        <div class="footer">AgroLanka Agricultural Management System &mdash; Confidential Report &mdash; ${date}</div>
+        </body></html>`;
+
+        const win = window.open('', '_blank');
+        win.document.write(html);
+        win.document.close();
+        setTimeout(() => win.print(), 400);
     };
 
     // Derived stats
@@ -189,21 +304,7 @@ const MachineryDashboard = () => {
 
     return (
         <div className="farmer-dashboard-page">
-            <style>
-                {`
-                    @media print {
-                        .navbar, .dashboard-header p, .dashboard-header div, 
-                        .dashboard-grid, .summary-stats-container, 
-                        button, form, .tabs-container { display: none !important; }
-                        .dashboard-container { padding: 0 !important; max-width: 100% !important; }
-                        table { width: 100% !important; border: 1px solid #ccc !important; font-size: 10px !important; }
-                        th, td { padding: 8px !important; }
-                        .print-header { display: block !important; margin-bottom: 20px; text-align: center; }
-                        h1 { font-size: 18px !important; margin-bottom: 5px !important; }
-                    }
-                    .print-header { display: none; }
-                `}
-            </style>
+            <style>{`.print-header { display: none; }`}</style>
             <Navbar />
             <div className="dashboard-container">
                 <div className="print-header">

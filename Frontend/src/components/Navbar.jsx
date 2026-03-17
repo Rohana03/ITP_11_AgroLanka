@@ -27,7 +27,7 @@ const Navbar = () => {
                     <Link to="/about" className="navbar-item">{t('navbar.about')}</Link>
                     <Link to="/services" className="navbar-item" onClick={handleServicesClick}>{t('navbar.services')}</Link>
                     <Link to="/contact" className="navbar-item">{t('navbar.contact')}</Link>
-                    {user && <Link to="/admin" className="navbar-item">Dashboard</Link>}
+                    {user && <Link to="/admin" className="navbar-item">{t('dashboard.overview')}</Link>}
                 </div>
                 <div className="navbar-auth">
                     <button
@@ -39,8 +39,8 @@ const Navbar = () => {
 
                     {user ? (
                         <div className="user-menu" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>Hi, {user.name.split(' ')[0]}</span>
-                            <button onClick={logout} className="btn btn-outline" style={{ padding: '8px 16px', fontSize: '0.9rem' }}>Logout</button>
+                            <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>{t('dashboard.welcome')}, {user.name.split(' ')[0]}</span>
+                            <button onClick={logout} className="btn btn-outline btn-logout" style={{ padding: '8px 16px', fontSize: '0.9rem' }}>{t('dashboard.logout')}</button>
                         </div>
                     ) : (
                         <>

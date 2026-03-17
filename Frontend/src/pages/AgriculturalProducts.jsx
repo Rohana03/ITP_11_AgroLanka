@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 import Navbar from '../components/Navbar';
 import './FarmerPages.css';
 
 const AgriculturalProducts = () => {
     const { user, token } = useAuth();
     const navigate = useNavigate();
+    const { t } = useLanguage();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [products, setProducts] = useState([]);
@@ -32,15 +34,15 @@ const AgriculturalProducts = () => {
     }, [token]);
 
     const categories = [
-        { value: 'all', label: 'All Products' },
-        { value: 'Crop Protection', label: '🛡️ Protection' },
-        { value: 'Crop Nutrients', label: '🌿 Nutrients' },
-        { value: 'Seeds & Planting Material', label: '🌾 Seeds' },
-        { value: 'Agri Equipment', label: '🛠️ Equipment' },
-        { value: 'Animal Health & Nutrition', label: '🐄 Animal Health' },
-        { value: 'Post-Harvest & Storage', label: '📦 Storage' },
-        { value: 'Irrigation & Water Management', label: '💧 Irrigation' },
-        { value: 'Home & Garden', label: '🏡 Home' },
+        { value: 'all', label: t('farmer_market.allProducts') },
+        { value: 'Crop Protection', label: `🛡️ ${t('farmer_market.protection')}` },
+        { value: 'Crop Nutrients', label: `🌿 ${t('farmer_market.nutrients')}` },
+        { value: 'Seeds & Planting Material', label: `🌾 ${t('farmer_market.seeds')}` },
+        { value: 'Agri Equipment', label: `🛠️ ${t('farmer_market.equipment')}` },
+        { value: 'Animal Health & Nutrition', label: `🐄 ${t('farmer_market.animalHealth')}` },
+        { value: 'Post-Harvest & Storage', label: `📦 ${t('farmer_market.storage')}` },
+        { value: 'Irrigation & Water Management', label: `💧 ${t('farmer_market.irrigation')}` },
+        { value: 'Home & Garden', label: `🏡 ${t('farmer_market.homeGarden')}` },
     ];
 
     const filteredProducts = products.filter(product => {
@@ -69,10 +71,10 @@ const AgriculturalProducts = () => {
             <div className="page-container">
                 <div className="page-header">
                     <button className="back-btn" onClick={() => navigate('/farmer-dashboard')}>
-                        ← Back to Dashboard
+                        ← {t('common.backToDashboard')}
                     </button>
-                    <h1>🛒 Agricultural Products</h1>
-                    <p>Browse products available in your district ({user?.assignedAsc?.district || 'Unknown'})</p>
+                    <h1>🛒 {t('farmer_market.title')}</h1>
+                    <p>{t('farmer_market.subtitleDist')} ({user?.assignedAsc?.district || 'Unknown'})</p>
                 </div>
 
                 {/* Search and Filter */}
@@ -80,7 +82,7 @@ const AgriculturalProducts = () => {
                     <div className="search-box">
                         <input
                             type="text"
-                            placeholder="Search products..."
+                            placeholder={t('farmer_market.searchPlaceholder')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -102,7 +104,7 @@ const AgriculturalProducts = () => {
                 {/* Products Grid */}
                 <div className="products-grid">
                     {loading ? (
-                        <div className="loading">Loading products...</div>
+                        <div className="loading">{t('common.loading')}</div>
                     ) : filteredProducts.length > 0 ? (
                         filteredProducts.map(product => (
                             <div key={product._id} className="product-card">
@@ -119,14 +121,14 @@ const AgriculturalProducts = () => {
                                         {product.description}
                                     </p>
                                     <div style={{ fontSize: '0.8rem', color: '#3b82f6', marginBottom: '10px' }}>
-                                        👤 Sold by: {product.seller?.name || 'Authorized Seller'}
+                                        👤 {t('farmer_market.soldBy')}: {product.seller?.name || 'Authorized Seller'}
                                     </div>
                                     <div className="product-footer" style={{ borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
                                         <span className="product-price" style={{ fontWeight: '700', color: '#059669' }}>
-                                            LKR {product.price} <span style={{ fontSize: '0.7rem', color: '#64748b' }}>/ {product.unit}</span>
+                                            LKR {product.price} <span style={{ fontSize: '0.7rem', color: '#64748b' }}>/ {product.unit || t('farmer_market.unit')}</span>
                                         </span>
                                         <button className="btn btn-primary btn-sm">
-                                            Contact Seller
+                                            {t('farmer_market.contactSeller')}
                                         </button>
                                     </div>
                                 </div>
@@ -134,7 +136,7 @@ const AgriculturalProducts = () => {
                         ))
                     ) : (
                         <div className="no-results" style={{ gridColumn: 'span 4', textAlign: 'center', padding: '50px' }}>
-                            <p style={{ fontSize: '1.2rem', color: '#64748b' }}>No products found in your district matching your criteria.</p>
+                            <p style={{ fontSize: '1.2rem', color: '#64748b' }}>{t('farmer_market.noProductsDist')}</p>
                         </div>
                     )}
                 </div>

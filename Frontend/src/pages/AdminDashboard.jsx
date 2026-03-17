@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 import Navbar from '../components/Navbar';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
     const { user, logout } = useAuth();
+    const { t } = useLanguage();
     const navigate = useNavigate();
     const [stats, setStats] = useState({ ascCount: 0, officerCount: 0 });
     const [selectedDistrict, setSelectedDistrict] = useState('Colombo');
@@ -66,7 +68,7 @@ const AdminDashboard = () => {
             <div className="dashboard-loading">
                 <Navbar />
                 <div className="loading-content">
-                    <p>Loading user data...</p>
+                    <p>{t('common.loading')}</p>
                 </div>
             </div>
         );
@@ -83,14 +85,14 @@ const AdminDashboard = () => {
             <div className="dashboard-container">
                 <header className="dashboard-header">
                     <div className="header-left">
-                        <h1>Ministry of Agriculture Control Panel</h1>
-                        <p className="welcome-text">Welcome back, <strong>{user.name}</strong></p>
+                        <h1>AgroLanka {t('dashboard.overview')}</h1>
+                        <p className="welcome-text">{t('dashboard.welcome')}, <strong>{user.name}</strong></p>
                     </div>
                     <div className="header-right">
                         <span className={`role-badge role-${user.role.toLowerCase()}`}>
-                            {user.role.replace('_', ' ')}
+                            {t(`dashboard.role${user.role.split('_')[0].charAt(0).toUpperCase() + user.role.split('_')[0].slice(1).toLowerCase()}`)}
                         </span>
-                        <button onClick={handleLogout} className="btn btn-outline ml-2">Logout</button>
+                        <button onClick={handleLogout} className="btn btn-outline btn-logout ml-2">{t('dashboard.logout')}</button>
                     </div>
                 </header>
 
@@ -142,26 +144,25 @@ const AdminDashboard = () => {
                                     </div>
                                     <div className="action-card" onClick={() => navigate('/admin/reports')}>
                                         <div className="card-icon">📊</div>
-                                        <h3>Regional Reports</h3>
+                                        <h3>{t('dashboard.reports')}</h3>
                                         <p>View agricultural production reports by district and province.</p>
-                                        <button className="btn btn-sm">View Analytics</button>
+                                        <button className="btn btn-sm">{t('common.viewAll')}</button>
                                     </div>
                                 </div>
                             </div>
                             {/* ── District AI Range Map ── */}
-                            <div className="dashboard-section map-section">
+                            <div className="dashboard-section" style={{ marginTop: '30px' }}>
                                 <div className="section-header">
                                     <h2>🗺️ District Agricultural AI Range Map</h2>
                                     <p>Explore district-wise Agrarian Instructor (AI) range boundaries across Sri Lanka.</p>
                                 </div>
 
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '18px', flexWrap: 'wrap' }}>
-                                    <label style={{ fontWeight: '600', color: '#ffffff' }}>Select District:</label>
+                                    <label style={{ fontWeight: '600', color: '#374151' }}>Select District:</label>
                                     <select
                                         value={selectedDistrict}
                                         onChange={e => setSelectedDistrict(e.target.value)}
-                                        className="district-select"
-                                        style={{ padding: '10px 16px', borderRadius: '8px', fontSize: '0.95rem', cursor: 'pointer', minWidth: '200px' }}
+                                        style={{ padding: '10px 16px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '0.95rem', color: '#1e293b', backgroundColor: '#fff', cursor: 'pointer', minWidth: '200px' }}
                                     >
                                         {Object.keys(districtMaps).map(d => (
                                             <option key={d} value={d}>{d} District</option>
@@ -172,13 +173,13 @@ const AdminDashboard = () => {
                                         target="_blank"
                                         rel="noreferrer"
                                         className="btn btn-sm"
-                                        style={{ width: 'auto', backgroundColor: '#4ade80', color: '#064e3b', padding: '10px 18px', borderRadius: '8px', textDecoration: 'none', fontWeight: '800' }}
+                                        style={{ backgroundColor: '#3b82f6', color: '#fff', padding: '10px 18px', borderRadius: '8px', textDecoration: 'none', fontWeight: '600' }}
                                     >
                                         ↗ Open Full Map
                                     </a>
                                 </div>
 
-                                <div className="map-container" style={{ borderRadius: '12px', overflow: 'hidden' }}>
+                                <div style={{ borderRadius: '12px', overflow: 'hidden', border: '2px solid #e2e8f0', boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}>
                                     <iframe
                                         key={selectedDistrict}
                                         src={districtMaps[selectedDistrict]}

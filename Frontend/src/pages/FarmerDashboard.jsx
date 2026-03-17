@@ -1,11 +1,13 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 import Navbar from '../components/Navbar';
 import './FarmerDashboard.css'; // We will create this css file next
 
 const FarmerDashboard = () => {
     const { user, updateUser } = useAuth();
+    const { t } = useLanguage();
     const navigate = useNavigate();
     const [ascs, setAscs] = React.useState([]);
     const [districts, setDistricts] = React.useState([]);
@@ -81,7 +83,7 @@ const FarmerDashboard = () => {
     };
 
     if (!user) {
-        return <div>Loading...</div>;
+        return <div>{t('common.loading')}</div>;
     }
 
     return (
@@ -91,8 +93,8 @@ const FarmerDashboard = () => {
                 <header className="dashboard-header">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
-                            <h1>Welcome, {user.name || 'Farmer'}! 🌾</h1>
-                            <p>Manage your agricultural activities efficiently.</p>
+                            <h1>{t('dashboard.welcome')}, {user.name || 'Farmer'}! 🌾</h1>
+                            <p>{t('farmer.manageActivities')}</p>
                         </div>
 
                         <div className="asc-status-card" style={{
@@ -106,32 +108,32 @@ const FarmerDashboard = () => {
                             {!isEditingAsc ? (
                                 <>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                        <span style={{ fontSize: '0.85rem', fontWeight: '600', color: '#64748b' }}>YOUR CENTER</span>
+                                        <span style={{ fontSize: '0.85rem', fontWeight: '600', color: '#64748b' }}>{t('farmer.yourCenter')}</span>
                                         <button
                                             onClick={() => setIsEditingAsc(true)}
                                             style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', fontSize: '0.85rem' }}
                                         >
-                                            Change
+                                            {t('farmer.change')}
                                         </button>
                                     </div>
                                     {user.assignedAsc ? (
                                         <div>
                                             <div style={{ fontWeight: '700', color: '#1e293b' }}>📍 {user.assignedAsc.name}</div>
-                                            <div style={{ fontSize: '0.85rem', color: '#64748b' }}>{user.assignedAsc.district} District</div>
+                                            <div style={{ fontSize: '0.85rem', color: '#64748b' }}>{user.assignedAsc.district} {t('auth.district')}</div>
                                         </div>
                                     ) : (
-                                        <div style={{ color: '#ef4444', fontWeight: '500', fontSize: '0.9rem' }}>⚠️ No center assigned. Please select one.</div>
+                                        <div style={{ color: '#ef4444', fontWeight: '500', fontSize: '0.9rem' }}>⚠️ {t('farmer.noCenter')}</div>
                                     )}
                                 </>
                             ) : (
                                 <div>
-                                    <div style={{ fontSize: '0.85rem', fontWeight: '600', color: '#64748b', marginBottom: '10px' }}>SELECT NEW CENTER</div>
+                                    <div style={{ fontSize: '0.85rem', fontWeight: '600', color: '#64748b', marginBottom: '10px' }}>{t('farmer.selectNewCenter')}</div>
                                     <select
                                         value={selectedDistrict}
                                         onChange={(e) => setSelectedDistrict(e.target.value)}
                                         style={{ width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
                                     >
-                                        <option value="">Select District</option>
+                                        <option value="">{t('auth.district')}</option>
                                         {districts.map(d => <option key={d} value={d}>{d}</option>)}
                                     </select>
                                     <select
@@ -140,7 +142,7 @@ const FarmerDashboard = () => {
                                         disabled={!selectedDistrict}
                                         style={{ width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
                                     >
-                                        <option value="">Select Center</option>
+                                        <option value="">{t('auth.asc')}</option>
                                         {ascs.filter(a => a.district === selectedDistrict).map(a => (
                                             <option key={a._id} value={a._id}>{a.name}</option>
                                         ))}
@@ -151,14 +153,14 @@ const FarmerDashboard = () => {
                                             disabled={saving || !selectedAsc}
                                             style={{ backgroundColor: '#10b981', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', flex: 1 }}
                                         >
-                                            {saving ? 'Saving...' : 'Save'}
+                                            {saving ? t('common.loading') : t('common.save')}
                                         </button>
                                         <button
                                             onClick={() => setIsEditingAsc(false)}
                                             disabled={saving}
                                             style={{ backgroundColor: '#cbd5e1', color: '#334155', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', flex: 1 }}
                                         >
-                                            Cancel
+                                            {t('common.cancel')}
                                         </button>
                                     </div>
                                 </div>
@@ -178,27 +180,27 @@ const FarmerDashboard = () => {
                             {!isEditingPhone ? (
                                 <>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                        <span style={{ fontSize: '0.85rem', fontWeight: '600', color: '#64748b' }}>PHONE NUMBER</span>
+                                        <span style={{ fontSize: '0.85rem', fontWeight: '600', color: '#64748b' }}>{t('farmer.phoneNumber')}</span>
                                         <button
                                             onClick={() => setIsEditingPhone(true)}
                                             style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', fontSize: '0.85rem' }}
                                         >
-                                            Edit
+                                            {t('farmer.edit')}
                                         </button>
                                     </div>
                                     <div>
                                         <div style={{ fontWeight: '700', color: '#1e293b' }}>📞 {user.phone || 'Not added'}</div>
-                                        <div style={{ fontSize: '0.85rem', color: '#64748b' }}>Primary Contact</div>
+                                        <div style={{ fontSize: '0.85rem', color: '#64748b' }}>{t('farmer.primaryContact')}</div>
                                     </div>
                                 </>
                             ) : (
                                 <div>
-                                    <div style={{ fontSize: '0.85rem', fontWeight: '600', color: '#64748b', marginBottom: '10px' }}>UPDATE PHONE</div>
+                                    <div style={{ fontSize: '0.85rem', fontWeight: '600', color: '#64748b', marginBottom: '10px' }}>{t('farmer.updatePhone')}</div>
                                     <input
                                         type="text"
                                         value={newPhone}
                                         onChange={(e) => setNewPhone(e.target.value)}
-                                        placeholder="Enter phone number"
+                                        placeholder={t('farmer.enterPhone')}
                                         style={{ width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
                                     />
                                     <div style={{ display: 'flex', gap: '10px' }}>
@@ -207,14 +209,14 @@ const FarmerDashboard = () => {
                                             disabled={saving}
                                             style={{ backgroundColor: '#10b981', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', flex: 1 }}
                                         >
-                                            {saving ? '...' : 'Save'}
+                                            {saving ? '...' : t('common.save')}
                                         </button>
                                         <button
                                             onClick={() => { setIsEditingPhone(false); setNewPhone(user.phone || ''); }}
                                             disabled={saving}
                                             style={{ backgroundColor: '#cbd5e1', color: '#334155', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', flex: 1 }}
                                         >
-                                            Cancel
+                                            {t('common.cancel')}
                                         </button>
                                     </div>
                                 </div>
@@ -229,13 +231,13 @@ const FarmerDashboard = () => {
                         <div className="card-inner">
                             <div className="card-front">
                                 <div className="card-icon">🌱</div>
-                                <h3>Register Crop</h3>
-                                <p>Register your new crops for the season.</p>
+                                <h3>{t('farmer.registerCrop')}</h3>
+                                <p>{t('farmer.registerCropDesc')}</p>
                             </div>
                             <div className="card-back">
-                                <h3>Register Crop</h3>
-                                <p>Notify the ASC about your new seasonal cultivation to access benefits.</p>
-                                <div className="go-btn">Manage Now →</div>
+                                <h3>{t('farmer.registerCrop')}</h3>
+                                <p>{t('farmer.registerCropBack')}</p>
+                                <div className="go-btn">{t('common.viewAll')} →</div>
                             </div>
                         </div>
                     </div>
@@ -245,13 +247,13 @@ const FarmerDashboard = () => {
                         <div className="card-inner">
                             <div className="card-front">
                                 <div className="card-icon">💰</div>
-                                <h3>Financial Assistance</h3>
-                                <p>Apply for compensation and financial aid.</p>
+                                <h3>{t('farmer.financialAid')}</h3>
+                                <p>{t('farmer.financialAidDesc')}</p>
                             </div>
                             <div className="card-back">
-                                <h3>Financial Aid</h3>
-                                <p>Get support for crop damages or seasonal cultivation loans.</p>
-                                <div className="go-btn">View Schemes →</div>
+                                <h3>{t('farmer.financialAid')}</h3>
+                                <p>{t('farmer.financialAidBack')}</p>
+                                <div className="go-btn">{t('common.viewAll')} →</div>
                             </div>
                         </div>
                     </div>
@@ -261,13 +263,13 @@ const FarmerDashboard = () => {
                         <div className="card-inner">
                             <div className="card-front">
                                 <div className="card-icon">🚜</div>
-                                <h3>Machinery & Services</h3>
-                                <p>Request machinery and agricultural services.</p>
+                                <h3>{t('farmer.machineryHub')}</h3>
+                                <p>{t('farmer.machineryHubDesc')}</p>
                             </div>
                             <div className="card-back">
-                                <h3>Machinery Hub</h3>
-                                <p>Rent tractors and harvesters from your ASC or community.</p>
-                                <div className="go-btn">Book Now →</div>
+                                <h3>{t('farmer.machineryHub')}</h3>
+                                <p>{t('farmer.machineryHubBack')}</p>
+                                <div className="go-btn">{t('common.viewAll')} →</div>
                             </div>
                         </div>
                     </div>
@@ -277,13 +279,13 @@ const FarmerDashboard = () => {
                         <div className="card-inner">
                             <div className="card-front">
                                 <div className="card-icon">🛒</div>
-                                <h3>Agri Products</h3>
-                                <p>Explore and buy agricultural supplies.</p>
+                                <h3>{t('farmer.agriProducts')}</h3>
+                                <p>{t('farmer.agriProductsDesc')}</p>
                             </div>
                             <div className="card-back">
-                                <h3>Supply Shop</h3>
-                                <p>Purchase seeds, fertilizers, and equipment from regional stores.</p>
-                                <div className="go-btn">Shop Now →</div>
+                                <h3>{t('farmer.agriProducts')}</h3>
+                                <p>{t('farmer.agriProductsBack')}</p>
+                                <div className="go-btn">{t('common.viewAll')} →</div>
                             </div>
                         </div>
                     </div>
@@ -293,13 +295,13 @@ const FarmerDashboard = () => {
                         <div className="card-inner">
                             <div className="card-front">
                                 <div className="card-icon">📈</div>
-                                <h3>Sell Harvest</h3>
-                                <p>List your crops for sale to registered buyers.</p>
+                                <h3>{t('farmer.sellHarvest')}</h3>
+                                <p>{t('farmer.sellHarvestDesc')}</p>
                             </div>
                             <div className="card-back">
-                                <h3>Marketplace</h3>
-                                <p>Connect directly with bulk buyers and get the best prices.</p>
-                                <div className="go-btn">List Crops →</div>
+                                <h3>{t('farmer.sellHarvest')}</h3>
+                                <p>{t('farmer.sellHarvestBack')}</p>
+                                <div className="go-btn">{t('common.viewAll')} →</div>
                             </div>
                         </div>
                     </div>
