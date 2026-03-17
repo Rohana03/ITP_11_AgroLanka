@@ -4,11 +4,14 @@ import { AuthProvider } from './context/AuthContext';
 import PublicRoute from './components/PublicRoute';
 import ProtectedRoute from './components/ProtectedRoute';
 import LandingPage from './pages/LandingPage';
+import About from './pages/About';
+import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
 import ManageASC from './pages/admin/ManageASC';
 import ManageOfficers from './pages/admin/ManageOfficers';
+import RegionalReports from './pages/admin/RegionalReports';
 import FarmerDashboard from './pages/FarmerDashboard';
 import RegisterCrop from './pages/RegisterCrop';
 import FinancialAssistance from './pages/FinancialAssistance';
@@ -34,6 +37,8 @@ function App() {
             <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
             <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
             <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+            <Route path="/about" element={<PublicRoute><About /></PublicRoute>} />
+            <Route path="/contact" element={<PublicRoute><Contact /></PublicRoute>} />
 
             {/* Protected routes - require authentication */}
             {/* Admin routes */}
@@ -41,6 +46,7 @@ function App() {
             <Route path="/admin/ascs" element={<ProtectedRoute><ManageASC /></ProtectedRoute>} />
             <Route path="/admin/officers" element={<ProtectedRoute><ManageOfficers /></ProtectedRoute>} />
             <Route path="/admin/products/review" element={<ProtectedRoute><AdminProductReview /></ProtectedRoute>} />
+            <Route path="/admin/reports" element={<ProtectedRoute><RegionalReports /></ProtectedRoute>} />
 
             {/* Farmer routes */}
             <Route path="/farmer-dashboard" element={<ProtectedRoute><FarmerDashboard /></ProtectedRoute>} />

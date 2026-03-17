@@ -63,6 +63,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/ascs", require("./routes/ascRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
+app.use("/api/admin", require("./routes/analyticsRoutes")); // Register new analytics
 app.use("/api/crops", require("./routes/cropRoutes"));
 app.use("/api/loans", require("./routes/loanRoutes"));
 app.use("/api/compensation", require("./routes/compensationRoutes"));

@@ -36,9 +36,7 @@ const AdminDashboard = () => {
         'Trincomalee': 'https://www.arcgis.com/apps/View/index.html?appid=4f784ca89b004693aca062435f370582',
         'Batticaloa': 'https://www.arcgis.com/apps/View/index.html?appid=6db119fe17fd4c9781a589ed15ff2d09',
         'Ampara': 'https://www.arcgis.com/apps/View/index.html?appid=d48dca51c5814f96902118241fdce3a2',
-    };
-
-    useEffect(() => {
+    }; useEffect(() => {
         if (user?.role === 'ADMIN') {
             fetchStats();
         }
@@ -142,33 +140,28 @@ const AdminDashboard = () => {
                                         <p>Review and approve regulated product listings from managers.</p>
                                         <button className="btn btn-sm">Review Queue</button>
                                     </div>
-                                    <div className="action-card">
+                                    <div className="action-card" onClick={() => navigate('/admin/reports')}>
                                         <div className="card-icon">📊</div>
                                         <h3>Regional Reports</h3>
                                         <p>View agricultural production reports by district and province.</p>
                                         <button className="btn btn-sm">View Analytics</button>
                                     </div>
-                                    <div className="action-card">
-                                        <div className="card-icon">⚙️</div>
-                                        <h3>System Settings</h3>
-                                        <p>Modify global parameters and user access permissions.</p>
-                                        <button className="btn btn-sm">Configuration</button>
-                                    </div>
                                 </div>
                             </div>
                             {/* ── District AI Range Map ── */}
-                            <div className="dashboard-section" style={{ marginTop: '30px' }}>
+                            <div className="dashboard-section map-section">
                                 <div className="section-header">
                                     <h2>🗺️ District Agricultural AI Range Map</h2>
-                                    <p>Explore district-wise Agrarian Instructor (AI) range boundaries across Sri Lanka. Source: <a href="https://doa.gov.lk/ai-range-in-sri-lanka/" target="_blank" rel="noreferrer" style={{ color: '#3b82f6' }}>Department of Agriculture</a></p>
+                                    <p>Explore district-wise Agrarian Instructor (AI) range boundaries across Sri Lanka.</p>
                                 </div>
 
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '18px', flexWrap: 'wrap' }}>
-                                    <label style={{ fontWeight: '600', color: '#374151' }}>Select District:</label>
+                                    <label style={{ fontWeight: '600', color: '#ffffff' }}>Select District:</label>
                                     <select
                                         value={selectedDistrict}
                                         onChange={e => setSelectedDistrict(e.target.value)}
-                                        style={{ padding: '10px 16px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '0.95rem', color: '#1e293b', backgroundColor: '#fff', cursor: 'pointer', minWidth: '200px' }}
+                                        className="district-select"
+                                        style={{ padding: '10px 16px', borderRadius: '8px', fontSize: '0.95rem', cursor: 'pointer', minWidth: '200px' }}
                                     >
                                         {Object.keys(districtMaps).map(d => (
                                             <option key={d} value={d}>{d} District</option>
@@ -179,19 +172,19 @@ const AdminDashboard = () => {
                                         target="_blank"
                                         rel="noreferrer"
                                         className="btn btn-sm"
-                                        style={{ backgroundColor: '#3b82f6', color: '#fff', padding: '10px 18px', borderRadius: '8px', textDecoration: 'none', fontWeight: '600' }}
+                                        style={{ width: 'auto', backgroundColor: '#4ade80', color: '#064e3b', padding: '10px 18px', borderRadius: '8px', textDecoration: 'none', fontWeight: '800' }}
                                     >
                                         ↗ Open Full Map
                                     </a>
                                 </div>
 
-                                <div style={{ borderRadius: '12px', overflow: 'hidden', border: '2px solid #e2e8f0', boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}>
+                                <div className="map-container" style={{ borderRadius: '12px', overflow: 'hidden' }}>
                                     <iframe
                                         key={selectedDistrict}
                                         src={districtMaps[selectedDistrict]}
                                         title={`AI Range Map - ${selectedDistrict}`}
                                         width="100%"
-                                        height="520"
+                                        height="600"
                                         style={{ display: 'block', border: 'none' }}
                                         allowFullScreen
                                     />

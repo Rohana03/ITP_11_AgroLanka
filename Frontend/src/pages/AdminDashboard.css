@@ -1,10 +1,13 @@
 .admin-dashboard {
     min-height: 100vh;
-    background-color: #f1f5f9;
+    background: linear-gradient(rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.4)), url('/assets/admin_bg.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
 }
 
 .dashboard-container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 32px 24px;
 }
@@ -14,22 +17,39 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 32px;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     padding: 24px 32px;
-    border-radius: 16px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+    animation: fadeInDown 0.8s ease-out;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .header-left h1 {
-    font-size: 1.75rem;
+    font-size: 1.85rem;
     font-weight: 800;
-    color: #0f172a;
+    color: #ffffff;
     margin-bottom: 4px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .welcome-text {
-    color: #64748b;
-    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
 }
 
 .header-right {
@@ -47,141 +67,193 @@
 }
 
 .stat-card {
-    background: #fff;
-    padding: 24px;
-    border-radius: 16px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(226, 232, 240, 0.8);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 28px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    transition: transform 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .stat-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-8px);
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
 }
 
 .stat-value {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: #2563eb;
-    margin-bottom: 4px;
+    font-size: 2.8rem;
+    font-weight: 900;
+    color: #4ade80;
+    /* emerald-400 */
+    margin-bottom: 6px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .stat-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
 }
 
 .section-header {
-    margin-bottom: 24px;
+    margin-bottom: 28px;
+    background: rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 12px;
+    backdrop-filter: blur(4px);
 }
 
 .section-header h2 {
-    font-size: 1.5rem;
-    color: #1e293b;
-    margin-bottom: 4px;
+    font-size: 1.6rem;
+    color: #ffffff;
+    margin-bottom: 2px;
+    font-weight: 700;
 }
 
 .section-header p {
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
 }
 
 .role-badge {
-    padding: 6px 16px;
+    padding: 8px 20px;
     border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 700;
+    font-size: 0.8rem;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.role-admin {
-    background-color: #dcfce7;
-    color: #166534;
+    letter-spacing: 0.1em;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .action-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 24px;
+    gap: 28px;
 }
 
 .action-card {
-    background: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     padding: 32px;
-    border-radius: 20px;
-    border: 1px solid #e2e8f0;
-    transition: all 0.3s ease;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     cursor: pointer;
-    position: relative;
-    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .action-card:hover {
-    border-color: #2563eb;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    transform: translateY(-8px);
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
 }
 
 .card-icon {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
+    font-size: 3rem;
+    margin-bottom: 24px;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
 }
 
 .action-card h3 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #0f172a;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #ffffff;
     margin-bottom: 12px;
 }
 
 .action-card p {
-    color: #475569;
-    font-size: 0.95rem;
-    line-height: 1.6;
-    margin-bottom: 24px;
-}
-
-.ml-2 {
-    margin-left: 8px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 28px;
 }
 
 .btn-outline {
-    border: 1px solid #e2e8f0;
-    background: transparent;
-    padding: 8px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    color: #475569;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px 24px;
+    border-radius: 12px;
+    font-weight: 700;
+    color: #ffffff;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s;
+    backdrop-filter: blur(4px);
 }
 
 .btn-outline:hover {
-    background: #f8fafc;
-    border-color: #cbd5e1;
+    background: #ffffff;
+    color: #0f172a;
+    border-color: #ffffff;
 }
 
 .btn-sm {
-    background: #f1f5f9;
-    color: #334155;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 0.875rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.9rem;
     width: 100%;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .action-card:hover .btn-sm {
-    background: #2563eb;
-    color: #fff;
+    background: #4ade80;
+    color: #064e3b;
+    border-color: #4ade80;
+    box-shadow: 0 4px 12px rgba(74, 222, 128, 0.4);
+}
+
+/* Map Section Enhancements */
+.map-section {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
+    padding: 32px;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 40px;
+}
+
+.map-section h2 {
+    color: white;
+}
+
+.map-section p {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.district-select {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
+    backdrop-filter: blur(4px);
+}
+
+.district-select option {
+    background: #1e293b;
+    color: white;
+}
+
+.map-container {
+    border: 2px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
 }
