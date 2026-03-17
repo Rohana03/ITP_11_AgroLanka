@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
 import './FarmerPages.css';
@@ -26,6 +27,20 @@ const MachineryService = () => {
         location: '',
         additionalNotes: ''
     });
+
+    // Pre-fill location from user's ASC center once user loads
+    useEffect(() => {
+        if (user) {
+            const ascLocation = user.assignedAsc
+                ? `${user.assignedAsc.name}${user.assignedAsc.district ? ', ' + user.assignedAsc.district + ' District' : ''}`
+                : '';
+            setMachineryForm(prev => ({ ...prev, location: ascLocation }));
+            setServiceForm(prev => ({ ...prev, location: ascLocation }));
+            if (user.phone) {
+                setRentalForm(prev => ({ ...prev, contactNumber: user.phone }));
+            }
+        }
+    }, [user]);
 
     const [serviceForm, setServiceForm] = useState({
         serviceType: '',
@@ -223,8 +238,18 @@ const MachineryService = () => {
                                     <input type="number" step="0.1" value={machineryForm.landSize} onChange={(e) => setMachineryForm({ ...machineryForm, landSize: e.target.value })} required />
                                 </div>
                                 <div className="form-group">
-                                    <label>Location *</label>
-                                    <input type="text" value={machineryForm.location} onChange={(e) => setMachineryForm({ ...machineryForm, location: e.target.value })} placeholder="e.g. North Field" required />
+                                    <label>📍 {t('farmer_machinery.location')} <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '400' }}>(Auto-filled from your ASC center)</span></label>
+                                    <input
+                                        type="text"
+                                        value={machineryForm.location}
+                                        readOnly
+                                        style={{ backgroundColor: '#f1f5f9', cursor: 'not-allowed', color: '#475569' }}
+                                    />
+                                    {user?.assignedAsc && (
+                                        <small style={{ color: '#10b981', marginTop: '4px', display: 'block' }}>
+                                            🏛️ {user.assignedAsc.name}{user.assignedAsc.district ? ' — ' + user.assignedAsc.district + ' District' : ''}
+                                        </small>
+                                    )}
                                 </div>
                             </div>
 
@@ -259,8 +284,18 @@ const MachineryService = () => {
                                     <input type="date" value={serviceForm.requestDate} onChange={(e) => setServiceForm({ ...serviceForm, requestDate: e.target.value })} required />
                                 </div>
                                 <div className="form-group">
-                                    <label>Location *</label>
-                                    <input type="text" value={serviceForm.location} onChange={(e) => setServiceForm({ ...serviceForm, location: e.target.value })} required />
+                                    <label>📍 {t('farmer_machinery.location')} <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '400' }}>(Auto-filled from your ASC center)</span></label>
+                                    <input
+                                        type="text"
+                                        value={serviceForm.location}
+                                        readOnly
+                                        style={{ backgroundColor: '#f1f5f9', cursor: 'not-allowed', color: '#475569' }}
+                                    />
+                                    {user?.assignedAsc && (
+                                        <small style={{ color: '#10b981', marginTop: '4px', display: 'block' }}>
+                                            🏛️ {user.assignedAsc.name}{user.assignedAsc.district ? ' — ' + user.assignedAsc.district + ' District' : ''}
+                                        </small>
+                                    )}
                                 </div>
                             </div>
 
@@ -296,8 +331,16 @@ const MachineryService = () => {
                                     <input type="number" value={rentalForm.rentPerDay} onChange={(e) => setRentalForm({ ...rentalForm, rentPerDay: e.target.value })} required />
                                 </div>
                                 <div className="form-group">
-                                    <label>{t('farmer_machinery.contactNum')} *</label>
-                                    <input type="text" value={rentalForm.contactNumber} onChange={(e) => setRentalForm({ ...rentalForm, contactNumber: e.target.value })} required />
+                                    <label>{t('farmer_machinery.contactNum')} * <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '400' }}>(Auto-filled, you can edit)</span></label>
+                                    <input
+                                        type="text"
+                                        value={rentalForm.contactNumber}
+                                        onChange={(e) => setRentalForm({ ...rentalForm, contactNumber: e.target.value })}
+                                        required
+                                    />
+                                    {user?.phone && (
+                                        <small style={{ color: '#3b82f6', marginTop: '4px', display: 'block' }}>📱 Pre-filled from your profile</small>
+                                    )}
                                 </div>
                             </div>
 
