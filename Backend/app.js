@@ -70,6 +70,7 @@ app.use("/api/compensation", require("./routes/compensationRoutes"));
 app.use("/api/machinery", require("./routes/machineryRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
 app.use("/api/purchases", require("./routes/purchaseRoutes"));
+app.use("/api/ai", require("./routes/aiRoutes"));
 
 mongoose
   .connect(process.env.MONGO_URI)

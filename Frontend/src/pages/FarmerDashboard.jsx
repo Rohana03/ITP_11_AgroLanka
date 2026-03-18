@@ -305,6 +305,22 @@ const FarmerDashboard = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Block 6: Rice Leaf Diagnostic AI */}
+                    <div className="dashboard-card" onClick={() => navigate('/farmer/leaf-detection')}>
+                        <div className="card-inner">
+                            <div className="card-front">
+                                <div className="card-icon">🔍</div>
+                                <h3>{t('farmer.leafDiagnostic')}</h3>
+                                <p>{t('farmer.leafDiagnosticDesc')}</p>
+                            </div>
+                            <div className="card-back">
+                                <h3>{t('farmer.leafDiagnostic')}</h3>
+                                <p>{t('farmer.leafDiagnosticBack')}</p>
+                                <div className="go-btn">{t('common.viewAll')} →</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

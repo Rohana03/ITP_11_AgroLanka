@@ -1,0 +1,570 @@
+/* ── MyCrops Page Dedicated Styles ── */
+
+.mycrops-page {
+    background: linear-gradient(160deg, #f0fdf4 0%, #f8fafc 50%, #eff6ff 100%);
+    min-height: 100vh;
+}
+
+.mycrops-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+}
+
+/* ── Header ── */
+.mycrops-header {
+    margin-bottom: 28px;
+}
+
+.mycrops-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 4px;
+}
+
+.mycrops-title {
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: #14532d;
+    margin: 8px 0 4px;
+    letter-spacing: -0.5px;
+}
+
+.mycrops-subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.mycrops-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mycrops-refresh-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid #d1fae5;
+    background: white;
+    color: #059669;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.mycrops-refresh-btn:hover {
+    background: #f0fdf4;
+    border-color: #059669;
+    transform: scale(1.05);
+}
+
+.mycrops-refresh-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.mycrops-new-btn {
+    white-space: nowrap;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 10px;
+}
+
+/* spin animation for refresh */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+.spin {
+    display: inline-block;
+    animation: spin 0.7s linear infinite;
+}
+
+/* ── Stat Filter Cards ── */
+.mycrops-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+@media (max-width: 640px) {
+    .mycrops-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.mycrops-stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 16px 12px;
+    border-radius: 14px;
+    background: var(--stat-bg);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.22s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.mycrops-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    border-color: var(--stat-color);
+}
+
+.mycrops-stat-card.active {
+    background: var(--stat-active);
+    border-color: var(--stat-active);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--stat-active) 35%, transparent);
+    transform: translateY(-2px);
+}
+
+.mycrops-stat-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+.mycrops-stat-count {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: var(--stat-color);
+    line-height: 1.1;
+}
+
+.mycrops-stat-card.active .mycrops-stat-count,
+.mycrops-stat-card.active .mycrops-stat-label {
+    color: #fff;
+}
+
+.mycrops-stat-label {
+    font-size: 0.72rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+/* ── Search Row ── */
+.mycrops-search-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.mycrops-search-box {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+}
+
+.mycrops-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    pointer-events: none;
+}
+
+.mycrops-search-input {
+    width: 100%;
+    padding: 10px 40px 10px 42px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    background: white;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.mycrops-search-input:focus {
+    outline: none;
+    border-color: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34,197,94,0.12);
+}
+
+.mycrops-search-clear {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: color 0.15s;
+}
+
+.mycrops-search-clear:hover {
+    color: #ef4444;
+}
+
+.mycrops-results-count {
+    font-size: 0.85rem;
+    color: #64748b;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+/* ── Loading Spinner ── */
+.mycrops-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    color: #64748b;
+    gap: 16px;
+}
+
+.mycrops-spinner {
+    position: relative;
+    width: 64px;
+    height: 64px;
+}
+
+@keyframes spin-ring {
+    to { transform: rotate(360deg); }
+}
+
+.spinner-ring {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 4px solid #dcfce7;
+    border-top-color: #22c55e;
+    animation: spin-ring 0.9s linear infinite;
+}
+
+.spinner-leaf {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.6rem;
+}
+
+/* ── Error Box ── */
+.mycrops-error-box {
+    background: #fff1f2;
+    border: 1.5px solid #fca5a5;
+    border-radius: 14px;
+    padding: 36px 24px;
+    text-align: center;
+    color: #991b1b;
+}
+
+/* ── Empty State ── */
+.mycrops-empty {
+    background: white;
+    border-radius: 20px;
+    padding: 80px 24px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    border: 1px dashed #bbf7d0;
+}
+
+.mycrops-empty-art {
+    font-size: 5rem;
+    margin-bottom: 16px;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-10px); }
+}
+
+.mycrops-empty h2 {
+    color: #1e293b;
+    margin-bottom: 8px;
+    font-size: 1.4rem;
+}
+
+.mycrops-empty p {
+    color: #64748b;
+    max-width: 340px;
+    margin: 0 auto 24px;
+    line-height: 1.6;
+}
+
+.mycrops-empty-btn {
+    padding: 12px 28px !important;
+    font-size: 1rem !important;
+    border-radius: 12px !important;
+}
+
+/* ── No Match State ── */
+.mycrops-no-match {
+    background: white;
+    border-radius: 16px;
+    padding: 60px 24px;
+    text-align: center;
+    color: #64748b;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+
+.mycrops-clear-filter {
+    margin-top: 12px;
+    background: none;
+    border: none;
+    color: #2563eb;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.92rem;
+    text-decoration: underline;
+    padding: 4px 0;
+}
+
+/* ── Cards Grid ── */
+.mycrops-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+@media (max-width: 480px) {
+    .mycrops-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Card ── */
+.mycrops-card {
+    background: white;
+    border-radius: 18px;
+    border: 1.5px solid #f1f5f9;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    overflow: hidden;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.mycrops-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.09);
+}
+
+/* Top accent bar uses crop color */
+.mycrops-card-accent {
+    height: 5px;
+    background: var(--crop-color, #22c55e);
+    border-radius: 0;
+    width: 100%;
+}
+
+/* ── Card Header ── */
+.mycrops-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 18px 18px 14px;
+}
+
+.mycrops-card-icon-wrap {
+    width: 50px;
+    height: 50px;
+    border-radius: 13px;
+    background: color-mix(in srgb, var(--crop-color, #22c55e) 12%, white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.7rem;
+}
+
+.mycrops-card-title-group {
+    flex: 1;
+    min-width: 0;
+}
+
+.mycrops-card-title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1e293b;
+    text-transform: capitalize;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mycrops-card-variety {
+    margin: 3px 0 0;
+    font-size: 0.82rem;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mycrops-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    border: 1px solid;
+    font-size: 0.73rem;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+/* ── Card Divider ── */
+.mycrops-card-divider {
+    height: 1px;
+    background: #f1f5f9;
+    margin: 0 18px;
+}
+
+/* ── Card Stats Row ── */
+.mycrops-card-stats {
+    display: flex;
+    padding: 8px 4px;
+}
+
+.mycrops-stat-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 6px;
+    gap: 3px;
+    border-right: 1px solid #f1f5f9;
+}
+
+.mycrops-stat-item:last-child {
+    border-right: none;
+}
+
+.stat-icon {
+    font-size: 1.05rem;
+}
+
+.stat-value {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #1e293b;
+    text-align: center;
+    text-transform: capitalize;
+}
+
+.stat-label {
+    font-size: 0.68rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-align: center;
+}
+
+/* ── Expand Button ── */
+.mycrops-expand-btn {
+    background: none;
+    border: none;
+    border-top: 1px solid #f1f5f9;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 0.78rem;
+    padding: 8px 18px;
+    text-align: left;
+    width: 100%;
+    transition: background 0.15s, color 0.15s;
+    font-weight: 500;
+}
+
+.mycrops-expand-btn:hover {
+    background: #f8fafc;
+    color: #334155;
+}
+
+/* ── Expanded Details ── */
+.mycrops-card-details {
+    padding: 4px 18px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-top: 1px dashed #e2e8f0;
+    animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.detail-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 0.83rem;
+    padding: 4px 0;
+    border-bottom: 1px solid #f8fafc;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-icon {
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.detail-label {
+    color: #94a3b8;
+    font-weight: 500;
+    min-width: 110px;
+    flex-shrink: 0;
+}
+
+.detail-value {
+    color: #334155;
+    font-weight: 600;
+    flex: 1;
+}
+
+.detail-notes .detail-value {
+    font-style: italic;
+    color: #64748b;
+    font-weight: 400;
+}
+
+/* ── Card Footer (ASC center) ── */
+.mycrops-card-footer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    background: #f8fafc;
+    border-top: 1px solid #f1f5f9;
+    font-size: 0.8rem;
+    color: #475569;
+    margin-top: auto;
+}

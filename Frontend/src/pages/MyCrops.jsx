@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import Navbar from '../components/Navbar';
 import './FarmerPages.css';
+import './MyCrops.css';
 
 const CROP_ICONS = {
     rice: '🌾', vegetables: '🥦', fruits: '🍎', spices: '🌶️',
@@ -11,10 +12,55 @@ const CROP_ICONS = {
     paddy: '🌾', corn: '🌽', tomato: '🍅', potato: '🥔',
 };
 
+const CROP_COLORS = {
+    rice: '#10b981', paddy: '#10b981',
+    vegetables: '#22c55e',
+    fruits: '#f59e0b',
+    spices: '#ef4444',
+    tea: '#84cc16',
+    coconut: '#f97316',
+    rubber: '#64748b',
+    coffee: '#92400e',
+    other: '#6366f1',
+    corn: '#eab308',
+    tomato: '#dc2626',
+    potato: '#d97706',
+};
+
 const STATUS_CONFIG = {
-    APPROVED: { bg: '#dcfce7', color: '#166534', border: '#10b981', label: '✅ Approved', icon: '✅' },
-    REJECTED: { bg: '#fee2e2', color: '#991b1b', border: '#f87171', label: '❌ Rejected', icon: '❌' },
-    PENDING:  { bg: '#fef3c7', color: '#92400e', border: '#f59e0b', label: '⏳ Pending', icon: '⏳' },
+    APPROVED: {
+        bg: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
+        color: '#15803d',
+        border: '#86efac',
+        label: 'Approved',
+        icon: '✅',
+        dot: '#22c55e',
+    },
+    REJECTED: {
+        bg: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
+        color: '#b91c1c',
+        border: '#fca5a5',
+        label: 'Rejected',
+        icon: '❌',
+        dot: '#ef4444',
+    },
+    PENDING: {
+        bg: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+        color: '#92400e',
+        border: '#fcd34d',
+        label: 'Pending Review',
+        icon: '⏳',
+        dot: '#f59e0b',
+    },
+};
+
+const formatDate = (dateStr) => {
+    if (!dateStr) return '—';
+    try {
+        return new Date(dateStr).toLocaleDateString('en-GB', {
+            day: '2-digit', month: 'short', year: 'numeric'
+        });
+    } catch { return '—'; }
 };
 
 const MyCrops = () => {
@@ -25,178 +71,272 @@ const MyCrops = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [filter, setFilter] = useState('ALL');
+    const [search, setSearch] = useState('');
+    const [refreshing, setRefreshing] = useState(false);
+    const [expandedCard, setExpandedCard] = useState(null);
+
+    const fetchMyCrops = useCallback(async (isRefresh = false) => {
+        if (isRefresh) setRefreshing(true);
+        else setLoading(true);
+        setError(null);
+        try {
+            const res = await fetch('http://localhost:5000/api/crops', {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            const data = await res.json();
+            if (res.ok) setCrops(data);
+            else setError(data.message || t('common.error'));
+        } catch {
+            setError(t('common.error'));
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    }, [t]);
 
     useEffect(() => {
-        const fetchMyCrops = async () => {
-            try {
-                const res = await fetch('http://localhost:5000/api/crops', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-                });
-                const data = await res.json();
-                if (res.ok) setCrops(data);
-                else setError(data.message || t('common.error'));
-            } catch {
-                setError(t('common.error'));
-            } finally {
-                setLoading(false);
-            }
-        };
         if (user) fetchMyCrops();
-    }, [user, t]);
+    }, [user, fetchMyCrops]);
 
-    const filtered = filter === 'ALL' ? crops : crops.filter(c => c.status === filter);
+    const getCropIcon = (type) => CROP_ICONS[type?.toLowerCase()] || '🌱';
+    const getCropColor = (type) => CROP_COLORS[type?.toLowerCase()] || '#6366f1';
+
+    const filtered = crops
+        .filter(c => filter === 'ALL' || c.status === filter)
+        .filter(c => !search || c.cropType?.toLowerCase().includes(search.toLowerCase()) || c.variety?.toLowerCase().includes(search.toLowerCase()));
+
     const counts = {
-        ALL: crops.length,
+        ALL:      crops.length,
         APPROVED: crops.filter(c => c.status === 'APPROVED').length,
         PENDING:  crops.filter(c => c.status === 'PENDING').length,
         REJECTED: crops.filter(c => c.status === 'REJECTED').length,
     };
 
-    const getCropIcon = (type) => CROP_ICONS[type?.toLowerCase()] || '🌱';
+    const FILTER_TABS = [
+        { key: 'ALL',      label: 'All Crops',  icon: '🌱', color: '#3b82f6', bg: '#eff6ff', activeBg: '#3b82f6' },
+        { key: 'APPROVED', label: 'Approved',   icon: '✅', color: '#22c55e', bg: '#f0fdf4', activeBg: '#22c55e' },
+        { key: 'PENDING',  label: 'Pending',    icon: '⏳', color: '#f59e0b', bg: '#fffbeb', activeBg: '#f59e0b' },
+        { key: 'REJECTED', label: 'Rejected',   icon: '❌', color: '#ef4444', bg: '#fef2f2', activeBg: '#ef4444' },
+    ];
 
     return (
-        <div className="farmer-page">
+        <div className="farmer-page mycrops-page">
             <Navbar />
-            <div className="page-container">
-                {/* Header */}
-                <div className="page-header">
+            <div className="mycrops-container">
+                {/* ── Header ── */}
+                <div className="mycrops-header">
                     <button className="back-btn" onClick={() => navigate('/farmer-dashboard')}>
                         ← {t('common.backToDashboard')}
                     </button>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '12px' }}>
+                    <div className="mycrops-title-row">
                         <div>
-                            <h1>🌾 {t('farmer_crop.headerList')}</h1>
-                            <p>{t('farmer_crop.subtitleList')}</p>
+                            <h1 className="mycrops-title">🌾 {t('farmer_crop.headerList')}</h1>
+                            <p className="mycrops-subtitle">{t('farmer_crop.subtitleList')}</p>
                         </div>
-                        <button
-                            className="btn btn-primary"
-                            onClick={() => navigate('/farmer/register-crop')}
-                            style={{ whiteSpace: 'nowrap' }}
-                        >
-                            + {t('farmer_crop.createNew')}
-                        </button>
+                        <div className="mycrops-header-actions">
+                            <button
+                                className="mycrops-refresh-btn"
+                                onClick={() => fetchMyCrops(true)}
+                                disabled={refreshing}
+                                title="Refresh"
+                            >
+                                <span className={refreshing ? 'spin' : ''}>↻</span>
+                            </button>
+                            <button
+                                className="btn btn-primary mycrops-new-btn"
+                                onClick={() => navigate('/farmer/register-crop')}
+                            >
+                                + {t('farmer_crop.createNew')}
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                {/* Summary Cards */}
+                {/* ── Summary Filter Cards ── */}
                 {!loading && !error && crops.length > 0 && (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '14px', marginBottom: '28px' }}>
-                        {[
-                            { key: 'ALL',      label: 'All Crops',  icon: '🌱', color: '#3b82f6', bg: '#eff6ff' },
-                            { key: 'APPROVED', label: 'Approved',   icon: '✅', color: '#10b981', bg: '#ecfdf5' },
-                            { key: 'PENDING',  label: 'Pending',    icon: '⏳', color: '#f59e0b', bg: '#fffbeb' },
-                            { key: 'REJECTED', label: 'Rejected',   icon: '❌', color: '#ef4444', bg: '#fef2f2' },
-                        ].map(({ key, label, icon, color, bg }) => (
-                            <div
-                                key={key}
-                                onClick={() => setFilter(key)}
-                                style={{
-                                    backgroundColor: filter === key ? color : bg,
-                                    border: `2px solid ${filter === key ? color : 'transparent'}`,
-                                    borderRadius: '12px', padding: '16px', textAlign: 'center',
-                                    cursor: 'pointer', transition: 'all 0.2s',
-                                    boxShadow: filter === key ? `0 4px 14px ${color}40` : '0 2px 8px rgba(0,0,0,0.05)',
-                                }}
-                            >
-                                <div style={{ fontSize: '1.8rem', marginBottom: '4px' }}>{icon}</div>
-                                <div style={{ fontSize: '1.8rem', fontWeight: '800', color: filter === key ? '#fff' : color }}>{counts[key]}</div>
-                                <div style={{ fontSize: '0.78rem', color: filter === key ? 'rgba(255,255,255,0.9)' : '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</div>
-                            </div>
-                        ))}
+                    <div className="mycrops-stats">
+                        {FILTER_TABS.map(({ key, label, icon, color, bg, activeBg }) => {
+                            const isActive = filter === key;
+                            return (
+                                <button
+                                    key={key}
+                                    className={`mycrops-stat-card ${isActive ? 'active' : ''}`}
+                                    onClick={() => setFilter(key)}
+                                    style={{
+                                        '--stat-color': color,
+                                        '--stat-bg': bg,
+                                        '--stat-active': activeBg,
+                                    }}
+                                >
+                                    <span className="mycrops-stat-icon">{icon}</span>
+                                    <span className="mycrops-stat-count">{counts[key]}</span>
+                                    <span className="mycrops-stat-label">{label}</span>
+                                </button>
+                            );
+                        })}
                     </div>
                 )}
 
-                {/* Content */}
+                {/* ── Search Bar ── */}
+                {!loading && !error && crops.length > 0 && (
+                    <div className="mycrops-search-row">
+                        <div className="mycrops-search-box">
+                            <span className="mycrops-search-icon">🔍</span>
+                            <input
+                                type="text"
+                                placeholder="Search by crop type or variety…"
+                                value={search}
+                                onChange={e => setSearch(e.target.value)}
+                                className="mycrops-search-input"
+                            />
+                            {search && (
+                                <button className="mycrops-search-clear" onClick={() => setSearch('')}>✕</button>
+                            )}
+                        </div>
+                        <span className="mycrops-results-count">
+                            {filtered.length} crop{filtered.length !== 1 ? 's' : ''} found
+                        </span>
+                    </div>
+                )}
+
+                {/* ── Content ── */}
                 {loading ? (
-                    <div style={{ textAlign: 'center', padding: '60px', color: '#64748b' }}>
-                        <div style={{ fontSize: '3rem', marginBottom: '12px' }}>🌱</div>
-                        <p style={{ fontSize: '1.1rem' }}>{t('common.loading')}</p>
+                    <div className="mycrops-loading">
+                        <div className="mycrops-spinner">
+                            <div className="spinner-ring"></div>
+                            <div className="spinner-leaf">🌱</div>
+                        </div>
+                        <p>{t('common.loading')}</p>
                     </div>
                 ) : error ? (
-                    <div className="alert-error">{error}</div>
+                    <div className="mycrops-error-box">
+                        <div style={{ fontSize: '2.5rem', marginBottom: '10px' }}>⚠️</div>
+                        <p>{error}</p>
+                        <button className="btn btn-primary" style={{ marginTop: '14px' }} onClick={() => fetchMyCrops()}>
+                            Try Again
+                        </button>
+                    </div>
                 ) : crops.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '80px 20px', backgroundColor: 'white', borderRadius: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }}>
-                        <div style={{ fontSize: '5rem', marginBottom: '16px' }}>🌱</div>
-                        <h2 style={{ color: '#1e293b', marginBottom: '8px' }}>{t('farmer_crop.emptyList')}</h2>
-                        <p style={{ color: '#64748b', marginBottom: '24px' }}>Register your first crop to start tracking your harvest.</p>
-                        <button className="btn btn-primary" onClick={() => navigate('/farmer/register-crop')}>
+                    <div className="mycrops-empty">
+                        <div className="mycrops-empty-art">🌱</div>
+                        <h2>{t('farmer_crop.emptyList')}</h2>
+                        <p>Register your first crop to start tracking your harvest and accessing ASC services.</p>
+                        <button className="btn btn-primary mycrops-empty-btn" onClick={() => navigate('/farmer/register-crop')}>
                             + {t('farmer_crop.createNew')}
                         </button>
                     </div>
                 ) : filtered.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '60px', backgroundColor: 'white', borderRadius: '16px', color: '#64748b' }}>
-                        <div style={{ fontSize: '3rem', marginBottom: '12px' }}>🔍</div>
-                        <p>No crops with <strong>{filter}</strong> status.</p>
-                        <button onClick={() => setFilter('ALL')} style={{ marginTop: '12px', background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', fontWeight: '600', textDecoration: 'underline' }}>Show all crops</button>
+                    <div className="mycrops-no-match">
+                        <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>🔍</div>
+                        <p>No crops match your <strong>{filter !== 'ALL' ? filter.toLowerCase() : ''}</strong> {search ? `"${search}"` : ''} filter.</p>
+                        <button
+                            onClick={() => { setFilter('ALL'); setSearch(''); }}
+                            className="mycrops-clear-filter"
+                        >
+                            Clear filters
+                        </button>
                     </div>
                 ) : (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+                    <div className="mycrops-grid">
                         {filtered.map((crop) => {
                             const st = STATUS_CONFIG[crop.status] || STATUS_CONFIG.PENDING;
-                            const cropKey = crop.cropType?.toLowerCase();
+                            const cropColor = getCropColor(crop.cropType);
+                            const isExpanded = expandedCard === crop._id;
+
                             return (
-                                <div key={crop._id} style={{
-                                    backgroundColor: 'white',
-                                    borderRadius: '16px',
-                                    border: '1px solid #e2e8f0',
-                                    borderTop: `4px solid ${st.border}`,
-                                    boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
-                                    overflow: 'hidden',
-                                    transition: 'transform 0.2s, box-shadow 0.2s',
-                                }}
-                                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)'; }}
-                                    onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.06)'; }}
+                                <div
+                                    key={crop._id}
+                                    className={`mycrops-card ${isExpanded ? 'expanded' : ''}`}
+                                    style={{ '--crop-color': cropColor }}
                                 >
+                                    {/* Card top accent bar */}
+                                    <div className="mycrops-card-accent" />
+
                                     {/* Card Header */}
-                                    <div style={{ padding: '20px 20px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                            <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem', flexShrink: 0 }}>
-                                                {getCropIcon(crop.cropType)}
-                                            </div>
-                                            <div>
-                                                <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#1e293b', fontWeight: '700', textTransform: 'capitalize' }}>
-                                                    {crop.cropType}
-                                                </h3>
-                                                {crop.variety && crop.variety !== 'N/A' && (
-                                                    <p style={{ margin: '2px 0 0', fontSize: '0.83rem', color: '#64748b' }}>{crop.variety}</p>
-                                                )}
-                                            </div>
+                                    <div className="mycrops-card-header">
+                                        <div className="mycrops-card-icon-wrap">
+                                            <span className="mycrops-card-icon">{getCropIcon(crop.cropType)}</span>
                                         </div>
-                                        <span style={{
-                                            fontSize: '0.72rem', fontWeight: '700', padding: '4px 10px',
-                                            borderRadius: '20px', backgroundColor: st.bg, color: st.color,
-                                            border: `1px solid ${st.border}`, whiteSpace: 'nowrap'
-                                        }}>
-                                            {st.icon} {crop.status}
+                                        <div className="mycrops-card-title-group">
+                                            <h3 className="mycrops-card-title">{crop.cropType}</h3>
+                                            {crop.variety && crop.variety !== 'N/A' && (
+                                                <p className="mycrops-card-variety">{crop.variety}</p>
+                                            )}
+                                        </div>
+                                        <span className="mycrops-status-badge" style={{ background: st.bg, color: st.color, borderColor: st.border }}>
+                                            <span className="status-dot" style={{ background: st.dot }} />
+                                            {st.label}
                                         </span>
                                     </div>
 
-                                    {/* Card Stats */}
-                                    <div style={{ display: 'flex', borderTop: '1px solid #f1f5f9' }}>
-                                        {[
-                                            { label: t('farmer_crop.landSize'), value: crop.landSize ? `${crop.landSize} ac` : '—', icon: '📐' },
-                                            { label: t('farmer_crop.season'),   value: (crop.season && crop.season !== 'N/A') ? crop.season : '—',        icon: '🗓️' },
-                                            { label: 'Year',                    value: crop.year || '—',                                                   icon: '📅' },
-                                        ].map(({ label, value, icon }) => (
-                                            <div key={label} style={{ flex: 1, padding: '14px 8px', textAlign: 'center', borderRight: '1px solid #f1f5f9' }}>
-                                                <div style={{ fontSize: '1.1rem', marginBottom: '2px' }}>{icon}</div>
-                                                <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#1e293b' }}>{value}</div>
-                                                <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</div>
-                                            </div>
-                                        ))}
+                                    {/* Divider */}
+                                    <div className="mycrops-card-divider" />
+
+                                    {/* Stats row */}
+                                    <div className="mycrops-card-stats">
+                                        <div className="mycrops-stat-item">
+                                            <span className="stat-icon">📐</span>
+                                            <span className="stat-value">{crop.landSize ? `${crop.landSize} ac` : '—'}</span>
+                                            <span className="stat-label">{t('farmer_crop.landSize') || 'Land Size'}</span>
+                                        </div>
+                                        <div className="mycrops-stat-item">
+                                            <span className="stat-icon">🗓️</span>
+                                            <span className="stat-value">{(crop.season && crop.season !== 'N/A') ? crop.season : '—'}</span>
+                                            <span className="stat-label">{t('farmer_crop.season') || 'Season'}</span>
+                                        </div>
+                                        <div className="mycrops-stat-item">
+                                            <span className="stat-icon">🌍</span>
+                                            <span className="stat-value">{crop.soilType || '—'}</span>
+                                            <span className="stat-label">Soil Type</span>
+                                        </div>
                                     </div>
 
-                                    {/* Notes Section */}
-                                    {crop.notes && (
-                                        <div style={{ padding: '12px 20px', borderTop: '1px solid #f1f5f9', fontSize: '0.83rem', color: '#64748b', fontStyle: 'italic' }}>
-                                            💬 "{crop.notes}"
+                                    {/* Expandable details */}
+                                    <button
+                                        className="mycrops-expand-btn"
+                                        onClick={() => setExpandedCard(isExpanded ? null : crop._id)}
+                                    >
+                                        {isExpanded ? '▲ Hide details' : '▼ More details'}
+                                    </button>
+
+                                    {isExpanded && (
+                                        <div className="mycrops-card-details">
+                                            {crop.plantingDate && (
+                                                <div className="detail-row">
+                                                    <span className="detail-icon">🌱</span>
+                                                    <span className="detail-label">Planting Date</span>
+                                                    <span className="detail-value">{formatDate(crop.plantingDate)}</span>
+                                                </div>
+                                            )}
+                                            {crop.expectedHarvest && (
+                                                <div className="detail-row">
+                                                    <span className="detail-icon">🌾</span>
+                                                    <span className="detail-label">Expected Harvest</span>
+                                                    <span className="detail-value">{formatDate(crop.expectedHarvest)}</span>
+                                                </div>
+                                            )}
+                                            {crop.location && (
+                                                <div className="detail-row">
+                                                    <span className="detail-icon">📍</span>
+                                                    <span className="detail-label">Location</span>
+                                                    <span className="detail-value">{crop.location}</span>
+                                                </div>
+                                            )}
+                                            {crop.notes && (
+                                                <div className="detail-row detail-notes">
+                                                    <span className="detail-icon">💬</span>
+                                                    <span className="detail-label">Notes</span>
+                                                    <span className="detail-value">{crop.notes}</span>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
 
-                                    {/* ASC Center */}
+                                    {/* ASC Center footer */}
                                     {crop.asc?.name && (
-                                        <div style={{ padding: '10px 20px', borderTop: '1px solid #f1f5f9', fontSize: '0.8rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#f8fafc' }}>
-                                            🏛️ <span>{crop.asc.name}</span>
+                                        <div className="mycrops-card-footer">
+                                            <span>🏛️</span>
+                                            <span>{crop.asc.name}</span>
                                         </div>
                                     )}
                                 </div>

@@ -198,7 +198,20 @@ export const translations = {
             agriProductsBack: "Purchase seeds, fertilizers, and equipment from regional stores.",
             sellHarvest: "Sell Harvest",
             sellHarvestDesc: "List your crops for sale to registered buyers.",
-            sellHarvestBack: "Connect directly with bulk buyers and get the best prices."
+            sellHarvestBack: "Connect directly with bulk buyers and get the best prices.",
+            leafDiagnostic: "Rice Leaf Diagnostic",
+            leafDiagnosticDesc: "Identify rice diseases using AI technology.",
+            leafDiagnosticBack: "Upload a photo of a rice leaf to detect diseases and get expert treatment advice.",
+            scanLeaf: "Scan Leaf",
+            scanning: "Scanning...",
+            uploadPrompt: "Drop an image here or click to upload",
+            uploadHint: "Supports JPG, PNG, JPEG",
+            diagnosticResults: "Diagnostic Results",
+            confidence: "Confidence",
+            symptoms: "Symptoms",
+            recommendations: "Expert Recommendations",
+            detectedDisease: "Detected Disease",
+            tryAgain: "Scan Another Leaf"
         },
         landing: {
             heroTitle: "Revolutionizing Agriculture for a Sustainable Future",
@@ -734,7 +747,20 @@ export const translations = {
             agriProductsBack: "ප්‍රාදේශීය වෙළඳසැල් වලින් බීජ, පොහොර සහ උපකරණ මිලදී ගන්න.",
             sellHarvest: "අස්වනු අලෙවිය",
             sellHarvestDesc: "ලියාපදිංචි ගැනුම්කරුවන්ට විකිණීම සඳහා ඔබේ බෝග ලැයිස්තුගත කරන්න.",
-            sellHarvestBack: "තොග ගැනුම්කරුවන් සමඟ සෘජුවම සම්බන්ධ වී හොඳම මිල ලබා ගන්න."
+            sellHarvestBack: "තොග ගැනුම්කරුවන් සමඟ සෘජුවම සම්බන්ධ වී හොඳම මිල ලබා ගන්න.",
+            leafDiagnostic: "වී පත්‍ර රෝග නිර්ණය",
+            leafDiagnosticDesc: "AI තාක්ෂණය භාවිතයෙන් වී රෝග හඳුනා ගන්න.",
+            leafDiagnosticBack: "රෝග හඳුනා ගැනීමට සහ විශේෂඥ උපදෙස් ලබා ගැනීමට වී පත්‍රයක ඡායාරූපයක් උඩුගත කරන්න.",
+            scanLeaf: "පත්‍රය පරීක්ෂා කරන්න",
+            scanning: "පරීක්ෂා කරමින් පවතී...",
+            uploadPrompt: "ඡායාරූපය මෙහි තබන්න හෝ උඩුගත කිරීමට ක්ලික් කරන්න",
+            uploadHint: "JPG, PNG, JPEG පමණි",
+            diagnosticResults: "රෝග විනිශ්චය ප්‍රතිඵල",
+            confidence: "විශ්වාසවන්තභාවය",
+            symptoms: "රෝග ලක්ෂණ",
+            recommendations: "විශේෂඥ නිර්දේශ",
+            detectedDisease: "හඳුනාගත් රෝගය",
+            tryAgain: "තවත් පත්‍රයක් පරීක්ෂා කරන්න"
         },
         landing: {
             heroTitle: "තිරසාර අනාගතයක් සඳහා කෘෂිකර්මාන්තයේ විප්ලවයක්",

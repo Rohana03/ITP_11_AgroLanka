@@ -25,6 +25,7 @@ import AdminProductReview from './pages/AdminProductReview';
 import SellHarvest from './pages/SellHarvest';
 import ASCDashboard from './pages/ASCDashboard';
 import MyCrops from './pages/MyCrops';
+import RiceLeafDetection from './pages/RiceLeafDetection';
 import './App.css';
 
 function App() {
@@ -56,6 +57,7 @@ function App() {
             <Route path="/farmer/machinery" element={<ProtectedRoute><MachineryService /></ProtectedRoute>} />
             <Route path="/farmer/products" element={<ProtectedRoute><AgriculturalProducts /></ProtectedRoute>} />
             <Route path="/farmer/sell-harvest" element={<ProtectedRoute><SellHarvest /></ProtectedRoute>} />
+            <Route path="/farmer/leaf-detection" element={<ProtectedRoute><RiceLeafDetection /></ProtectedRoute>} />
 
             {/* Officer routes */}
             <Route path="/financial-dashboard" element={<ProtectedRoute><FinancialDashboard /></ProtectedRoute>} />
