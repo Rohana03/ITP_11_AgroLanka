@@ -26,6 +26,7 @@ import SellHarvest from './pages/SellHarvest';
 import ASCDashboard from './pages/ASCDashboard';
 import MyCrops from './pages/MyCrops';
 import RiceLeafDetection from './pages/RiceLeafDetection';
+import Footer from './components/Footer';
 import './App.css';
 
 function App() {
@@ -33,9 +34,10 @@ function App() {
     <AuthProvider>
       <LanguageProvider>
         <Router>
-          <Routes>
+          <div className="app-main-layout">
+            <Routes>
             {/* Public routes - redirect to dashboard if logged in */}
-            <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
             <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
             <Route path="/about" element={<PublicRoute><About /></PublicRoute>} />
@@ -66,6 +68,8 @@ function App() {
             <Route path="/machinery-dashboard" element={<ProtectedRoute><MachineryDashboard /></ProtectedRoute>} />
             <Route path="/asc-dashboard" element={<ProtectedRoute><ASCDashboard /></ProtectedRoute>} />
           </Routes>
+            <Footer />
+          </div>
         </Router>
       </LanguageProvider>
     </AuthProvider>

@@ -43,3 +43,10 @@
 .read-the-docs {
   color: #888;
 }
+
+.app-main-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-top: 80px;
+}

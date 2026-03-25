@@ -85,8 +85,8 @@ const AdminDashboard = () => {
             <div className="dashboard-container">
                 <header className="dashboard-header">
                     <div className="header-left">
-                        <h1>AgroLanka {t('dashboard.overview')}</h1>
-                        <p className="welcome-text">{t('dashboard.welcome')}, <strong>{user.name}</strong></p>
+                        <h1>Ministry of Agriculture<br />Control Panel</h1>
+                        <p className="welcome-text">Welcome back, <strong>{user.name || 'System Admin'}</strong></p>
                     </div>
                     <div className="header-right">
                         <span className={`role-badge role-${user.role.toLowerCase()}`}>

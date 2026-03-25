@@ -1,6 +1,7 @@
 .farmer-dashboard-page {
     min-height: 100vh;
-    background-color: #f4f7f6;
+    background: linear-gradient(rgba(15, 44, 22, 0.5), rgba(15, 44, 22, 0.8)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
+    background-size: cover;
     font-family: 'Inter', sans-serif;
 }
 
@@ -12,18 +13,26 @@
 
 .dashboard-header {
     margin-bottom: 3rem;
-    text-align: center;
+    background: rgba(232, 245, 233, 0.85); /* Light green glass */
+    backdrop-filter: blur(12px);
+    padding: 2rem;
+    border-radius: 16px;
+    text-align: left;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .dashboard-header h1 {
     font-size: 2.5rem;
-    color: #2c3e50;
+    color: #1b5e20;
     margin-bottom: 0.5rem;
+    font-weight: 800;
 }
 
 .dashboard-header p {
-    color: #7f8c8d;
+    color: #2e7d32;
     font-size: 1.1rem;
+    font-weight: 500;
 }
 
 .dashboard-grid {
@@ -69,11 +78,12 @@
     align-items: center;
     padding: 2rem;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .card-front {
-    background-color: white;
+    background: rgba(200, 230, 201, 0.94);
+    backdrop-filter: blur(12px);
+    border: 2px solid #66bb6a;
 }
 
 .card-back {

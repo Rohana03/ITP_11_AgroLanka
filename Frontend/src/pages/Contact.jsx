@@ -127,12 +127,6 @@ const Contact = () => {
                 </div>
             </section>
 
-            {/* Simple Footer */}
-            <footer className="footer" style={{ marginTop: '0' }}>
-                <div className="footer-content" style={{ justifyContent: 'center' }}>
-                    <p>{t('footer.rights')}</p>
-                </div>
-            </footer>
         </div>
     );
 };

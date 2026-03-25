@@ -1,10 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { useLanguage } from '../context/LanguageContext';
 import './LandingPage.css';
 
 const LandingPage = () => {
     const { t } = useLanguage();
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.state?.scrollToServices) {
+            setTimeout(() => {
+                document.getElementById('services-showcase')?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+    }, [location]);
 
     return (
         <div className="landing-page">
@@ -149,37 +159,6 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* Footer */}
-            <footer className="footer">
-                <div className="footer-content">
-                    <div className="footer-section">
-                        <h3>AgroLanka</h3>
-                        <p>{t('landing.footerQuote')}</p>
-                        <div className="social-links">
-                            <div className="social-btn">📱</div>
-                            <div className="social-btn">📘</div>
-                            <div className="social-btn">📸</div>
-                        </div>
-                    </div>
-                    <div className="footer-section">
-                        <h4>{t('landing.quickLinks')}</h4>
-                        <ul>
-                            <li><a href="/">{t('navbar.home')}</a></li>
-                            <li><a href="/login">{t('navbar.login')}</a></li>
-                            <li><a href="/register">{t('navbar.signup')}</a></li>
-                        </ul>
-                    </div>
-                    <div className="footer-section">
-                        <h4>{t('navbar.contact')}</h4>
-                        <p>{t('landing.contactMsg')}</p>
-                        <p>📞 +94 11 234 5678</p>
-                        <p>Colombo, Sri Lanka</p>
-                    </div>
-                </div>
-                <div className="footer-bottom">
-                    <p>{t('landing.rights')}</p>
-                </div>
-            </footer>
         </div>
     );
 };

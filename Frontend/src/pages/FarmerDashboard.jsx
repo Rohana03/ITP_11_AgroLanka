@@ -98,11 +98,12 @@ const FarmerDashboard = () => {
                         </div>
 
                         <div className="asc-status-card" style={{
-                            backgroundColor: '#fff',
+                            backgroundColor: 'rgba(200, 230, 201, 0.94)',
+                            backdropFilter: 'blur(12px)',
                             padding: '15px 20px',
                             borderRadius: '12px',
-                            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-                            border: '1px solid #e2e8f0',
+                            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)',
+                            border: '2px solid #66bb6a',
                             maxWidth: '350px'
                         }}>
                             {!isEditingAsc ? (
@@ -169,11 +170,12 @@ const FarmerDashboard = () => {
 
                         {/* Phone Status Card */}
                         <div className="asc-status-card" style={{
-                            backgroundColor: '#fff',
+                            backgroundColor: 'rgba(200, 230, 201, 0.94)',
+                            backdropFilter: 'blur(12px)',
                             padding: '15px 20px',
                             borderRadius: '12px',
-                            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-                            border: '1px solid #e2e8f0',
+                            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)',
+                            border: '2px solid #66bb6a',
                             maxWidth: '350px',
                             marginLeft: '15px'
                         }}>

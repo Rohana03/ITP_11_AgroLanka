@@ -82,20 +82,6 @@ const About = () => {
                 </div>
             </section>
 
-            {/* Reuse Landing Page Footer Logic or simple footer */}
-            <footer className="footer" style={{ marginTop: '0' }}>
-                <div className="footer-content">
-                    <div className="footer-section">
-                        <h3>AgroLanka</h3>
-                        <p>{t('footer.brandQuote')}</p>
-                    </div>
-                    <div className="footer-section">
-                        <h4>{t('footer.contact')}</h4>
-                        <p>{t('footer.email')}</p>
-                        <p>📞 +94 11 234 5678</p>
-                    </div>
-                </div>
-            </footer>
         </div>
     );
 };
