@@ -1,6 +1,10 @@
 .admin-dashboard {
     min-height: 100vh;
     background-color: #f1f5f9;
+    background-image: url('/assets/admin_bg.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
 }
 
 .dashboard-container {
