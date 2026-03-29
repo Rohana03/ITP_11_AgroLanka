@@ -66,24 +66,40 @@ router.post("/apply", protect, authorize("FARMER"), async (req, res) => {
     try {
         const { loanAmount, repaymentPeriod, interestRate, purpose, collateral, termsAccepted, asc } = req.body;
 
+        // ─── Validation Guards ───
+        if (!loanAmount || isNaN(parseFloat(loanAmount)) || parseFloat(loanAmount) < 1000) {
+            return res.status(400).json({ message: "Loan amount must be a valid number (minimum LKR 1,000)." });
+        }
+        if (!repaymentPeriod || isNaN(parseInt(repaymentPeriod)) || parseInt(repaymentPeriod) <= 0) {
+            return res.status(400).json({ message: "Invalid repayment period." });
+        }
+        if (!purpose || !purpose.trim()) {
+            return res.status(400).json({ message: "Loan purpose is required." });
+        }
+        if (!collateral || collateral.trim().length < 10) {
+            return res.status(400).json({ message: "Please provide a detailed collateral description (min 10 characters)." });
+        }
         if (!termsAccepted) {
             return res.status(400).json({ message: "Terms and conditions must be accepted." });
+        }
+        if (!asc) {
+            return res.status(400).json({ message: "ASC selection is required." });
         }
 
         // Calculate EMI and Total Payable
         const P = parseFloat(loanAmount);
-        const r = (parseFloat(interestRate) / 100) / 12;
+        const r = (parseFloat(interestRate || 8) / 100) / 12;
         const n = parseInt(repaymentPeriod);
         const emi = (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
         const totalPayable = emi * n;
 
         const newLoan = new Loan({
             farmer: req.user._id,
-            amount: loanAmount,
-            repaymentPeriod,
-            interestRate,
-            purpose,
-            collateral,
+            amount: P,
+            repaymentPeriod: n,
+            interestRate: interestRate || 8,
+            purpose: purpose.trim(),
+            collateral: collateral.trim(),
             termsAccepted,
             asc,
             monthlyInstallment: emi.toFixed(2),
@@ -151,12 +167,17 @@ router.patch("/:id/status", protect, authorize("FINANCIAL_OFFICER", "ADMIN"), as
 router.post("/repayments", protect, authorize("FARMER"), upload.single("receipt"), async (req, res) => {
     try {
         const { loanId, amount } = req.body;
+        
+        if (!loanId) return res.status(400).json({ message: "Loan ID is required" });
+        if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
+            return res.status(400).json({ message: "A valid positive repayment amount is required" });
+        }
         if (!req.file) return res.status(400).json({ message: "Payment proof (bank slip) is required" });
 
         const repayment = await Repayment.create({
             loan: loanId,
             farmer: req.user._id,
-            amount,
+            amount: parseFloat(amount),
             receiptImage: req.file.path
         });
 

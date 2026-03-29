@@ -6,6 +6,10 @@ import Navbar from '../components/Navbar';
 import axios from 'axios';
 import './FarmerPages.css';
 
+const FieldError = ({ message }) => (
+    message ? <div className="field-error" style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>{message}</div> : null
+);
+
 const MachineryService = () => {
     const { user, token } = useAuth();
     const { t } = useLanguage();
@@ -17,6 +21,8 @@ const MachineryService = () => {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
+    const [fieldErrors, setFieldErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Form states
     const [machineryForm, setMachineryForm] = useState({
@@ -100,19 +106,68 @@ const MachineryService = () => {
         }
     };
 
+    const validateMachinery = () => {
+        const errors = {};
+        if (!machineryForm.machineryId) errors.machineryId = "Select machinery.";
+        if (!machineryForm.requestDate) errors.requestDate = "Date is required.";
+        else if (new Date(machineryForm.requestDate) < new Date().setHours(0,0,0,0)) {
+            errors.requestDate = "Date cannot be in the past.";
+        }
+        if (!machineryForm.duration) errors.duration = "Duration is required.";
+        if (!machineryForm.landSize || parseFloat(machineryForm.landSize) <= 0) {
+            errors.landSize = "Enter valid land size.";
+        }
+        setFieldErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
+    const validateService = () => {
+        const errors = {};
+        if (!serviceForm.serviceType) errors.serviceType = "Select service type.";
+        if (!serviceForm.requestDate) errors.requestDate = "Date is required.";
+        else if (new Date(serviceForm.requestDate) < new Date().setHours(0,0,0,0)) {
+            errors.requestDate = "Date cannot be in the past.";
+        }
+        if (!serviceForm.description || serviceForm.description.trim().length < 10) {
+            errors.description = "Description too short (min 10 chars).";
+        }
+        setFieldErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
+    const validateRental = () => {
+        const errors = {};
+        if (!rentalForm.machineryType) errors.machineryType = "Select machinery type.";
+        if (!rentalForm.rentPerDay || parseFloat(rentalForm.rentPerDay) <= 0) {
+            errors.rentPerDay = "Enter a valid positive rent.";
+        }
+        if (!rentalForm.contactNumber) errors.contactNumber = "Contact number required.";
+        if (!rentalForm.description || rentalForm.description.trim().length < 10) {
+            errors.description = "Description too short (min 10 chars).";
+        }
+        setFieldErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
     const handleMachinerySubmit = async (e) => {
         e.preventDefault();
         setSuccess('');
         setError('');
+        if (!validateMachinery()) return;
+        
+        setIsSubmitting(true);
         try {
             await axios.post('http://localhost:5000/api/machinery/requests', machineryForm, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setSuccess(t('farmer_machinery.successMachinery'));
-            setMachineryForm({ machineryId: '', requestDate: '', duration: '', landSize: '', location: '', additionalNotes: '' });
+            setMachineryForm({ ...machineryForm, machineryId: '', requestDate: '', duration: '', landSize: '', additionalNotes: '' });
             fetchHistory();
+            setFieldErrors({});
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to submit request');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -120,15 +175,21 @@ const MachineryService = () => {
         e.preventDefault();
         setSuccess('');
         setError('');
+        if (!validateService()) return;
+
+        setIsSubmitting(true);
         try {
             await axios.post('http://localhost:5000/api/machinery/services', serviceForm, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setSuccess(t('farmer_machinery.successService'));
-            setServiceForm({ serviceType: '', requestDate: '', location: '', description: '' });
+            setServiceForm({ ...serviceForm, serviceType: '', requestDate: '', description: '' });
             fetchHistory();
+            setFieldErrors({});
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to submit request');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -136,15 +197,21 @@ const MachineryService = () => {
         e.preventDefault();
         setSuccess('');
         setError('');
+        if (!validateRental()) return;
+
+        setIsSubmitting(true);
         try {
             await axios.post('http://localhost:5000/api/machinery/rent-out', rentalForm, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setSuccess(t('farmer_machinery.successRental'));
-            setRentalForm({ machineryType: '', description: '', rentPerDay: '', contactNumber: '' });
+            setRentalForm({ ...rentalForm, machineryType: '', description: '', rentPerDay: '' });
             fetchHistory();
+            setFieldErrors({});
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to list machinery');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -210,6 +277,7 @@ const MachineryService = () => {
                                         <option key={m._id} value={m._id}>{m.name} ({m.type})</option>
                                     ))}
                                 </select>
+                                <FieldError message={fieldErrors.machineryId} />
                                 {availableMachinery.length === 0 && <small style={{ color: '#ef4444' }}>No machinery currently available in your ASC.</small>}
                             </div>
 
@@ -217,6 +285,7 @@ const MachineryService = () => {
                                 <div className="form-group">
                                     <label>{t('farmer_machinery.reqDate')} *</label>
                                     <input type="date" value={machineryForm.requestDate} onChange={(e) => setMachineryForm({ ...machineryForm, requestDate: e.target.value })} required />
+                                    <FieldError message={fieldErrors.requestDate} />
                                 </div>
                                 <div className="form-group">
                                     <label>{t('farmer_machinery.duration')} *</label>
@@ -229,6 +298,7 @@ const MachineryService = () => {
                                         <option value="1 Week">{t('farmer_machinery.oneWeek')}</option>
                                         <option value="Custom">{t('common.other')}</option>
                                     </select>
+                                    <FieldError message={fieldErrors.duration} />
                                 </div>
                             </div>
 
@@ -236,6 +306,7 @@ const MachineryService = () => {
                                 <div className="form-group">
                                     <label>Land Size (Acres) *</label>
                                     <input type="number" step="0.1" value={machineryForm.landSize} onChange={(e) => setMachineryForm({ ...machineryForm, landSize: e.target.value })} required />
+                                    <FieldError message={fieldErrors.landSize} />
                                 </div>
                                 <div className="form-group">
                                     <label>📍 {t('farmer_machinery.location')} <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '400' }}>(Auto-filled from your ASC center)</span></label>
@@ -258,7 +329,9 @@ const MachineryService = () => {
                                 <textarea value={machineryForm.additionalNotes} onChange={(e) => setMachineryForm({ ...machineryForm, additionalNotes: e.target.value })} rows="3"></textarea>
                             </div>
 
-                            <button type="submit" className="btn btn-primary">{t('farmer_machinery.submitRequest')}</button>
+                            <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                                {isSubmitting ? t('common.processing') || "Processing..." : t('farmer_machinery.submitRequest')}
+                            </button>
                         </form>
                     )}
 
@@ -276,12 +349,14 @@ const MachineryService = () => {
                                     <option value="Custom Farming Service">{t('farmer_machinery.customFarming')}</option>
                                     <option value="Equipment Maintenance">{t('farmer_machinery.maintenance')}</option>
                                 </select>
+                                <FieldError message={fieldErrors.serviceType} />
                             </div>
 
                             <div className="form-row">
                                 <div className="form-group">
                                     <label>Preferred Date *</label>
                                     <input type="date" value={serviceForm.requestDate} onChange={(e) => setServiceForm({ ...serviceForm, requestDate: e.target.value })} required />
+                                    <FieldError message={fieldErrors.requestDate} />
                                 </div>
                                 <div className="form-group">
                                     <label>📍 {t('farmer_machinery.location')} <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '400' }}>(Auto-filled from your ASC center)</span></label>
@@ -302,9 +377,12 @@ const MachineryService = () => {
                              <div className="form-group">
                                  <label>{t('farmer_machinery.serviceDescNeeded')} *</label>
                                  <textarea value={serviceForm.description} onChange={(e) => setServiceForm({ ...serviceForm, description: e.target.value })} rows="4" required></textarea>
+                                 <FieldError message={fieldErrors.description} />
                              </div>
  
-                             <button type="submit" className="btn btn-primary">{t('farmer_machinery.submitService')}</button>
+                             <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                                 {isSubmitting ? t('common.processing') || "Processing..." : t('farmer_machinery.submitService')}
+                             </button>
                         </form>
                     )}
 
@@ -323,12 +401,14 @@ const MachineryService = () => {
                                     <option value="Seeder">Seeder</option>
                                     <option value="Sprayer">Sprayer</option>
                                 </select>
+                                <FieldError message={fieldErrors.machineryType} />
                             </div>
 
                             <div className="form-row">
                                 <div className="form-group">
                                     <label>{t('farmer_machinery.rentPerDay')} (LKR) *</label>
                                     <input type="number" value={rentalForm.rentPerDay} onChange={(e) => setRentalForm({ ...rentalForm, rentPerDay: e.target.value })} required />
+                                    <FieldError message={fieldErrors.rentPerDay} />
                                 </div>
                                 <div className="form-group">
                                     <label>{t('farmer_machinery.contactNum')} * <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '400' }}>(Auto-filled, you can edit)</span></label>
@@ -341,15 +421,19 @@ const MachineryService = () => {
                                     {user?.phone && (
                                         <small style={{ color: '#3b82f6', marginTop: '4px', display: 'block' }}>📱 Pre-filled from your profile</small>
                                     )}
+                                    <FieldError message={fieldErrors.contactNumber} />
                                 </div>
                             </div>
 
                             <div className="form-group">
                                 <label>{t('farmer_market.description')} *</label>
                                 <textarea value={rentalForm.description} onChange={(e) => setRentalForm({ ...rentalForm, description: e.target.value })} rows="3" placeholder={t('farmer_machinery.descPlaceholder')} required></textarea>
+                                <FieldError message={fieldErrors.description} />
                             </div>
 
-                            <button type="submit" className="btn btn-primary">{t('farmer_machinery.listMachinery')}</button>
+                            <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                                {isSubmitting ? t('common.processing') || "Processing..." : t('farmer_machinery.listMachinery')}
+                            </button>
                         </form>
                     )}
 

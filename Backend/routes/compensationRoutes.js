@@ -42,9 +42,20 @@ router.post("/", protect, authorize("FARMER"), upload.array("evidenceFiles", 5),
     try {
         const { crop, damageType, incidentDate, affectedArea, damageDescription, asc } = req.body;
 
-        if (!crop || !damageType || !incidentDate || !affectedArea || !damageDescription || !asc) {
-            return res.status(400).json({ message: "Please provide all required fields" });
+        // ─── Validation Guards ───
+        if (!crop) return res.status(400).json({ message: "Crop selection is required." });
+        if (!damageType) return res.status(400).json({ message: "Damage type is required." });
+        if (!incidentDate) return res.status(400).json({ message: "Incident date is required." });
+        if (new Date(incidentDate) > new Date()) {
+            return res.status(400).json({ message: "Incident date cannot be in the future." });
         }
+        if (!affectedArea || isNaN(parseFloat(affectedArea)) || parseFloat(affectedArea) <= 0) {
+            return res.status(400).json({ message: "Affected area must be a positive number." });
+        }
+        if (!damageDescription || damageDescription.trim().length < 10) {
+            return res.status(400).json({ message: "Damage description is required (min 10 characters)." });
+        }
+        if (!asc) return res.status(400).json({ message: "ASC selection is required." });
 
         const evidenceFiles = req.files ? req.files.map(file => file.path) : [];
 
@@ -53,8 +64,8 @@ router.post("/", protect, authorize("FARMER"), upload.array("evidenceFiles", 5),
             crop,
             damageType,
             incidentDate,
-            affectedArea,
-            damageDescription,
+            affectedArea: parseFloat(affectedArea),
+            damageDescription: damageDescription.trim(),
             evidenceFiles,
             asc
         });

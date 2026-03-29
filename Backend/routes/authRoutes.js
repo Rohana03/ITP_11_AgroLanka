@@ -20,20 +20,57 @@ router.post("/register", async (req, res) => {
   const { name, email, nic, phone, password, role, assignedAsc, specialization, serviceDistricts } = req.body;
 
   try {
+    // ─── Required field check ───
     if (!name || !email || !nic || !password) {
-      return res.status(400).json({ message: "Please add all fields" });
+      return res.status(400).json({ message: "Please fill in all required fields (name, email, NIC, password)." });
     }
 
-    // Check if user exists
-    const userExists = await User.findOne({ email });
-    const nicExists = await User.findOne({ nic });
+    // ─── Email format ───
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRe.test(email.trim())) {
+      return res.status(400).json({ message: "Please enter a valid email address." });
+    }
+
+    // ─── NIC format (old: 9 digits + V/X, new: 12 digits) ───
+    const nicCleaned = nic.trim().toUpperCase();
+    const nicOld = /^\d{9}[VX]$/;
+    const nicNew = /^\d{12}$/;
+    if (!nicOld.test(nicCleaned) && !nicNew.test(nicCleaned)) {
+      return res.status(400).json({ message: "Invalid NIC. Use old format (9 digits + V/X) or new 12-digit format." });
+    }
+
+    // ─── Password strength ───
+    if (password.length < 8) {
+      return res.status(400).json({ message: "Password must be at least 8 characters long." });
+    }
+    if (!/\d/.test(password)) {
+      return res.status(400).json({ message: "Password must contain at least one number." });
+    }
+
+    // ─── Phone format (optional field) ───
+    if (phone) {
+      const phoneDigits = phone.replace(/[\s\-]/g, '');
+      const phoneRe = /^(\+94|94)?0?7\d{8}$/;
+      if (!phoneRe.test(phoneDigits)) {
+        return res.status(400).json({ message: "Invalid phone number. Use Sri Lanka format (e.g. 0712345678)." });
+      }
+    }
+
+    // Regex escape function for safety
+    const escapeRegex = (string) => string.replace(/[\\^$*+?.()|[\]{}]/g, '\\$&');
+
+    // Check if user exists (case-insensitive)
+    const userExists = await User.findOne({ 
+      email: { $regex: new RegExp(`^${escapeRegex(email.trim())}$`, 'i') } 
+    });
+    const nicExists = await User.findOne({ nic: nicCleaned });
 
     if (userExists) {
-      return res.status(400).json({ message: "User already exists with this email" });
+      return res.status(400).json({ message: "An account with this email already exists." });
     }
 
     if (nicExists) {
-      return res.status(400).json({ message: "User already exists with this NIC" });
+      return res.status(400).json({ message: "An account with this NIC already exists." });
     }
 
     // Hash password
@@ -42,12 +79,12 @@ router.post("/register", async (req, res) => {
 
     // Create user
     const user = await User.create({
-      name,
-      email,
-      nic,
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      nic: nicCleaned,
       phone: phone || "",
       password: hashedPassword,
-      role: role || 'FARMER', // Default role
+      role: role || 'FARMER',
       assignedAsc: assignedAsc || null,
       specialization: specialization || null,
       serviceDistricts: serviceDistricts || []
@@ -67,10 +104,10 @@ router.post("/register", async (req, res) => {
         token: generateToken(user.id),
       });
     } else {
-      res.status(400).json({ message: "Invalid user data" });
+      res.status(400).json({ message: "Could not create account. Please check your details and try again." });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Server error. Please try again later." });
   }
 });
 
@@ -81,8 +118,21 @@ router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Check for user email
-    const user = await User.findOne({ email }).populate('assignedAsc', 'name district');
+    // ─── Basic validation ───
+    if (!email || !email.trim()) {
+      return res.status(400).json({ message: "Email is required." });
+    }
+    if (!password) {
+      return res.status(400).json({ message: "Password is required." });
+    }
+
+    // Regex escape function for safety
+    const escapeRegex = (string) => string.replace(/[\\^$*+?.()|[\]{}]/g, '\\$&');
+
+    // Case-insensitive search to support legacy mixed-case emails
+    const user = await User.findOne({ 
+      email: { $regex: new RegExp(`^${escapeRegex(email.trim())}$`, 'i') } 
+    }).populate('assignedAsc', 'name district');
 
     if (user && (await bcrypt.compare(password, user.password))) {
       res.json({
@@ -97,10 +147,10 @@ router.post("/login", async (req, res) => {
         token: generateToken(user.id),
       });
     } else {
-      res.status(400).json({ message: "Invalid credentials" });
+      res.status(400).json({ message: "Incorrect email or password. Please try again." });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Server error. Please try again later." });
   }
 });
 

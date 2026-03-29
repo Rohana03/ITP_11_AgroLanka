@@ -29,12 +29,26 @@ router.post("/requests", protect, authorize("FARMER"), async (req, res) => {
         const { machineryId, requestDate, duration, location, landSize, additionalNotes } = req.body;
         const ascId = req.user.assignedAsc?._id || req.user.assignedAsc;
 
+        // ─── Validation ───
+        if (!machineryId) {
+            return res.status(400).json({ message: "Please select a machinery item." });
+        }
+        if (!requestDate) {
+            return res.status(400).json({ message: "Request date is required." });
+        }
+        if (!duration || isNaN(Number(duration)) || Number(duration) <= 0) {
+            return res.status(400).json({ message: "Duration must be a positive number of days." });
+        }
+        if (!location || !location.trim()) {
+            return res.status(400).json({ message: "Location / field address is required." });
+        }
+
         const machineryRequest = await MachineryRequest.create({
             farmer: req.user._id,
             machinery: machineryId,
             requestDate,
             duration,
-            location,
+            location: location.trim(),
             landSize,
             asc: ascId,
             additionalNotes
@@ -42,7 +56,7 @@ router.post("/requests", protect, authorize("FARMER"), async (req, res) => {
 
         res.status(201).json({ message: "Machinery request submitted successfully!", machineryRequest });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Server error. Please try again later." });
     }
 });
 
@@ -53,18 +67,29 @@ router.post("/services", protect, authorize("FARMER"), async (req, res) => {
         const { serviceType, requestDate, location, description } = req.body;
         const ascId = req.user.assignedAsc?._id || req.user.assignedAsc;
 
+        // ─── Validation ───
+        if (!serviceType || !serviceType.trim()) {
+            return res.status(400).json({ message: "Service type is required." });
+        }
+        if (!requestDate) {
+            return res.status(400).json({ message: "Request date is required." });
+        }
+        if (!location || !location.trim()) {
+            return res.status(400).json({ message: "Location is required." });
+        }
+
         const serviceRequest = await ServiceRequest.create({
             farmer: req.user._id,
-            serviceType,
+            serviceType: serviceType.trim(),
             requestDate,
-            location,
+            location: location.trim(),
             description,
             asc: ascId
         });
 
         res.status(201).json({ message: "Service request submitted successfully!", serviceRequest });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Server error. Please try again later." });
     }
 });
 
@@ -75,18 +100,29 @@ router.post("/rent-out", protect, authorize("FARMER"), async (req, res) => {
         const { machineryType, description, rentPerDay, contactNumber } = req.body;
         const ascId = req.user.assignedAsc?._id || req.user.assignedAsc;
 
+        // ─── Validation ───
+        if (!machineryType || !machineryType.trim()) {
+            return res.status(400).json({ message: "Machinery type is required." });
+        }
+        if (!rentPerDay || isNaN(Number(rentPerDay)) || Number(rentPerDay) <= 0) {
+            return res.status(400).json({ message: "Rent per day must be a positive number." });
+        }
+        if (!contactNumber || !contactNumber.trim()) {
+            return res.status(400).json({ message: "Contact number is required." });
+        }
+
         const rental = await FarmerMachinery.create({
             farmer: req.user._id,
-            machineryType,
+            machineryType: machineryType.trim(),
             description,
-            rentPerDay,
-            contactNumber,
+            rentPerDay: Number(rentPerDay),
+            contactNumber: contactNumber.trim(),
             asc: ascId
         });
 
         res.status(201).json({ message: "Machinery listed for rent successfully!", rental });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Server error. Please try again later." });
     }
 });
 
@@ -190,17 +226,28 @@ router.post("/inventory", protect, authorize("MACHINERY_OFFICER", "ASC_OFFICER")
         const { name, type, totalCount } = req.body;
         const ascId = req.user.assignedAsc?._id || req.user.assignedAsc;
 
+        // ─── Validation ───
+        if (!name || !name.trim()) {
+            return res.status(400).json({ message: "Machinery name is required." });
+        }
+        if (!type || !type.trim()) {
+            return res.status(400).json({ message: "Machinery type is required." });
+        }
+        if (!totalCount || isNaN(Number(totalCount)) || Number(totalCount) < 1) {
+            return res.status(400).json({ message: "Total count must be at least 1." });
+        }
+
         const item = await Machinery.create({
-            name,
-            type,
-            totalCount,
-            availableCount: totalCount,
+            name: name.trim(),
+            type: type.trim(),
+            totalCount: Number(totalCount),
+            availableCount: Number(totalCount),
             asc: ascId
         });
 
         res.status(201).json({ message: "Machinery added to inventory!", item });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Server error. Please try again later." });
     }
 });
 

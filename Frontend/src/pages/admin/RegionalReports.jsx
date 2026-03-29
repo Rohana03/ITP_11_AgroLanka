@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import '../AdminDashboard.css';
 import './RegionalReports.css';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
@@ -81,24 +82,24 @@ const RegionalReports = () => {
     }
 
     return (
-        <div className="regional-reports">
+        <div className="admin-dashboard">
             <Navbar />
-            <div className="reports-container">
-                <header className="reports-header">
+            <div className="dashboard-container">
+                <header className="dashboard-header" style={{ marginBottom: '24px' }}>
                     <div className="header-left">
-                        <button className="back-btn" onClick={() => navigate('/admin')}>
+                        <button className="btn-outline" onClick={() => navigate('/admin')} style={{ marginBottom: '12px', padding: '6px 16px' }}>
                             &larr; Back to Dashboard
                         </button>
                         <h1>📊 Regional Analytics</h1>
-                        <p>Platform-wide agricultural and demographic insights</p>
+                        <p className="welcome-text">Platform-wide agricultural and demographic insights</p>
                     </div>
                     <div className="header-right" style={{ gap: '16px', flexWrap: 'wrap' }}>
-                        <div className="district-filter">
-                            <label style={{ marginRight: '8px', fontWeight: '600', color: '#475569' }}>Filter by:</label>
+                        <div className="district-filter" style={{ backgroundColor: '#f8fafc', padding: '8px 16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                            <label style={{ marginRight: '8px', fontWeight: '600', color: '#475569' }}>Filter by District:</label>
                             <select
                                 value={selectedDistrict}
                                 onChange={(e) => setSelectedDistrict(e.target.value)}
-                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', cursor: 'pointer' }}
+                                style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', cursor: 'pointer', backgroundColor: '#fff' }}
                             >
                                 <option value="All">All Districts</option>
                                 {SRI_LANKA_DISTRICTS.map(d => (
@@ -109,6 +110,7 @@ const RegionalReports = () => {
                         <button
                             className="btn-download-report"
                             onClick={handlePrint}
+                            style={{ height: '45px' }}
                         >
                             {`📄 Print ${selectedDistrict === 'All' ? 'Full' : selectedDistrict} Report`}
                         </button>

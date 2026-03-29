@@ -3,7 +3,14 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import Navbar from '../components/Navbar';
+import {
+    validateEmail, validateNIC, validatePhone, validatePassword
+} from '../utils/validators';
 import './Auth.css';
+
+/* Inline error helper */
+const FieldError = ({ msg }) =>
+    msg ? <small style={{ color: '#dc2626', display: 'block', marginTop: '4px', fontSize: '0.78rem' }}>{msg}</small> : null;
 
 const Register = () => {
     const [name, setName] = useState('');
@@ -20,6 +27,9 @@ const Register = () => {
     const [ascs, setAscs] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [error, setError] = useState('');
+    const [fieldErrors, setFieldErrors] = useState({});
+    const [submitting, setSubmitting] = useState(false);
+
     const { register } = useAuth();
     const { t } = useLanguage();
     const navigate = useNavigate();
@@ -30,8 +40,6 @@ const Register = () => {
                 const response = await fetch('http://localhost:5000/api/ascs');
                 const data = await response.json();
                 setAscs(data);
-
-                // Get unique districts
                 const uniqueDistricts = [...new Set(data.map(asc => asc.district))].sort();
                 setDistricts(uniqueDistricts);
             } catch (err) {
@@ -41,21 +49,55 @@ const Register = () => {
         fetchAscs();
     }, []);
 
+    /* Validate a single field and update fieldErrors */
+    const validateField = (field, value) => {
+        let msg = null;
+        switch (field) {
+            case 'name':
+                if (!value.trim()) msg = 'Full name is required.';
+                else if (value.trim().length < 3) msg = 'Name must be at least 3 characters.';
+                break;
+            case 'email': msg = validateEmail(value); break;
+            case 'nic':   msg = validateNIC(value);   break;
+            case 'phone': msg = validatePhone(value); break;
+            case 'password': msg = validatePassword(value); break;
+            default: break;
+        }
+        setFieldErrors(prev => ({ ...prev, [field]: msg }));
+        return msg;
+    };
+
+    const validateAll = () => {
+        const errors = {
+            name:     validateField('name', name),
+            email:    validateField('email', email),
+            nic:      validateField('nic', nic),
+            phone:    validateField('phone', phone),
+            password: validateField('password', password),
+        };
+        // Extra: PRODUCT_MANAGER must select at least one district
+        if (role === 'PRODUCT_MANAGER' && serviceDistricts.length === 0) {
+            errors.serviceDistricts = t('auth.atLeastOne');
+        }
+        setFieldErrors(errors);
+        return Object.values(errors).every(v => !v);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (role === 'PRODUCT_MANAGER' && serviceDistricts.length === 0) {
-            setError(t('auth.atLeastOne'));
-            return;
-        }
-        console.log('📝 Submitting registration form...', { role, assignedAsc, specialization, serviceDistricts });
-        const res = await register(name, email, nic, phone, password, role, assignedAsc, specialization, serviceDistricts);
-        console.log('📋 Registration result:', res);
-        if (res.success) {
-            console.log('✅ Registration successful, redirecting to login...');
-            navigate('/login', { state: { message: t('auth.successReg') } });
-        } else {
-            console.error('❌ Registration failed:', res.message);
-            setError(res.message);
+        setError('');
+        if (!validateAll()) return;     // stop if client-side errors exist
+
+        setSubmitting(true);
+        try {
+            const res = await register(name, email, nic, phone, password, role, assignedAsc, specialization, serviceDistricts);
+            if (res.success) {
+                navigate('/login', { state: { message: t('auth.successReg') } });
+            } else {
+                setError(res.message || 'Registration failed. Please try again.');
+            }
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -65,45 +107,68 @@ const Register = () => {
             <div className="auth-container">
                 <div className="auth-card">
                     <h2>{t('auth.registerTitle')}</h2>
+
+                    {/* Global server error */}
                     {error && <div className="alert-error">{error}</div>}
-                    <form onSubmit={handleSubmit}>
+
+                    <form onSubmit={handleSubmit} noValidate>
+                        {/* Full Name */}
                         <div className="form-group">
                             <label>{t('auth.fullName')}</label>
                             <input
                                 type="text"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                required
+                                onBlur={(e) => validateField('name', e.target.value)}
+                                style={fieldErrors.name ? { borderColor: '#dc2626' } : {}}
+                                placeholder="e.g. Nuwan Perera"
                             />
+                            <FieldError msg={fieldErrors.name} />
                         </div>
+
+                        {/* NIC */}
                         <div className="form-group">
                             <label>{t('auth.nic')}</label>
                             <input
                                 type="text"
                                 value={nic}
                                 onChange={(e) => setNic(e.target.value)}
-                                required
+                                onBlur={(e) => validateField('nic', e.target.value)}
+                                style={fieldErrors.nic ? { borderColor: '#dc2626' } : {}}
+                                placeholder="e.g. 881234567V or 198812345678"
                             />
+                            <FieldError msg={fieldErrors.nic} />
                         </div>
+
+                        {/* Email */}
                         <div className="form-group">
                             <label>{t('auth.email')}</label>
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                required
+                                onBlur={(e) => validateField('email', e.target.value)}
+                                style={fieldErrors.email ? { borderColor: '#dc2626' } : {}}
+                                placeholder="e.g. nuwan@email.com"
                             />
+                            <FieldError msg={fieldErrors.email} />
                         </div>
+
+                        {/* Phone */}
                         <div className="form-group">
-                            <label>{t('auth.phone')}</label>
+                            <label>{t('auth.phone')} <span style={{ color: '#64748b', fontSize: '0.8rem' }}>(Optional)</span></label>
                             <input
                                 type="text"
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
+                                onBlur={(e) => validateField('phone', e.target.value)}
+                                style={fieldErrors.phone ? { borderColor: '#dc2626' } : {}}
                                 placeholder={t('auth.enterPhone')}
-                                required
                             />
+                            <FieldError msg={fieldErrors.phone} />
                         </div>
+
+                        {/* Password */}
                         <div className="form-group">
                             <label>{t('auth.password')}</label>
                             <div className="password-input-wrapper">
@@ -111,7 +176,9 @@ const Register = () => {
                                     type={showPassword ? "text" : "password"}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    required
+                                    onBlur={(e) => validateField('password', e.target.value)}
+                                    style={fieldErrors.password ? { borderColor: '#dc2626' } : {}}
+                                    placeholder="Min 8 chars, include a number"
                                 />
                                 <button
                                     type="button"
@@ -122,7 +189,10 @@ const Register = () => {
                                     {showPassword ? '👁️' : '👁️‍🗨️'}
                                 </button>
                             </div>
+                            <FieldError msg={fieldErrors.password} />
                         </div>
+
+                        {/* Role */}
                         <div className="form-group">
                             <label>{t('auth.role')}</label>
                             <select value={role} onChange={(e) => setRole(e.target.value)}>
@@ -135,19 +205,19 @@ const Register = () => {
                             </select>
                         </div>
 
+                        {/* Service Districts (Product Manager) */}
                         {(role === 'PRODUCT_MANAGER') && (
                             <div className="form-group">
-                                <label style={{ marginBottom: '10px', display: 'block' }}>{t('auth.serviceDistricts')} ({t('auth.selectDistricts')}) *</label>
+                                <label style={{ marginBottom: '10px', display: 'block' }}>
+                                    {t('auth.serviceDistricts')} ({t('auth.selectDistricts')}) *
+                                </label>
                                 <div style={{
                                     display: 'grid',
                                     gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
-                                    gap: '10px',
-                                    padding: '15px',
-                                    backgroundColor: '#f9fafb',
-                                    borderRadius: '8px',
-                                    border: '1px solid #e5e7eb',
-                                    maxHeight: '200px',
-                                    overflowY: 'auto'
+                                    gap: '10px', padding: '15px',
+                                    backgroundColor: '#f9fafb', borderRadius: '8px',
+                                    border: fieldErrors.serviceDistricts ? '1px solid #dc2626' : '1px solid #e5e7eb',
+                                    maxHeight: '200px', overflowY: 'auto'
                                 }}>
                                     {districts.map(district => (
                                         <label key={district} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px' }}>
@@ -156,21 +226,22 @@ const Register = () => {
                                                 value={district}
                                                 checked={serviceDistricts.includes(district)}
                                                 onChange={(e) => {
-                                                    if (e.target.checked) {
-                                                        setServiceDistricts([...serviceDistricts, district]);
-                                                    } else {
-                                                        setServiceDistricts(serviceDistricts.filter(d => d !== district));
-                                                    }
+                                                    const updated = e.target.checked
+                                                        ? [...serviceDistricts, district]
+                                                        : serviceDistricts.filter(d => d !== district);
+                                                    setServiceDistricts(updated);
+                                                    if (updated.length > 0) setFieldErrors(prev => ({ ...prev, serviceDistricts: null }));
                                                 }}
                                             />
                                             {district}
                                         </label>
                                     ))}
                                 </div>
-                                {serviceDistricts.length === 0 && <small style={{ color: '#ef4444' }}>{t('auth.atLeastOne')}</small>}
+                                <FieldError msg={fieldErrors.serviceDistricts} />
                             </div>
                         )}
 
+                        {/* District + ASC (non Product Manager roles) */}
                         {(role !== 'PRODUCT_MANAGER' && (role === 'FARMER' || role === 'ASC_OFFICER' || role === 'STORE_OFFICER' || role === 'FINANCIAL_OFFICER' || role === 'CROP_OFFICER' || role === 'MACHINERY_OFFICER')) && (
                             <>
                                 <div className="form-group">
@@ -179,7 +250,7 @@ const Register = () => {
                                         value={selectedDistrict}
                                         onChange={(e) => {
                                             setSelectedDistrict(e.target.value);
-                                            setAssignedAsc(''); // Reset center when district changes
+                                            setAssignedAsc('');
                                         }}
                                         required={role === 'FARMER'}
                                     >
@@ -210,6 +281,7 @@ const Register = () => {
                             </>
                         )}
 
+                        {/* Specialization (Crop Officer) */}
                         {role === 'CROP_OFFICER' && (
                             <div className="form-group">
                                 <label>{t('auth.specialization')}</label>
@@ -228,8 +300,12 @@ const Register = () => {
                                 </select>
                             </div>
                         )}
-                        <button type="submit" className="btn btn-primary btn-block">{t('auth.registerBtn')}</button>
+
+                        <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
+                            {submitting ? 'Registering...' : t('auth.registerBtn')}
+                        </button>
                     </form>
+
                     <p className="auth-footer">
                         {t('auth.haveAccount')} <Link to="/login">{t('auth.loginLink')}</Link>
                     </p>

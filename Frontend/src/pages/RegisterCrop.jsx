@@ -23,6 +23,39 @@ const RegisterCrop = () => {
     const [selectedDistrict, setSelectedDistrict] = useState(user?.assignedAsc?.district || '');
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
+    const [fieldErrors, setFieldErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const validateForm = () => {
+        const errors = {};
+        if (!formData.cropType) errors.cropType = t('farmer_crop.typeRequiredError') || "Crop type is required.";
+        
+        if (['rice', 'vegetables', 'fruits', 'spices', 'other'].includes(formData.cropType)) {
+            if (!formData.variety || formData.variety.trim().length === 0) {
+                errors.variety = t('farmer_crop.varietyRequiredError') || "Variety is required.";
+            }
+        }
+
+        if (!formData.landSize || parseFloat(formData.landSize) <= 0) {
+            errors.landSize = t('farmer_crop.invalidLandSizeError') || "Land size must be greater than 0.";
+        }
+
+        if (!formData.soilType) errors.soilType = t('farmer_crop.soilRequiredError') || "Soil type is required.";
+
+        if (formData.cropType === 'rice' && (!formData.season || formData.season === '')) {
+            errors.season = t('farmer_crop.seasonRequiredError') || "Season is required for rice.";
+        }
+
+        if (!selectedDistrict) errors.district = t('auth.districtRequiredError') || "District is required.";
+        if (!formData.assignedAsc) errors.assignedAsc = t('farmer_crop.ascRequiredError') || "Assigned ASC is required.";
+
+        setFieldErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
+    const FieldError = ({ message }) => (
+        message ? <div className="field-error" style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>{message}</div> : null
+    );
 
     React.useEffect(() => {
         const varietyNeeded = ['rice', 'vegetables', 'fruits', 'spices', 'other'].includes(formData.cropType);
@@ -69,6 +102,10 @@ const RegisterCrop = () => {
             ...formData,
             [e.target.name]: e.target.value
         });
+        // Clear field error when user types
+        if (fieldErrors[e.target.name]) {
+            setFieldErrors(prev => ({ ...prev, [e.target.name]: '' }));
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -76,6 +113,9 @@ const RegisterCrop = () => {
         setError('');
         setSuccess('');
 
+        if (!validateForm()) return;
+
+        setIsSubmitting(true);
         try {
             const response = await fetch('http://localhost:5000/api/crops', {
                 method: 'POST',
@@ -90,6 +130,7 @@ const RegisterCrop = () => {
 
             if (response.ok) {
                 setSuccess(t('farmer_crop.successReg'));
+                setFieldErrors({});
                 setTimeout(() => {
                     navigate('/farmer-dashboard');
                 }, 3000);
@@ -98,6 +139,8 @@ const RegisterCrop = () => {
             }
         } catch (err) {
             setError('Server error during crop registration');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -136,6 +179,7 @@ const RegisterCrop = () => {
                                     <option value="coffee">{t('farmer_crop.coffee')}</option>
                                     <option value="other">{t('auth.other')}</option>
                                 </select>
+                                <FieldError message={fieldErrors.cropType} />
                             </div>
 
                             {['rice', 'vegetables', 'fruits', 'spices', 'other'].includes(formData.cropType) && (
@@ -149,6 +193,7 @@ const RegisterCrop = () => {
                                         placeholder={t('farmer_crop.varietyPlaceholder')}
                                         required
                                     />
+                                    <FieldError message={fieldErrors.variety} />
                                 </div>
                             )}
                         </div>
@@ -165,8 +210,9 @@ const RegisterCrop = () => {
                                     placeholder="e.g., 2.5"
                                     required
                                 />
+                                <FieldError message={fieldErrors.landSize} />
                             </div>
- 
+  
                             <div className="form-group">
                                 <label>{t('farmer_crop.soilType')} *</label>
                                 <select name="soilType" value={formData.soilType} onChange={handleChange} required>
@@ -177,6 +223,7 @@ const RegisterCrop = () => {
                                     <option value="silt">{t('farmer_crop.silt')}</option>
                                     <option value="peat">{t('farmer_crop.peat')}</option>
                                 </select>
+                                <FieldError message={fieldErrors.soilType} />
                             </div>
                         </div>
 
@@ -188,6 +235,7 @@ const RegisterCrop = () => {
                                     <option value="Yala">{t('farmer_crop.yala')}</option>
                                     <option value="Maha">{t('farmer_crop.maha')}</option>
                                 </select>
+                                <FieldError message={fieldErrors.season} />
                             </div>
                         )}
 
@@ -211,6 +259,7 @@ const RegisterCrop = () => {
                                     <option key={district} value={district}>{district}</option>
                                 ))}
                             </select>
+                            <FieldError message={fieldErrors.district} />
                         </div>
 
                         <div className="form-group">
@@ -230,15 +279,16 @@ const RegisterCrop = () => {
                                     ))
                                 }
                             </select>
+                            <FieldError message={fieldErrors.assignedAsc} />
                             <small className="form-text text-muted">{t('farmer_crop.supportNote')}</small>
                         </div>
 
                         <div className="form-actions">
-                            <button type="button" className="btn btn-outline" onClick={() => navigate('/farmer-dashboard')}>
+                            <button type="button" className="btn btn-outline" onClick={() => navigate('/farmer-dashboard')} disabled={isSubmitting}>
                                 {t('common.cancel')}
                             </button>
-                            <button type="submit" className="btn btn-primary">
-                                {t('common.save')}
+                            <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                                {isSubmitting ? t('common.processing') || "Processing..." : t('common.save')}
                             </button>
                         </div>
                     </form>

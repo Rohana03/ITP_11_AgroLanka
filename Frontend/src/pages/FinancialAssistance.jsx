@@ -5,7 +5,11 @@ import { useLanguage } from '../context/LanguageContext';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
 import './FarmerPages.css';
- 
+
+const FieldError = ({ message }) => (
+    message ? <div className="field-error" style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>{message}</div> : null
+);
+
 const FinancialAssistance = () => {
     const { user, token } = useAuth();
     const { t } = useLanguage();
@@ -41,6 +45,50 @@ const FinancialAssistance = () => {
  
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
+    const [fieldErrors, setFieldErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Validation helpers
+    const validateLoanForm = () => {
+        const errors = {};
+        if (!loanData.loanAmount) errors.loanAmount = t('farmer_finance.selectAmountError');
+        if (!loanData.purpose) errors.purpose = t('farmer_finance.selectPurposeError');
+        if (!loanData.collateral || loanData.collateral.trim().length < 10) {
+            errors.collateral = t('farmer_finance.collateralMinLengthError') || "Collateral must be at least 10 characters.";
+        }
+        setFieldErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
+    const validateRepaymentForm = () => {
+        const errors = {};
+        if (!repaymentAmount || parseFloat(repaymentAmount) <= 0) {
+            errors.repaymentAmount = t('farmer_finance.invalidAmountError') || "Please enter a valid positive amount.";
+        }
+        if (!repaymentReceipt) {
+            errors.repaymentReceipt = t('farmer_finance.receiptError');
+        }
+        setFieldErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
+    const validateCompensationForm = () => {
+        const errors = {};
+        if (!compensationData.crop) errors.crop = t('farmer_finance.selectCropError');
+        if (!compensationData.damageType) errors.damageType = t('farmer_finance.selectDamageTypeError') || "Please select damage type.";
+        if (!compensationData.incidentDate) errors.incidentDate = t('farmer_finance.dateRequiredError') || "Incident date is required.";
+        else if (new Date(compensationData.incidentDate) > new Date()) {
+            errors.incidentDate = t('farmer_finance.futureDateError') || "Date cannot be in the future.";
+        }
+        if (!compensationData.affectedArea || parseFloat(compensationData.affectedArea) <= 0) {
+            errors.affectedArea = t('farmer_finance.invalidAreaError') || "Affected area must be greater than 0.";
+        }
+        if (!compensationData.damageDescription || compensationData.damageDescription.trim().length < 10) {
+            errors.damageDescription = t('farmer_finance.descriptionMinLengthError') || "Please provide at least 10 characters.";
+        }
+        setFieldErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
  
     useEffect(() => {
         fetchInterestRate();
@@ -149,12 +197,14 @@ const FinancialAssistance = () => {
         e.preventDefault();
         setError('');
         setSuccess('');
- 
+        
+        if (!validateLoanForm()) return;
         if (!termsAccepted) {
             setError(t('farmer_finance.termsError'));
             return;
         }
- 
+
+        setIsSubmitting(true);
         try {
             await axios.post('http://localhost:5000/api/loans/apply', {
                 loanAmount: loanData.loanAmount,
@@ -172,8 +222,11 @@ const FinancialAssistance = () => {
             setLoanData({ loanAmount: '', purpose: '', repaymentPeriod: '', collateral: '' });
             setMonthlyInstallment(null);
             setTermsAccepted(false);
+            setFieldErrors({});
         } catch (err) {
             setError(err.response?.data?.message || t('common.error'));
+        } finally {
+            setIsSubmitting(false);
         }
     };
  
@@ -182,11 +235,9 @@ const FinancialAssistance = () => {
         setError('');
         setSuccess('');
  
-        if (!repaymentReceipt) {
-            setError(t('farmer_finance.receiptError'));
-            return;
-        }
- 
+        if (!validateRepaymentForm()) return;
+
+        setIsSubmitting(true);
         try {
             const formData = new FormData();
             formData.append('loanId', selectedLoan._id);
@@ -204,8 +255,11 @@ const FinancialAssistance = () => {
             setSelectedLoan(null);
             setRepaymentAmount('');
             setRepaymentReceipt(null);
+            setFieldErrors({});
         } catch (err) {
             setError(err.response?.data?.message || t('common.error'));
+        } finally {
+            setIsSubmitting(false);
         }
     };
  
@@ -214,11 +268,9 @@ const FinancialAssistance = () => {
         setError('');
         setSuccess('');
  
-        if (!compensationData.crop) {
-            setError(t('farmer_finance.selectCropError'));
-            return;
-        }
- 
+        if (!validateCompensationForm()) return;
+
+        setIsSubmitting(true);
         try {
             const formData = new FormData();
             formData.append('crop', compensationData.crop);
@@ -251,8 +303,11 @@ const FinancialAssistance = () => {
                 incidentDate: '',
                 evidenceFiles: null
             });
+            setFieldErrors({});
         } catch (err) {
             setError(err.response?.data?.message || t('common.error'));
+        } finally {
+            setIsSubmitting(false);
         }
     };
  
@@ -315,8 +370,9 @@ const FinancialAssistance = () => {
                                         <option value="100000">100,000</option>
                                         <option value="200000">200,000</option>
                                         <option value="300000">300,000</option>
-                                        <option value="500000">500,000</option>
+                                        <option value="500000">50,0000</option>
                                     </select>
+                                    <FieldError message={fieldErrors.loanAmount} />
                                 </div>
  
                                 <div className="form-group">
@@ -333,6 +389,7 @@ const FinancialAssistance = () => {
                                         <option value="36">36 {t('farmer_finance.months')}</option>
                                         <option value="48">48 {t('farmer_finance.months')}</option>
                                     </select>
+                                    <FieldError message={fieldErrors.repaymentPeriod} />
                                 </div>
                             </div>
  
@@ -358,6 +415,7 @@ const FinancialAssistance = () => {
                                         <option value="livestock">{t('farmer_finance.livestock')}</option>
                                         <option value="other">{t('common.other')}</option>
                                     </select>
+                                    <FieldError message={fieldErrors.purpose} />
                                 </div>
                             </div>
  
@@ -371,6 +429,7 @@ const FinancialAssistance = () => {
                                     rows="3"
                                     required
                                 />
+                                <FieldError message={fieldErrors.collateral} />
                             </div>
  
                             <div className="calculation-section" style={{ margin: '20px 0', padding: '15px', backgroundColor: '#f0f9ff', borderRadius: '8px', border: '1px solid #bae6fd' }}>
@@ -409,8 +468,8 @@ const FinancialAssistance = () => {
                                 <button type="button" className="btn btn-outline" onClick={() => navigate('/farmer-dashboard')}>
                                     {t('common.cancel')}
                                 </button>
-                                <button type="submit" className="btn btn-primary" disabled={!termsAccepted}>
-                                    {t('farmer_finance.submitLoan')}
+                                <button type="submit" className="btn btn-primary" disabled={!termsAccepted || isSubmitting}>
+                                    {isSubmitting ? t('common.processing') || "Processing..." : t('farmer_finance.submitLoan')}
                                 </button>
                             </div>
                         </form>
@@ -521,6 +580,7 @@ const FinancialAssistance = () => {
                                         </option>
                                     ))}
                                 </select>
+                                <FieldError message={fieldErrors.crop} />
                                 {crops.length === 0 && <small style={{ color: '#ef4444' }}>{t('farmer_finance.noCropsFound')}</small>}
                             </div>
  
@@ -536,6 +596,7 @@ const FinancialAssistance = () => {
                                     <option value="storm">{t('farmer_finance.storm')}</option>
                                     <option value="other">{t('common.other')}</option>
                                 </select>
+                                <FieldError message={fieldErrors.damageType} />
                             </div>
  
                             <div className="form-row">
@@ -548,6 +609,7 @@ const FinancialAssistance = () => {
                                         onChange={handleCompensationChange}
                                         required
                                     />
+                                    <FieldError message={fieldErrors.incidentDate} />
                                 </div>
  
                                 <div className="form-group">
@@ -561,6 +623,7 @@ const FinancialAssistance = () => {
                                         placeholder="e.g., 1.5"
                                         required
                                     />
+                                    <FieldError message={fieldErrors.affectedArea} />
                                 </div>
                             </div>
  
@@ -575,6 +638,7 @@ const FinancialAssistance = () => {
                                     rows="4"
                                     required
                                 />
+                                <FieldError message={fieldErrors.damageDescription} />
                             </div>
  
                             <div className="form-group">
@@ -593,8 +657,8 @@ const FinancialAssistance = () => {
                                 <button type="button" className="btn btn-outline" onClick={() => navigate('/farmer-dashboard')}>
                                     {t('common.cancel')}
                                 </button>
-                                <button type="submit" className="btn btn-primary">
-                                    {t('farmer_finance.submitClaim')}
+                                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                                    {isSubmitting ? t('common.processing') || "Processing..." : t('farmer_finance.submitClaim')}
                                 </button>
                             </div>
                         </form>
@@ -621,6 +685,7 @@ const FinancialAssistance = () => {
                                         placeholder={t('farmer_finance.amountPlaceholder')}
                                         required
                                     />
+                                    <FieldError message={fieldErrors.repaymentAmount} />
                                 </div>
                                 <div className="form-group">
                                     <label>{t('farmer_finance.uploadSlip')} (Photo/PDF) *</label>
@@ -630,10 +695,13 @@ const FinancialAssistance = () => {
                                         accept="image/*,.pdf"
                                         required
                                     />
+                                    <FieldError message={fieldErrors.repaymentReceipt} />
                                 </div>
                                 <div className="form-actions" style={{ marginTop: '20px' }}>
-                                    <button type="button" className="btn btn-outline" onClick={() => setSelectedLoan(null)}>{t('common.cancel')}</button>
-                                    <button type="submit" className="btn btn-primary">{t('farmer_finance.submitVerification')}</button>
+                                    <button type="button" className="btn btn-outline" onClick={() => setSelectedLoan(null)} disabled={isSubmitting}>{t('common.cancel')}</button>
+                                    <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                                        {isSubmitting ? t('common.processing') || "Processing..." : t('farmer_finance.submitVerification')}
+                                    </button>
                                 </div>
                             </form>
                         </div>

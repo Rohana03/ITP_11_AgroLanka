@@ -3,7 +3,12 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import Navbar from '../components/Navbar';
+import { validatePrice, validateImageFile, required } from '../utils/validators';
 import './FarmerPages.css';
+
+/* Inline error helper */
+const FieldError = ({ msg }) =>
+    msg ? <small style={{ color: '#dc2626', display: 'block', marginTop: '4px', fontSize: '0.78rem' }}>{msg}</small> : null;
  
 const SellHarvest = () => {
     const { user, token } = useAuth();
@@ -13,7 +18,11 @@ const SellHarvest = () => {
     const [listings, setListings] = useState([]);
     const [sales, setSales] = useState([]);
     const [showForm, setShowForm] = useState(false);
-    const [message, setMessage] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+    const [formErrors, setFormErrors] = useState({});
+    const [imageFile, setImageFile] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [newListing, setNewListing] = useState({
         name: '', category: 'Other', description: '', price: '', unit: 'kg', image: ''
     });
@@ -45,15 +54,41 @@ const SellHarvest = () => {
  
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => setNewListing({ ...newListing, image: reader.result });
-            reader.readAsDataURL(file);
+        if (!file) return;
+        const sizeErr = validateImageFile(file, 2);
+        if (sizeErr) {
+            setFormErrors(prev => ({ ...prev, image: sizeErr }));
+            e.target.value = '';
+            return;
         }
+        setImageFile(file);
+        setFormErrors(prev => ({ ...prev, image: null }));
+        const reader = new FileReader();
+        reader.onloadend = () => setNewListing({ ...newListing, image: reader.result });
+        reader.readAsDataURL(file);
+    };
+ 
+    const validateListingForm = () => {
+        const errors = {
+            name:        required(newListing.name, 'Crop name'),
+            price:       validatePrice(newListing.price),
+            unit:        required(newListing.unit, 'Unit / Quantity'),
+            description: (!newListing.description || newListing.description.trim().length < 10)
+                            ? 'Description must be at least 10 characters.'
+                            : null,
+            image:       !newListing.image ? 'Please select an image (max 2 MB).' : null,
+        };
+        setFormErrors(errors);
+        return Object.values(errors).every(v => !v);
     };
  
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setSuccessMessage('');
+        setErrorMessage('');
+        if (!validateListingForm()) return;
+        
+        setIsSubmitting(true);
         try {
             const res = await fetch('http://localhost:5000/api/products', {
                 method: 'POST',
@@ -61,15 +96,21 @@ const SellHarvest = () => {
                 body: JSON.stringify(newListing)
             });
             if (res.ok) {
-                setMessage(t('farmer_market.listingPublished'));
+                setSuccessMessage(t('farmer_market.listingPublished'));
                 setNewListing({ name: '', category: 'Other', description: '', price: '', unit: 'kg', image: '' });
+                setImageFile(null);
+                setFormErrors({});
                 setShowForm(false);
                 fetchMyListings();
             } else {
                 const data = await res.json();
-                setMessage(data.message);
+                setErrorMessage(data.message || 'Failed to publish listing.');
             }
-        } catch (err) { console.error(err); }
+        } catch (err) {
+            setErrorMessage('Network error. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
  
     const handleDelete = async (id) => {
@@ -80,7 +121,8 @@ const SellHarvest = () => {
             });
             if (res.ok) {
                 setListings(listings.filter(l => l._id !== id));
-                setMessage(t('farmer_market.listingDeleted'));
+                setSuccessMessage(t('farmer_market.listingDeleted'));
+                setErrorMessage('');
             }
         } catch (err) { console.error(err); }
     };
@@ -133,8 +175,13 @@ const SellHarvest = () => {
                     <p>{t('farmer_market.subtitle')}</p>
                 </div>
  
-                {message && (
-                    <div className="alert-success" style={{ marginBottom: '20px' }}>{message}</div>
+                {successMessage && (
+                    <div className="alert-success" style={{ marginBottom: '20px' }}>{successMessage}</div>
+                )}
+                {errorMessage && (
+                    <div style={{ padding: '10px 14px', backgroundColor: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '8px', color: '#dc2626', fontSize: '0.9rem', marginBottom: '20px' }}>
+                        ⚠️ {errorMessage}
+                    </div>
                 )}
  
                 <div className="content-card">
@@ -167,31 +214,68 @@ const SellHarvest = () => {
                             </div>
  
                             {showForm && (
-                                <form onSubmit={handleSubmit} style={{ backgroundColor: '#f8fafc', padding: '25px', borderRadius: '12px', marginBottom: '30px', border: '1px solid #e2e8f0' }}>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                                        <div className="form-group">
-                                            <label>{t('farmer_market.cropName')}</label>
-                                            <input type="text" value={newListing.name} onChange={e => setNewListing({ ...newListing, name: e.target.value })} required placeholder="e.g. Red Onions" />
+                                                                <form onSubmit={handleSubmit} noValidate style={{ backgroundColor: '#f8fafc', padding: '25px', borderRadius: '12px', marginBottom: '30px', border: '1px solid #e2e8f0' }}>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                            <div className="form-group">
+                                                <label>{t('farmer_market.cropName')}</label>
+                                                <input
+                                                    type="text"
+                                                    value={newListing.name}
+                                                    onChange={e => { setNewListing({ ...newListing, name: e.target.value }); setFormErrors(p => ({ ...p, name: null })); }}
+                                                    style={formErrors.name ? { borderColor: '#dc2626' } : {}}
+                                                    placeholder="e.g. Red Onions"
+                                                />
+                                                <FieldError msg={formErrors.name} />
+                                            </div>
+                                            <div className="form-group">
+                                                <label>{t('farmer_market.price')} (LKR)</label>
+                                                <input
+                                                    type="number"
+                                                    value={newListing.price}
+                                                    onChange={e => { setNewListing({ ...newListing, price: e.target.value }); setFormErrors(p => ({ ...p, price: null })); }}
+                                                    style={formErrors.price ? { borderColor: '#dc2626' } : {}}
+                                                    placeholder="e.g. 5000"
+                                                    min="1"
+                                                />
+                                                <FieldError msg={formErrors.price} />
+                                            </div>
+                                            <div className="form-group">
+                                                <label>{t('farmer_market.unit')} / Quantity</label>
+                                                <input
+                                                    type="text"
+                                                    value={newListing.unit}
+                                                    onChange={e => { setNewListing({ ...newListing, unit: e.target.value }); setFormErrors(p => ({ ...p, unit: null })); }}
+                                                    style={formErrors.unit ? { borderColor: '#dc2626' } : {}}
+                                                    placeholder="e.g. 500kg, 20 Tons"
+                                                />
+                                                <FieldError msg={formErrors.unit} />
+                                            </div>
+                                            <div className="form-group">
+                                                <label>{t('farmer_market.image')} <span style={{ color: '#64748b', fontSize: '0.8rem' }}>(max 2 MB)</span></label>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleImageChange}
+                                                    style={formErrors.image ? { borderColor: '#dc2626' } : {}}
+                                                />
+                                                <FieldError msg={formErrors.image} />
+                                            </div>
                                         </div>
-                                        <div className="form-group">
-                                            <label>{t('farmer_market.price')}</label>
-                                            <input type="number" value={newListing.price} onChange={e => setNewListing({ ...newListing, price: e.target.value })} required />
+                                        <div className="form-group" style={{ marginTop: '20px' }}>
+                                            <label>{t('farmer_market.description')} <span style={{ color: '#64748b', fontSize: '0.8rem' }}>(min 10 chars)</span></label>
+                                            <textarea
+                                                value={newListing.description}
+                                                onChange={e => { setNewListing({ ...newListing, description: e.target.value }); setFormErrors(p => ({ ...p, description: null })); }}
+                                                style={formErrors.description ? { borderColor: '#dc2626' } : {}}
+                                                placeholder="Quality, grade, pick-up location..."
+                                                rows="4"
+                                            />
+                                            <FieldError msg={formErrors.description} />
                                         </div>
-                                        <div className="form-group">
-                                            <label>{t('farmer_market.unit')}</label>
-                                            <input type="text" value={newListing.unit} onChange={e => setNewListing({ ...newListing, unit: e.target.value })} required placeholder="e.g. 500kg, 20 Tons" />
-                                        </div>
-                                        <div className="form-group">
-                                            <label>{t('farmer_market.image')}</label>
-                                            <input type="file" accept="image/*" onChange={handleImageChange} required />
-                                        </div>
-                                    </div>
-                                    <div className="form-group" style={{ marginTop: '20px' }}>
-                                        <label>{t('farmer_market.description')}</label>
-                                        <textarea value={newListing.description} onChange={e => setNewListing({ ...newListing, description: e.target.value })} required placeholder="Quality, grade, pick-up location..." rows="4" />
-                                    </div>
-                                    <button type="submit" className="btn btn-primary" style={{ marginTop: '10px' }}>{t('farmer_market.postListing')}</button>
-                                </form>
+                                        <button type="submit" className="btn btn-primary" style={{ marginTop: '10px' }} disabled={isSubmitting}>
+                                            {isSubmitting ? t('common.processing') || "Publishing..." : t('farmer_market.postListing')}
+                                        </button>
+                                    </form>
                             )}
  
                             <div className="table-responsive">

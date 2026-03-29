@@ -1,7 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
+import {
+    validatePrice, validateImageFile,
+    validateCardNumber, validateExpiry, validateCVV, required
+} from '../utils/validators';
 import './FarmerDashboard.css';
+
+/* Inline error helper */
+const FieldError = ({ msg }) =>
+    msg ? <small style={{ color: '#dc2626', display: 'block', marginTop: '4px', fontSize: '0.78rem' }}>{msg}</small> : null;
 
 /* ─── Receipt Print Styles (injected once) ─── */
 const printStyle = `
@@ -29,6 +37,10 @@ const ProductDashboard = () => {
         name: '', category: 'Agri Equipment', description: '', price: '', unit: 'kg', image: ''
     });
 
+    // Form validation state
+    const [productFormErrors, setProductFormErrors] = useState({});
+    const [imageFile, setImageFile] = useState(null);
+
     // Payment modal state
     const [buyTarget, setBuyTarget] = useState(null);        // product being purchased
     const [payStep, setPayStep] = useState('confirm');        // 'confirm' | 'payment' | 'receipt'
@@ -36,6 +48,7 @@ const ProductDashboard = () => {
     const [cardFields, setCardFields] = useState({ number: '', expiry: '', cvv: '', name: '' });
     const [bankFields, setBankFields] = useState({ bank: '', accountName: '', reference: '' });
     const [processing, setProcessing] = useState(false);
+    const [payError, setPayError] = useState('');
     const [receipt, setReceipt] = useState(null);
 
     const receiptRef = useRef();
@@ -96,15 +109,37 @@ const ProductDashboard = () => {
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => setNewProduct({ ...newProduct, image: reader.result });
-            reader.readAsDataURL(file);
+        if (!file) return;
+        const sizeError = validateImageFile(file, 2);
+        if (sizeError) {
+            setProductFormErrors(prev => ({ ...prev, image: sizeError }));
+            e.target.value = '';
+            return;
         }
+        setImageFile(file);
+        setProductFormErrors(prev => ({ ...prev, image: null }));
+        const reader = new FileReader();
+        reader.onloadend = () => setNewProduct({ ...newProduct, image: reader.result });
+        reader.readAsDataURL(file);
+    };
+
+    const validateProductForm = () => {
+        const errors = {
+            name:        required(newProduct.name, 'Product name'),
+            price:       validatePrice(newProduct.price),
+            description: (!newProduct.description || newProduct.description.trim().length < 20)
+                            ? 'Description must be at least 20 characters.'
+                            : null,
+            unit:        required(newProduct.unit, 'Unit'),
+            image:       !newProduct.image ? 'Please select an image (max 2 MB).' : null,
+        };
+        setProductFormErrors(errors);
+        return Object.values(errors).every(v => !v);
     };
 
     const handleAddProduct = async (e) => {
         e.preventDefault();
+        if (!validateProductForm()) return;
         try {
             const res = await fetch('http://localhost:5000/api/products', {
                 method: 'POST',
@@ -114,13 +149,17 @@ const ProductDashboard = () => {
             if (res.ok) {
                 setMessage({ type: 'success', text: 'Product listed! (Regulated categories await admin approval)' });
                 setNewProduct({ name: '', category: 'Agri Equipment', description: '', price: '', unit: 'kg', image: '' });
+                setImageFile(null);
+                setProductFormErrors({});
                 setShowAddForm(false);
                 fetchData();
             } else {
                 const d = await res.json();
-                setMessage({ type: 'error', text: d.message });
+                setMessage({ type: 'error', text: d.message || 'Failed to list product.' });
             }
-        } catch (err) { console.error(err); }
+        } catch (err) {
+            setMessage({ type: 'error', text: 'Network error. Please try again.' });
+        }
     };
 
     const handleDeleteProduct = async (id) => {
@@ -143,6 +182,7 @@ const ProductDashboard = () => {
         setPayMethod('Card');
         setCardFields({ number: '', expiry: '', cvv: '', name: '' });
         setBankFields({ bank: '', accountName: '', reference: '' });
+        setPayError('');
         setReceipt(null);
     };
 
@@ -153,10 +193,30 @@ const ProductDashboard = () => {
         fetchData(); // refresh marketplace (item may now be Out of Stock)
     };
 
-    const handleConfirmBuy = () => setPayStep('payment');
+    const handleConfirmBuy = () => { setPayError(''); setPayStep('payment'); };
+
+    const validatePaymentFields = () => {
+        if (payMethod === 'Card') {
+            const nameErr   = required(cardFields.name, 'Cardholder name');
+            const numErr    = validateCardNumber(cardFields.number);
+            const expErr    = validateExpiry(cardFields.expiry);
+            const cvvErr    = validateCVV(cardFields.cvv);
+            const first = nameErr || numErr || expErr || cvvErr;
+            if (first) { setPayError(first); return false; }
+        } else {
+            const bankErr = required(bankFields.bank, 'Bank name');
+            const accErr  = required(bankFields.accountName, 'Account holder name');
+            const refErr  = required(bankFields.reference, 'Transfer reference');
+            const first = bankErr || accErr || refErr;
+            if (first) { setPayError(first); return false; }
+        }
+        return true;
+    };
 
     const handlePayment = async (e) => {
         e.preventDefault();
+        setPayError('');
+        if (!validatePaymentFields()) return;
         setProcessing(true);
         try {
             const res = await fetch('http://localhost:5000/api/purchases', {
@@ -169,10 +229,10 @@ const ProductDashboard = () => {
                 setReceipt(data);
                 setPayStep('receipt');
             } else {
-                alert(data.message || 'Payment failed');
+                setPayError(data.message || 'Payment failed. Please try again.');
             }
         } catch (err) {
-            alert('An error occurred. Please try again.');
+            setPayError('Network error. Please check your connection and try again.');
         } finally {
             setProcessing(false);
         }
@@ -282,7 +342,7 @@ const ProductDashboard = () => {
 
                 <div className="dashboard-grid">
                     {/* ── Main Content Card ── */}
-                    <div className="dashboard-card" style={{ gridColumn: 'span 2' }}>
+                    <div className="dashboard-panel" style={{ gridColumn: 'span 2' }}>
                         {/* Tabs */}
                         <div style={{ display: 'flex', gap: '20px', marginBottom: '20px', borderBottom: '1px solid #e2e8f0' }}>
                             {[['inventory', '📦 My Inventory'], ['marketplace', '🌾 Source from Farmers'], ['purchases', '🧾 My Purchases']].map(([key, label]) => (
@@ -313,7 +373,14 @@ const ProductDashboard = () => {
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                                             <div className="form-group">
                                                 <label>Product Name</label>
-                                                <input type="text" value={newProduct.name} onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} required placeholder="e.g. Urea Fertilizer" />
+                                                <input
+                                                    type="text"
+                                                    value={newProduct.name}
+                                                    onChange={e => { setNewProduct({ ...newProduct, name: e.target.value }); setProductFormErrors(p => ({ ...p, name: null })); }}
+                                                    style={productFormErrors.name ? { borderColor: '#dc2626' } : {}}
+                                                    placeholder="e.g. Urea Fertilizer"
+                                                />
+                                                <FieldError msg={productFormErrors.name} />
                                             </div>
                                             <div className="form-group">
                                                 <label>Category</label>
@@ -329,20 +396,48 @@ const ProductDashboard = () => {
                                             </div>
                                             <div className="form-group">
                                                 <label>Price (LKR)</label>
-                                                <input type="number" value={newProduct.price} onChange={e => setNewProduct({ ...newProduct, price: e.target.value })} required />
+                                                <input
+                                                    type="number"
+                                                    value={newProduct.price}
+                                                    onChange={e => { setNewProduct({ ...newProduct, price: e.target.value }); setProductFormErrors(p => ({ ...p, price: null })); }}
+                                                    style={productFormErrors.price ? { borderColor: '#dc2626' } : {}}
+                                                    placeholder="e.g. 2500"
+                                                    min="1"
+                                                />
+                                                <FieldError msg={productFormErrors.price} />
                                             </div>
                                             <div className="form-group">
                                                 <label>Unit</label>
-                                                <input type="text" value={newProduct.unit} onChange={e => setNewProduct({ ...newProduct, unit: e.target.value })} required placeholder="e.g. kg, 500ml, pack" />
+                                                <input
+                                                    type="text"
+                                                    value={newProduct.unit}
+                                                    onChange={e => { setNewProduct({ ...newProduct, unit: e.target.value }); setProductFormErrors(p => ({ ...p, unit: null })); }}
+                                                    style={productFormErrors.unit ? { borderColor: '#dc2626' } : {}}
+                                                    placeholder="e.g. kg, 500ml, pack"
+                                                />
+                                                <FieldError msg={productFormErrors.unit} />
                                             </div>
                                             <div className="form-group">
-                                                <label>Product Image</label>
-                                                <input type="file" accept="image/*" onChange={handleImageChange} required />
+                                                <label>Product Image <span style={{ color: '#64748b', fontSize: '0.8rem' }}>(max 2 MB)</span></label>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleImageChange}
+                                                    style={productFormErrors.image ? { borderColor: '#dc2626' } : {}}
+                                                />
+                                                <FieldError msg={productFormErrors.image} />
                                             </div>
                                         </div>
                                         <div className="form-group" style={{ marginTop: '15px' }}>
-                                            <label>Description</label>
-                                            <textarea value={newProduct.description} onChange={e => setNewProduct({ ...newProduct, description: e.target.value })} required placeholder="Provide details..." rows="3" />
+                                            <label>Description <span style={{ color: '#64748b', fontSize: '0.8rem' }}>(min 20 chars)</span></label>
+                                            <textarea
+                                                value={newProduct.description}
+                                                onChange={e => { setNewProduct({ ...newProduct, description: e.target.value }); setProductFormErrors(p => ({ ...p, description: null })); }}
+                                                style={productFormErrors.description ? { borderColor: '#dc2626' } : {}}
+                                                placeholder="Provide details about quality, usage, grade..."
+                                                rows="3"
+                                            />
+                                            <FieldError msg={productFormErrors.description} />
                                         </div>
                                         <button type="submit" className="btn btn-primary" style={{ marginTop: '10px' }}>Publish Listing</button>
                                     </form>
@@ -494,7 +589,7 @@ const ProductDashboard = () => {
                     </div>
 
                     {/* ── District Selector ── */}
-                    <div className="dashboard-card" style={{ gridColumn: 'span 1' }}>
+                    <div className="dashboard-panel" style={{ gridColumn: 'span 1' }}>
                         <div className="card-icon">🗺️</div>
                         <h3>Manage Service Districts</h3>
                         <p style={{ marginBottom: '15px' }}>Regions where you source and sell.</p>
@@ -572,28 +667,35 @@ const ProductDashboard = () => {
                                     ))}
                                 </div>
 
-                                <form onSubmit={handlePayment}>
+                                <form onSubmit={handlePayment} noValidate>
+                                    {/* Inline payment error */}
+                                    {payError && (
+                                        <div style={{ padding: '10px 14px', backgroundColor: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '8px', color: '#dc2626', fontSize: '0.85rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            ⚠️ {payError}
+                                        </div>
+                                    )}
+
                                     {payMethod === 'Card' ? (
                                         <>
                                             <div className="form-group">
                                                 <label>Cardholder Name</label>
-                                                <input type="text" placeholder="As shown on card" value={cardFields.name} onChange={e => setCardFields({ ...cardFields, name: e.target.value })} required />
+                                                <input type="text" placeholder="As shown on card" value={cardFields.name} onChange={e => { setCardFields({ ...cardFields, name: e.target.value }); setPayError(''); }} />
                                             </div>
                                             <div className="form-group">
                                                 <label>Card Number</label>
                                                 <input type="text" placeholder="1234 5678 9012 3456" maxLength="19"
                                                     value={cardFields.number}
-                                                    onChange={e => setCardFields({ ...cardFields, number: e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim() })}
-                                                    required />
+                                                    onChange={e => { setCardFields({ ...cardFields, number: e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim() }); setPayError(''); }}
+                                                />
                                             </div>
                                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                                                 <div className="form-group">
                                                     <label>Expiry (MM/YY)</label>
-                                                    <input type="text" placeholder="08/27" maxLength="5" value={cardFields.expiry} onChange={e => setCardFields({ ...cardFields, expiry: e.target.value })} required />
+                                                    <input type="text" placeholder="08/27" maxLength="5" value={cardFields.expiry} onChange={e => { setCardFields({ ...cardFields, expiry: e.target.value }); setPayError(''); }} />
                                                 </div>
                                                 <div className="form-group">
                                                     <label>CVV</label>
-                                                    <input type="password" placeholder="•••" maxLength="3" value={cardFields.cvv} onChange={e => setCardFields({ ...cardFields, cvv: e.target.value })} required />
+                                                    <input type="password" placeholder="•••" maxLength="3" value={cardFields.cvv} onChange={e => { setCardFields({ ...cardFields, cvv: e.target.value }); setPayError(''); }} />
                                                 </div>
                                             </div>
                                         </>
@@ -601,21 +703,21 @@ const ProductDashboard = () => {
                                         <>
                                             <div className="form-group">
                                                 <label>Bank Name</label>
-                                                <input type="text" placeholder="e.g. Bank of Ceylon" value={bankFields.bank} onChange={e => setBankFields({ ...bankFields, bank: e.target.value })} required />
+                                                <input type="text" placeholder="e.g. Bank of Ceylon" value={bankFields.bank} onChange={e => { setBankFields({ ...bankFields, bank: e.target.value }); setPayError(''); }} />
                                             </div>
                                             <div className="form-group">
                                                 <label>Account Holder Name</label>
-                                                <input type="text" placeholder="Your name" value={bankFields.accountName} onChange={e => setBankFields({ ...bankFields, accountName: e.target.value })} required />
+                                                <input type="text" placeholder="Your name" value={bankFields.accountName} onChange={e => { setBankFields({ ...bankFields, accountName: e.target.value }); setPayError(''); }} />
                                             </div>
                                             <div className="form-group">
                                                 <label>Transfer Reference</label>
-                                                <input type="text" placeholder="e.g. Invoice / Slip Number" value={bankFields.reference} onChange={e => setBankFields({ ...bankFields, reference: e.target.value })} required />
+                                                <input type="text" placeholder="e.g. Invoice / Slip Number" value={bankFields.reference} onChange={e => { setBankFields({ ...bankFields, reference: e.target.value }); setPayError(''); }} />
                                             </div>
                                         </>
                                     )}
 
                                     <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
-                                        <button type="button" onClick={() => setPayStep('confirm')} className="btn btn-outline" style={{ flex: 1 }}>Back</button>
+                                        <button type="button" onClick={() => { setPayStep('confirm'); setPayError(''); }} className="btn btn-outline" style={{ flex: 1 }}>Back</button>
                                         <button type="submit" className="btn btn-primary" style={{ flex: 1, backgroundColor: '#059669' }} disabled={processing}>
                                             {processing ? 'Processing...' : `Pay LKR ${Number(buyTarget.price).toLocaleString()}`}
                                         </button>

@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const User = require('../models/User');
 const ASC = require('../models/ASC');
 const { protect, authorize } = require('../middleware/authMiddleware');
@@ -27,6 +28,13 @@ router.get('/officers', protect, authorize('ADMIN'), async (req, res) => {
 router.put('/assign-officer', protect, authorize('ADMIN'), async (req, res) => {
     try {
         const { userId, ascId } = req.body;
+
+        if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ message: 'Invalid User ID provided' });
+        }
+        if (ascId && !mongoose.Types.ObjectId.isValid(ascId)) {
+            return res.status(400).json({ message: 'Invalid ASC ID provided' });
+        }
 
         const user = await User.findById(userId);
         if (!user) {

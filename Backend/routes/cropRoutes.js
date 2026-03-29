@@ -20,15 +20,26 @@ router.post("/", protect, authorize("FARMER"), async (req, res) => {
             season
         } = req.body;
 
-        if (!cropType || !variety || !landSize || !location || !soilType || !assignedAsc) {
-            return res.status(400).json({ message: "Please provide all required fields" });
+        // ─── Validation Guards ───
+        if (!cropType) return res.status(400).json({ message: "Crop type is required." });
+        if (!variety || !variety.trim()) return res.status(400).json({ message: "Variety is required." });
+        if (!landSize || isNaN(parseFloat(landSize)) || parseFloat(landSize) <= 0) {
+            return res.status(400).json({ message: "Land size must be a positive number." });
+        }
+        if (!location) return res.status(400).json({ message: "Location is required." });
+        if (!soilType) return res.status(400).json({ message: "Soil type is required." });
+        if (!assignedAsc) return res.status(400).json({ message: "Assigned ASC is required." });
+
+        // Rice-specific validation
+        if (cropType === 'rice' && (!season || season === 'N/A' || !['Yala', 'Maha'].includes(season))) {
+            return res.status(400).json({ message: "Please select a valid season (Yala or Maha) for rice." });
         }
 
         const crop = await Crop.create({
             farmer: req.user._id,
             cropType,
-            variety,
-            landSize,
+            variety: variety.trim(),
+            landSize: parseFloat(landSize),
             plantingDate,
             expectedHarvest,
             location,

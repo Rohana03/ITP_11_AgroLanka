@@ -60,6 +60,23 @@ router.post("/", protect, authorize("PRODUCT_MANAGER", "FARMER"), async (req, re
         const { name, category, description, price, unit, image } = req.body;
         const user = req.user;
 
+        // ─── Field validation ───
+        if (!name || !name.trim()) {
+            return res.status(400).json({ message: "Product name is required." });
+        }
+        if (name.trim().length > 100) {
+            return res.status(400).json({ message: "Product name must be 100 characters or fewer." });
+        }
+        if (!price || isNaN(Number(price)) || Number(price) <= 0) {
+            return res.status(400).json({ message: "Price must be a positive number." });
+        }
+        if (!description || !description.trim()) {
+            return res.status(400).json({ message: "Product description is required." });
+        }
+        if (!unit || !unit.trim()) {
+            return res.status(400).json({ message: "Unit is required (e.g. kg, pack, 500ml)." });
+        }
+
         let districts = [];
         if (user.role === 'PRODUCT_MANAGER') {
             districts = user.serviceDistricts;
@@ -77,11 +94,11 @@ router.post("/", protect, authorize("PRODUCT_MANAGER", "FARMER"), async (req, re
         const status = (user.role === 'PRODUCT_MANAGER' && regulatedCategories.includes(category)) ? "Pending" : "Active";
 
         const product = await Product.create({
-            name,
+            name: name.trim(),
             category,
-            description,
-            price,
-            unit,
+            description: description.trim(),
+            price: Number(price),
+            unit: unit.trim(),
             districts,
             seller: user._id,
             sellerRole: user.role,
@@ -91,7 +108,7 @@ router.post("/", protect, authorize("PRODUCT_MANAGER", "FARMER"), async (req, re
 
         res.status(201).json(product);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Server error. Please try again later." });
     }
 });
 
