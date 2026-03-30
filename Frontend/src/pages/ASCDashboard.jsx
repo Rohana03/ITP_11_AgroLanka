@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
-import './FarmerDashboard.css';
+import './AdminDashboard.css';
 
 const ASCDashboard = () => {
     const { user } = useAuth();
@@ -96,14 +96,73 @@ const ASCDashboard = () => {
         window.print();
     };
 
+    const formatFarmerDisplay = (farmer) => {
+        // CASE 1: Completely missing/null (Population failed)
+        if (farmer === null || farmer === undefined) {
+             return (
+                <div style={{ color: '#ef4444', fontSize: '0.85rem' }}>
+                    <div style={{ fontWeight: '700' }}>⚠️ Unregistered Farmer</div>
+                    <div style={{ fontSize: '0.7rem' }}>Link is broken in Database</div>
+                </div>
+            );
+        }
+        
+        // CASE 2: Farmer is a String (ID not populated by Backend)
+        if (typeof farmer === 'string') {
+            return (
+                <div style={{ color: '#64748b', fontSize: '0.85rem' }}>
+                    <div style={{ fontWeight: '600' }}>🆔 ID: {farmer.substring(0, 10)}...</div>
+                    <div style={{ fontSize: '0.7rem' }}>Wait: Data not populated</div>
+                </div>
+            );
+        }
+        
+        // CASE 3: Farmer is an Object (Successful Population)
+        const name = farmer.name || farmer.fullName || null;
+        const nic = farmer.nic || null;
+        const id = farmer._id || null;
+        
+        if (!name && !nic) return (
+            <div style={{ color: '#94a3b8' }}>
+                <div style={{ fontWeight: '600' }}>Anonymous Farmer</div>
+                {id && <div style={{ fontSize: '0.7rem' }}>ID: {id.substring(0, 8)}</div>}
+            </div>
+        );
+        
+        return (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ 
+                    width: '32px', 
+                    height: '32px', 
+                    borderRadius: '50%', 
+                    backgroundColor: '#15803d', 
+                    color: 'white', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    fontWeight: 'bold',
+                    fontSize: '0.8rem',
+                    flexShrink: 0
+                }}>
+                    {(name || 'F')[0].toUpperCase()}
+                </div>
+                <div>
+                    <div style={{ fontWeight: '600', color: '#1e293b' }}>{name || 'No Name Set'}</div>
+                    {nic && <div style={{ fontSize: '0.7rem', color: '#64748b' }}>🆔 {nic}</div>}
+                    {!nic && id && <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>Ref: {id.substring(0, 8)}</div>}
+                </div>
+            </div>
+        );
+    };
+
     const getTableHeaders = (type) => {
         switch (type) {
             case 'farmers': return [t('auth.fullName'), t('auth.email'), t('auth.nic')];
             case 'staff': return [t('auth.fullName'), t('auth.email'), t('auth.role'), t('auth.nic')];
-            case 'crops': return [t('asc.tableFarmer'), t('auth.roleCrop'), t('auth.roleCrop'), t('asc.tableLandSize'), t('common.loading')];
-            case 'loans': return [t('asc.tableFarmer'), t('auth.fullName'), t('asc.tablePurpose'), t('common.loading')];
-            case 'compensations': return [t('asc.tableFarmer'), t('auth.roleCrop'), t('asc.tableDamage'), t('common.loading')];
-            case 'machinery': return [t('asc.tableItem'), t('auth.roleMachinery'), t('dashboard.machinery'), t('common.loading')];
+            case 'crops': return ['Farmer', 'Crop Type', 'Variety', 'Land Size', 'Status'];
+            case 'loans': return ['Farmer', 'Amount', 'Purpose', 'Status'];
+            case 'compensations': return ['Farmer', 'Crop Type', 'Damage Type', 'Status'];
+            case 'machinery': return ['Item', 'Category', 'Type', 'Status'];
             default: return [];
         }
     };
@@ -125,32 +184,94 @@ const ASCDashboard = () => {
         const headers = getTableHeaders(type);
 
         return (
-            <div className="data-section" style={{ marginTop: '30px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                    <h2 style={{ textTransform: 'capitalize' }}>{type.replace(/([A-Z])/g, ' $1')}</h2>
+            <div className="data-section dashboard-panel" style={{ marginTop: '30px', backgroundColor: '#fff', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                    <h2 style={{ textTransform: 'capitalize', margin: 0, color: '#15803d', borderLeft: '5px solid #15803d', paddingLeft: '15px' }}>{type.replace(/([A-Z])/g, ' $1')}</h2>
                     <div style={{ display: 'flex', gap: '10px' }}>
-                        <button onClick={() => generateCSV(type)} className="export-btn" style={{ padding: '8px 16px', backgroundColor: '#3498db', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>{t('common.download')} CSV</button>
-                        <button onClick={generatePDF} className="export-btn" style={{ padding: '8px 16px', backgroundColor: '#e67e22', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>{t('common.print')}</button>
-                        <button onClick={() => setActiveTab('overview')} style={{ padding: '8px 16px', backgroundColor: '#95a5a6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>{t('common.back')}</button>
+                        <button onClick={() => generateCSV(type)} className="btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>⬇️ CSV</button>
+                        <button onClick={generatePDF} className="btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>🖨️ Print</button>
+                        <button onClick={() => setActiveTab('overview')} className="btn-outline">⬅️ {t('common.back')}</button>
                     </div>
                 </div>
-                {loading ? <p>{t('common.loading')}</p> : (
-                    <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'white', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-                            <thead style={{ backgroundColor: '#2ecc71', color: 'white' }}>
-                                <tr>
-                                    {headers.map(h => <th key={h} style={{ padding: '12px', textAlign: 'left' }}>{h}</th>)}
+                {loading ? <p>{t('common.loading')}/</p> : (
+                    <div style={{ overflowX: 'auto', padding: '5px' }}>
+                        <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 10px', tableLayout: 'fixed' }}>
+                            <thead>
+                                <tr style={{ backgroundColor: '#15803d', color: 'white' }}>
+                                    {headers.map((h, i) => (
+                                        <th key={h} style={{ 
+                                            padding: '18px 20px', 
+                                            textAlign: 'center', 
+                                            fontWeight: '700', 
+                                            fontSize: '0.85rem', 
+                                            textTransform: 'uppercase', 
+                                            letterSpacing: '0.1em',
+                                            width: i === 0 ? '35%' : i === headers.length - 1 ? '15%' : '25%',
+                                            borderRadius: i === 0 ? '12px 0 0 12px' : i === headers.length - 1 ? '0 12px 12px 0' : '0'
+                                        }}>
+                                            {h}
+                                        </th>
+                                    ))}
                                 </tr>
                             </thead>
                             <tbody>
                                 {data.map((item, index) => (
-                                    <tr key={item._id} style={{ borderBottom: '1px solid #eee', backgroundColor: index % 2 === 0 ? '#fafafa' : 'white' }}>
-                                        {type === 'farmers' && <><td style={{ padding: '12px' }}>{item.name}</td><td style={{ padding: '12px' }}>{item.email}</td><td style={{ padding: '12px' }}>{item.nic}</td></>}
-                                        {type === 'staff' && <><td style={{ padding: '12px' }}>{item.name}</td><td style={{ padding: '12px' }}>{item.email}</td><td style={{ padding: '12px' }}>{item.role}</td><td style={{ padding: '12px' }}>{item.nic}</td></>}
-                                        {type === 'crops' && <><td style={{ padding: '12px' }}>{item.farmer?.name}</td><td style={{ padding: '12px' }}>{item.cropType}</td><td style={{ padding: '12px' }}>{item.variety}</td><td style={{ padding: '12px' }}>{item.landSize}</td><td style={{ padding: '12px' }}>{item.status}</td></>}
-                                        {type === 'loans' && <><td style={{ padding: '12px' }}>{item.farmer?.name}</td><td style={{ padding: '12px' }}>{item.amount}</td><td style={{ padding: '12px' }}>{item.purpose}</td><td style={{ padding: '12px' }}>{item.status}</td></>}
-                                        {type === 'compensations' && <><td style={{ padding: '12px' }}>{item.farmer?.name}</td><td style={{ padding: '12px' }}>{item.crop?.cropType}</td><td style={{ padding: '12px' }}>{item.damageType}</td><td style={{ padding: '12px' }}>{item.status}</td></>}
-                                        {type === 'machinery' && <><td style={{ padding: '12px' }}>{item.name}</td><td style={{ padding: '12px' }}>{item.type}</td><td style={{ padding: '12px' }}>{item.category}</td><td style={{ padding: '12px' }}>{item.status}</td></>}
+                                    <tr key={item._id} style={{ 
+                                        backgroundColor: 'white', 
+                                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                                        borderRadius: '12px'
+                                    }}>
+                                        {type === 'farmers' && (
+                                            <>
+                                                <td style={{ padding: '20px', borderRadius: '12px 0 0 12px', width: '35%', textAlign: 'center' }}>{item.name}</td>
+                                                <td style={{ padding: '20px', width: '25%', textAlign: 'center' }}>{item.email}</td>
+                                                <td style={{ padding: '20px', borderRadius: '0 12px 12px 0', width: '15%', textAlign: 'center' }}>{item.nic}</td>
+                                            </>
+                                        )}
+                                        {type === 'staff' && (
+                                            <>
+                                                <td style={{ padding: '20px', borderRadius: '12px 0 0 12px', width: '35%', textAlign: 'center' }}>{formatFarmerDisplay(item)}</td>
+                                                <td style={{ padding: '20px', width: '25%', textAlign: 'center' }}>{item.email}</td>
+                                                <td style={{ padding: '20px', width: '25%', textAlign: 'center' }}>{item.role}</td>
+                                                <td style={{ padding: '20px', borderRadius: '0 12px 12px 0', width: '15%', textAlign: 'center' }}>{item.nic}</td>
+                                            </>
+                                        )}
+                                        {type === 'crops' && (
+                                            <>
+                                                <td style={{ padding: '20px', borderRadius: '12px 0 0 12px', width: '35%', textAlign: 'center' }}>{formatFarmerDisplay(item.farmer)}</td>
+                                                <td style={{ padding: '20px', width: '25%', textTransform: 'capitalize', textAlign: 'center' }}>{item.cropType}</td>
+                                                <td style={{ padding: '20px', width: '25%', textAlign: 'center' }}>{item.variety}</td>
+                                                <td style={{ padding: '20px', width: '25%', textAlign: 'center' }}>{item.landSize}</td>
+                                                <td style={{ padding: '20px', borderRadius: '0 12px 12px 0', width: '15%', textAlign: 'center' }}><span className={`status-badge ${item.status?.toLowerCase()}`}>{item.status}</span></td>
+                                            </>
+                                        )}
+                                        {type === 'loans' && (
+                                            <>
+                                                <td style={{ padding: '20px', borderRadius: '12px 0 0 12px', width: '35%', textAlign: 'center' }}>{formatFarmerDisplay(item.farmer)}</td>
+                                                <td style={{ padding: '20px', width: '25%', textAlign: 'center' }}>LKR {item.amount}</td>
+                                                <td style={{ padding: '20px', width: '25%', textAlign: 'center' }}>{item.purpose}</td>
+                                                <td style={{ padding: '20px', borderRadius: '0 12px 12px 0', width: '15%', textAlign: 'center' }}><span className={`status-badge ${item.status?.toLowerCase()}`}>{item.status}</span></td>
+                                            </>
+                                        )}
+                                        {type === 'compensations' && (
+                                            <>
+                                                <td style={{ padding: '20px', borderRadius: '12px 0 0 12px', width: '35%', textAlign: 'center' }}>{formatFarmerDisplay(item.farmer)}</td>
+                                                <td style={{ padding: '20px', width: '25%', textAlign: 'center' }}>{item.crop?.cropType}</td>
+                                                <td style={{ padding: '20px', width: '25%', textAlign: 'center' }}>{item.damageType}</td>
+                                                <td style={{ padding: '20px', borderRadius: '0 12px 12px 0', width: '15%', textAlign: 'center' }}><span className={`status-badge ${item.status?.toLowerCase()}`}>{item.status}</span></td>
+                                            </>
+                                        )}
+                                        {type === 'machinery' && (
+                                            <>
+                                                <td style={{ padding: '20px', borderRadius: '12px 0 0 12px', width: '35%', textAlign: 'center' }}>
+                                                    <div style={{ fontWeight: '600', color: '#1e293b' }}>{item.name}</div>
+                                                    <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>Code: {item.equipmentCode || 'N/A'}</div>
+                                                </td>
+                                                <td style={{ padding: '20px', width: '25%', textAlign: 'center' }}>{item.category}</td>
+                                                <td style={{ padding: '20px', width: '25%', textAlign: 'center' }}>{item.type}</td>
+                                                <td style={{ padding: '20px', borderRadius: '0 12px 12px 0', width: '15%', textAlign: 'center' }}><span className={`status-badge ${item.status?.toLowerCase()}`}>{item.status}</span></td>
+                                            </>
+                                        )}
                                     </tr>
                                 ))}
                                 {data.length === 0 && (
@@ -167,76 +288,130 @@ const ASCDashboard = () => {
     };
 
     return (
-        <div className="farmer-dashboard-page">
+        <div className="admin-dashboard">
             <Navbar />
             <div className="dashboard-container">
                 <style>
                     {`
+                        .action-card:hover { border-color: #16a34a !important; }
+                        .action-card:hover .btn-sm { background: #16a34a !important; color: white !important; }
+                        .role-badge { background-color: #f0fdf4 !important; color: #15803d !important; border: 1px solid #dcfce7 !important; }
+                        .welcome-text strong { color: #15803d; }
+                        
+                        .status-badge {
+                            padding: 4px 10px;
+                            border-radius: 9999px;
+                            font-size: 0.75rem;
+                            font-weight: 700;
+                            text-transform: uppercase;
+                        }
+                        .status-badge.approved { background-color: #dcfce7; color: #166534; }
+                        .status-badge.pending { background-color: #fef9c3; color: #854d0e; }
+                        .status-badge.rejected { background-color: #fee2e2; color: #991b1b; }
+                        
                         @media print {
-                            .navbar, .export-btn, header, .back-btn { display: none !important; }
-                            .data-section { margin-top: 0 !important; }
-                            table { width: 100% !important; border: 1px solid #ccc !important; }
+                            body * { visibility: hidden; }
+                            .data-section, .data-section * { visibility: visible; }
+                            .data-section { 
+                                position: absolute; 
+                                left: 0; 
+                                top: 0; 
+                                width: 100% !important; 
+                                padding: 0 !important; 
+                                margin: 0 !important;
+                                border: none !important;
+                                box-shadow: none !important;
+                            }
+                            .btn-outline, .btn-primary, .navbar, header, .sidebar { display: none !important; }
+                            h2 { margin-bottom: 20px !important; color: #15803d !important; }
+                            table { width: 100% !important; border-collapse: collapse !important; border: 1px solid #ddd !important; }
+                            th { background-color: #15803d !important; color: white !important; -webkit-print-color-adjust: exact; }
+                            td { border-bottom: 1px solid #eee !important; }
                         }
                     `}
                 </style>
-                <header className="dashboard-header">
-                    <div className="header-info">
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <h1>{t('asc.dashboardTitle')} 🏛️</h1>
-                            <span className={`role-badge role-${user.role.toLowerCase()}`} style={{ padding: '6px 14px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: '600', backgroundColor: '#e2fbef', color: '#10b981' }}>
+                <header className="dashboard-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div className="header-left">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '8px' }}>
+                            <h1 style={{ margin: 0, fontSize: '2rem' }}>{t('asc.dashboardTitle')} 🏛️</h1>
+                            <span className="role-badge" style={{ backgroundColor: '#15803d', color: 'white', padding: '4px 12px' }}>
                                 {t('dashboard.roleAsc')}
                             </span>
                         </div>
-                        <p>{t('dashboard.welcome')}, {user?.name}! {t('asc.manageCenter')}</p>
+                        <p className="welcome-text" style={{ fontSize: '1.2rem', margin: 0 }}>
+                            {t('dashboard.welcome')}, <strong style={{ color: '#15803d' }}>{user?.name}</strong>! 
+                        </p>
+                        <p style={{ color: '#64748b', margin: '4px 0 0 0' }}>{t('asc.manageCenter')}</p>
+                    </div>
+
+                    <div className="header-right" style={{ textAlign: 'right' }}>
                         {user?.assignedAsc ? (
-                            <div className="allocation-info" style={{ marginTop: '15px', padding: '10px 20px', backgroundColor: '#ecfdf5', borderRadius: '8px', border: '1px solid #10b981', display: 'inline-block' }}>
-                                <span style={{ color: '#065f46', fontWeight: '600' }}>📍 {t('asc.assignedCenter')}: </span>
-                                <span style={{ color: '#047857' }}>{user.assignedAsc.name} - {user.assignedAsc.district} {t('auth.district')}</span>
+                            <div style={{ 
+                                padding: '16px 24px', 
+                                backgroundColor: '#f0fdf4', 
+                                borderRadius: '16px', 
+                                border: '1px solid #dcfce7', 
+                                display: 'inline-flex', 
+                                flexDirection: 'column',
+                                alignItems: 'flex-end',
+                                gap: '4px',
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+                            }}>
+                                <div style={{ color: '#166534', fontWeight: '800', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                    📍 {t('asc.assignedCenter')}
+                                </div>
+                                <div style={{ color: '#14532d', fontSize: '1.1rem', fontWeight: 'bold' }}>
+                                    {user.assignedAsc.name}
+                                </div>
+                                <div style={{ color: '#166534', fontSize: '0.9rem' }}>
+                                    {user.assignedAsc.district} {t('auth.district')}
+                                </div>
                             </div>
                         ) : (
-                            <div className="allocation-info" style={{ marginTop: '15px', padding: '10px 20px', backgroundColor: '#fff7ed', borderRadius: '8px', border: '1px solid #f97316', display: 'inline-block' }}>
-                                <span style={{ color: '#9a3412', fontWeight: '500' }}>⚠️ {t('asc.noCenterAllocated')}</span>
+                            <div style={{ padding: '12px 20px', backgroundColor: '#fff7ed', borderRadius: '12px', border: '1px solid #ffedd5' }}>
+                                <span style={{ color: '#9a3412', fontWeight: '600' }}>⚠️ {t('asc.noCenterAllocated')}</span>
                             </div>
                         )}
                     </div>
                 </header>
 
                 {activeTab === 'overview' ? (
-                    <div className="dashboard-grid">
-                        <div className="dashboard-card" onClick={() => setActiveTab('farmers')}>
+                    <div className="action-grid">
+                        <div className="action-card" onClick={() => setActiveTab('farmers')}>
                             <div className="card-icon">🏘️</div>
                             <h3>{t('asc.centerManagement')}</h3>
                             <p>{t('asc.centerManagementDesc')}</p>
+                            <button className="btn-sm">Manage Farmers →</button>
                         </div>
-                        <div className="dashboard-card" onClick={() => setActiveTab('staff')}>
+                        <div className="action-card" onClick={() => setActiveTab('staff')}>
                             <div className="card-icon">👥</div>
                             <h3>{t('asc.staffCoordination')}</h3>
                             <p>{t('asc.staffCoordinationDesc')}</p>
+                            <button className="btn-sm">View Staff →</button>
                         </div>
-                        <div className="dashboard-card" onClick={() => setActiveTab('crops')}>
+                        <div className="action-card" onClick={() => setActiveTab('crops')}>
                             <div className="card-icon">🌾</div>
                             <h3>{t('asc.cropRegs')}</h3>
                             <p>{t('asc.cropRegsDesc')}</p>
+                            <button className="btn-sm">Track Crops →</button>
                         </div>
-                        <div className="dashboard-card" onClick={() => setActiveTab('loans')}>
+                        <div className="action-card" onClick={() => setActiveTab('loans')}>
                             <div className="card-icon">💳</div>
                             <h3>{t('asc.loanApps')}</h3>
                             <p>{t('asc.loanAppsDesc')}</p>
+                            <button className="btn-sm">Review Loans →</button>
                         </div>
-                        <div className="dashboard-card" onClick={() => setActiveTab('compensations')}>
+                        <div className="action-card" onClick={() => setActiveTab('compensations')}>
                             <div className="card-icon">📋</div>
                             <h3>{t('asc.compClaims')}</h3>
                             <p>{t('asc.compClaimsDesc')}</p>
+                            <button className="btn-sm">Manage Claims →</button>
                         </div>
-                        <div className="dashboard-card" onClick={() => setActiveTab('machinery')}>
+                        <div className="action-card" onClick={() => setActiveTab('machinery')}>
                             <div className="card-icon">🚜</div>
                             <h3>{t('asc.machineryServices')}</h3>
                             <p>{t('asc.machineryServicesDesc')}</p>
-                        </div>
-                        <div className="dashboard-card" onClick={() => setActiveTab('products')}>
-                            <div className="card-icon">🛒</div>
-                            <h3>{t('dashboard.marketplace')}</h3>
-                            <p>{t('common.loading')}</p>
+                            <button className="btn-sm">View Services →</button>
                         </div>
                     </div>
                 ) : (

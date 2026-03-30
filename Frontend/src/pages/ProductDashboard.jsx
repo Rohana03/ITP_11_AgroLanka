@@ -342,7 +342,7 @@ const ProductDashboard = () => {
 
                 <div className="dashboard-grid">
                     {/* ── Main Content Card ── */}
-                    <div className="dashboard-panel" style={{ gridColumn: 'span 2' }}>
+                    <div className="dashboard-panel" style={{ gridColumn: '1 / -1' }}>
                         {/* Tabs */}
                         <div style={{ display: 'flex', gap: '20px', marginBottom: '20px', borderBottom: '1px solid #e2e8f0' }}>
                             {[['inventory', '📦 My Inventory'], ['marketplace', '🌾 Source from Farmers'], ['purchases', '🧾 My Purchases']].map(([key, label]) => (
@@ -589,33 +589,97 @@ const ProductDashboard = () => {
                     </div>
 
                     {/* ── District Selector ── */}
-                    <div className="dashboard-panel" style={{ gridColumn: 'span 1' }}>
-                        <div className="card-icon">🗺️</div>
-                        <h3>Manage Service Districts</h3>
-                        <p style={{ marginBottom: '15px' }}>Regions where you source and sell.</p>
+                    <div className="dashboard-panel" style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px', marginBottom: '15px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <div className="card-icon" style={{ fontSize: '1.8rem', marginBottom: 0 }}>📍</div>
+                                <h3 style={{ margin: 0 }}>Manage Service Districts</h3>
+                                <p style={{ margin: 0, fontSize: '0.9rem', color: '#64748b' }}>(Select the regions where you source and sell crops)</p>
+                            </div>
+                            
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                                <button 
+                                    type="button"
+                                    className="btn-outline" 
+                                    style={{ fontSize: '0.8rem', padding: '8px 16px' }}
+                                    onClick={() => setSelectedDistricts(districts)}
+                                >
+                                    Select All
+                                </button>
+                                <button 
+                                    type="button"
+                                    className="btn-outline" 
+                                    style={{ fontSize: '0.8rem', padding: '8px 16px' }}
+                                    onClick={() => setSelectedDistricts([])}
+                                >
+                                    Clear All
+                                </button>
+                                <button 
+                                    className="btn btn-primary" 
+                                    style={{ 
+                                        padding: '8px 20px', 
+                                        borderRadius: '8px', 
+                                        fontSize: '0.9rem',
+                                        minWidth: '150px',
+                                        backgroundColor: isUpdating ? '#94a3b8' : '#3b82f6'
+                                    }} 
+                                    onClick={handleUpdateDistricts} 
+                                    disabled={isUpdating}
+                                >
+                                    {isUpdating ? 'Updating...' : 'Save Changes'}
+                                </button>
+                            </div>
+                        </div>
 
                         {message.text && (
-                            <div style={{ padding: '10px', borderRadius: '6px', marginBottom: '15px', backgroundColor: message.type === 'success' ? '#ecfdf5' : '#fef2f2', color: message.type === 'success' ? '#065f46' : '#991b1b', border: `1px solid ${message.type === 'success' ? '#10b981' : '#f87171'}` }}>
-                                {message.text}
+                            <div style={{ padding: '10px', textAlign: 'center', borderRadius: '8px', marginBottom: '15px', backgroundColor: message.type === 'success' ? '#ecfdf5' : '#fef2f2', color: message.type === 'success' ? '#059669' : '#991b1b', border: `1px solid ${message.type === 'success' ? '#10b981' : '#f87171'}`, fontWeight: '600' }}>
+                                {message.type === 'success' ? '✓ ' : '⚠️ '}{message.text}
                             </div>
                         )}
 
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '8px', padding: '12px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', maxHeight: '150px', overflowY: 'auto', marginBottom: '15px' }}>
+                        <div style={{ 
+                            display: 'grid', 
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', 
+                            gap: '12px', 
+                            padding: '20px', 
+                            backgroundColor: '#f8fafc', 
+                            borderRadius: '12px', 
+                            border: '1px solid #e2e8f0', 
+                            maxHeight: '400px', 
+                            overflowY: 'auto',
+                            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
+                        }}>
                             {districts.map(d => (
-                                <label key={d} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px' }}>
-                                    <input type="checkbox" checked={selectedDistricts.includes(d)} onChange={(e) => {
-                                        if (e.target.checked) setSelectedDistricts([...selectedDistricts, d]);
-                                        else setSelectedDistricts(selectedDistricts.filter(x => x !== d));
-                                    }} />
+                                <label key={d} style={{ 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    gap: '10px', 
+                                    cursor: 'pointer', 
+                                    fontSize: '0.9rem',
+                                    padding: '8px 12px',
+                                    borderRadius: '8px',
+                                    transition: 'all 0.2s',
+                                    backgroundColor: selectedDistricts.includes(d) ? '#eff6ff' : '#fff',
+                                    color: selectedDistricts.includes(d) ? '#1e40af' : '#475569',
+                                    fontWeight: selectedDistricts.includes(d) ? '600' : '400',
+                                    border: selectedDistricts.includes(d) ? '2px solid #3b82f6' : '1px solid #e2e8f0',
+                                    boxShadow: selectedDistricts.includes(d) ? '0 4px 6px -1px rgba(59, 130, 246, 0.1)' : 'none'
+                                }}>
+                                    <input 
+                                        type="checkbox" 
+                                        checked={selectedDistricts.includes(d)} 
+                                        onChange={(e) => {
+                                            if (e.target.checked) setSelectedDistricts([...selectedDistricts, d]);
+                                            else setSelectedDistricts(selectedDistricts.filter(x => x !== d));
+                                        }} 
+                                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                                    />
                                     {d}
                                 </label>
                             ))}
                         </div>
-
-                        <button className="btn btn-primary btn-sm btn-block" onClick={handleUpdateDistricts} disabled={isUpdating}>
-                            {isUpdating ? 'Updating...' : 'Update Districts'}
-                        </button>
                     </div>
+
                 </div>
             </div>
 
