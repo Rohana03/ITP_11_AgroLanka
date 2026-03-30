@@ -1,7 +1,7 @@
 /* ── MyCrops Page Dedicated Styles ── */
 
 .mycrops-page {
-    background: linear-gradient(160deg, #f0fdf4 0%, #f8fafc 50%, #eff6ff 100%);
+    /* Inherits background from .farmer-page in FarmerPages.css */
     min-height: 100vh;
 }
 
@@ -26,17 +26,19 @@
 }
 
 .mycrops-title {
-    font-size: 1.9rem;
+    font-size: 2.8rem;
     font-weight: 800;
-    color: #14532d;
+    color: #ffffff;
     margin: 8px 0 4px;
-    letter-spacing: -0.5px;
+    letter-spacing: -1px;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .mycrops-subtitle {
-    color: #64748b;
-    font-size: 0.95rem;
+    color: #d1fae5;
+    font-size: 1.1rem;
     margin: 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .mycrops-header-actions {
@@ -147,12 +149,12 @@
     color: #fff;
 }
 
-.mycrops-stat-label {
-    font-size: 0.72rem;
-    color: #64748b;
+.mycrops-stat-card .mycrops-stat-label {
+    font-size: 0.75rem;
+    color: #475569;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 600;
+    letter-spacing: 0.08em;
+    font-weight: 700;
 }
 
 /* ── Search Row ── */
@@ -217,10 +219,11 @@
 }
 
 .mycrops-results-count {
-    font-size: 0.85rem;
-    color: #64748b;
+    font-size: 0.95rem;
+    color: #ffffff;
     white-space: nowrap;
-    font-weight: 500;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* ── Loading Spinner ── */
@@ -273,12 +276,13 @@
 
 /* ── Empty State ── */
 .mycrops-empty {
-    background: white;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(16px);
     border-radius: 20px;
     padding: 80px 24px;
     text-align: center;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-    border: 1px dashed #bbf7d0;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .mycrops-empty-art {
@@ -293,16 +297,17 @@
 }
 
 .mycrops-empty h2 {
-    color: #1e293b;
+    color: #1b5e20;
     margin-bottom: 8px;
-    font-size: 1.4rem;
+    font-size: 1.8rem;
+    font-weight: 800;
 }
 
 .mycrops-empty p {
-    color: #64748b;
-    max-width: 340px;
+    color: #4b5563;
+    max-width: 400px;
     margin: 0 auto 24px;
-    line-height: 1.6;
+    line-height: 1.8;
 }
 
 .mycrops-empty-btn {
@@ -313,12 +318,14 @@
 
 /* ── No Match State ── */
 .mycrops-no-match {
-    background: white;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(16px);
     border-radius: 16px;
     padding: 60px 24px;
     text-align: center;
-    color: #64748b;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    color: #4b5563;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .mycrops-clear-filter {
@@ -465,22 +472,25 @@
 }
 
 .stat-icon {
-    font-size: 1.05rem;
+    font-size: 1.1rem;
+    margin-bottom: 2px;
 }
 
-.stat-value {
-    font-size: 0.88rem;
-    font-weight: 700;
-    color: #1e293b;
+.mycrops-card .stat-value {
+    font-size: 1.15rem !important;
+    font-weight: 800;
+    color: #1e293b !important;
     text-align: center;
     text-transform: capitalize;
+    line-height: 1.2;
 }
 
-.stat-label {
-    font-size: 0.68rem;
-    color: #94a3b8;
+.mycrops-card .stat-label {
+    font-size: 0.65rem !important;
+    color: #64748b !important;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
+    font-weight: 700;
     text-align: center;
 }
 
@@ -554,6 +564,7 @@
     font-style: italic;
     color: #64748b;
     font-weight: 400;
+    text-transform: none;
 }
 
 /* ── Card Footer (ASC center) ── */

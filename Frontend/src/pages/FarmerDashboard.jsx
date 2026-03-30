@@ -90,49 +90,60 @@ const FarmerDashboard = () => {
         <div className="farmer-dashboard-page">
             <Navbar />
             <div className="dashboard-container">
-                <header className="dashboard-header">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div>
-                            <h1>{t('dashboard.welcome')}, {user.name || 'Farmer'}! 🌾</h1>
-                            <p>{t('farmer.manageActivities')}</p>
-                        </div>
+                <header className="dashboard-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div className="header-left">
+                        <h1 style={{ margin: '0 0 8px 0', fontSize: '2.5rem', color: '#1b5e20', fontWeight: '800' }}>
+                            {t('dashboard.welcome')}, {user.name || 'Farmer'}! 🌾
+                        </h1>
+                        <p style={{ margin: 0, fontSize: '1.2rem', color: '#2e7d32', fontWeight: '500' }}>
+                            {t('farmer.manageActivities')}
+                        </p>
+                    </div>
 
+                    <div className="header-right" style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                        {/* ASC Status Card */}
                         <div className="asc-status-card" style={{
-                            backgroundColor: 'rgba(200, 230, 201, 0.94)',
-                            backdropFilter: 'blur(12px)',
-                            padding: '15px 20px',
-                            borderRadius: '12px',
-                            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)',
-                            border: '2px solid #66bb6a',
-                            maxWidth: '350px'
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            backdropFilter: 'blur(8px)',
+                            padding: '16px 20px',
+                            borderRadius: '16px',
+                            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.08)',
+                            border: '1px solid rgba(102, 187, 106, 0.3)',
+                            minWidth: '240px',
+                            textAlign: 'right'
                         }}>
                             {!isEditingAsc ? (
                                 <>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                        <span style={{ fontSize: '0.85rem', fontWeight: '600', color: '#64748b' }}>{t('farmer.yourCenter')}</span>
+                                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                                        <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#166534', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                            🏛️ {t('farmer.yourCenter')}
+                                        </span>
                                         <button
                                             onClick={() => setIsEditingAsc(true)}
-                                            style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', fontSize: '0.85rem' }}
+                                            style={{ background: '#f0fdf4', border: '1px solid #dcfce7', color: '#15803d', padding: '2px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem', fontWeight: '700' }}
                                         >
                                             {t('farmer.change')}
                                         </button>
                                     </div>
                                     {user.assignedAsc ? (
                                         <div>
-                                            <div style={{ fontWeight: '700', color: '#1e293b' }}>📍 {user.assignedAsc.name}</div>
-                                            <div style={{ fontSize: '0.85rem', color: '#64748b' }}>{user.assignedAsc.district} {t('auth.district')}</div>
+                                            <div style={{ fontWeight: '800', color: '#1e293b', fontSize: '1.2rem' }}>
+                                                {user.assignedAsc.name} 
+                                                {user.assignedAsc.code && <span style={{ fontSize: '0.8rem', color: '#64748b', marginLeft: '6px', fontWeight: '500' }}>({user.assignedAsc.code})</span>}
+                                            </div>
+                                            <div style={{ fontSize: '0.9rem', color: '#44403c', marginTop: '2px', fontWeight: '600' }}>{user.assignedAsc.district} {t('auth.district')}</div>
                                         </div>
                                     ) : (
-                                        <div style={{ color: '#ef4444', fontWeight: '500', fontSize: '0.9rem' }}>⚠️ {t('farmer.noCenter')}</div>
+                                        <div style={{ color: '#ef4444', fontWeight: '600', fontSize: '0.9rem' }}>⚠️ {t('farmer.noCenter')}</div>
                                     )}
                                 </>
                             ) : (
-                                <div>
-                                    <div style={{ fontSize: '0.85rem', fontWeight: '600', color: '#64748b', marginBottom: '10px' }}>{t('farmer.selectNewCenter')}</div>
+                                <div style={{ textAlign: 'left' }}>
+                                    <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#64748b', marginBottom: '8px' }}>Select Center:</div>
                                     <select
                                         value={selectedDistrict}
                                         onChange={(e) => setSelectedDistrict(e.target.value)}
-                                        style={{ width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                                        style={{ width: '100%', padding: '6px', marginBottom: '6px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
                                     >
                                         <option value="">{t('auth.district')}</option>
                                         {districts.map(d => <option key={d} value={d}>{d}</option>)}
@@ -141,26 +152,18 @@ const FarmerDashboard = () => {
                                         value={selectedAsc}
                                         onChange={(e) => setSelectedAsc(e.target.value)}
                                         disabled={!selectedDistrict}
-                                        style={{ width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                                        style={{ width: '100%', padding: '6px', marginBottom: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
                                     >
                                         <option value="">{t('auth.asc')}</option>
                                         {ascs.filter(a => a.district === selectedDistrict).map(a => (
                                             <option key={a._id} value={a._id}>{a.name}</option>
                                         ))}
                                     </select>
-                                    <div style={{ display: 'flex', gap: '10px' }}>
-                                        <button
-                                            onClick={handleUpdateAsc}
-                                            disabled={saving || !selectedAsc}
-                                            style={{ backgroundColor: '#10b981', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', flex: 1 }}
-                                        >
-                                            {saving ? t('common.loading') : t('common.save')}
+                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                        <button onClick={handleUpdateAsc} disabled={saving || !selectedAsc} style={{ backgroundColor: '#10b981', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', flex: 1, fontSize: '0.8rem', fontWeight: '600' }}>
+                                            {saving ? '...' : t('common.save')}
                                         </button>
-                                        <button
-                                            onClick={() => setIsEditingAsc(false)}
-                                            disabled={saving}
-                                            style={{ backgroundColor: '#cbd5e1', color: '#334155', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', flex: 1 }}
-                                        >
+                                        <button onClick={() => setIsEditingAsc(false)} disabled={saving} style={{ backgroundColor: '#f1f5f9', color: '#475569', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', flex: 1, fontSize: '0.8rem' }}>
                                             {t('common.cancel')}
                                         </button>
                                     </div>
@@ -169,55 +172,49 @@ const FarmerDashboard = () => {
                         </div>
 
                         {/* Phone Status Card */}
-                        <div className="asc-status-card" style={{
-                            backgroundColor: 'rgba(200, 230, 201, 0.94)',
-                            backdropFilter: 'blur(12px)',
-                            padding: '15px 20px',
-                            borderRadius: '12px',
-                            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)',
-                            border: '2px solid #66bb6a',
-                            maxWidth: '350px',
-                            marginLeft: '15px'
+                        <div className="phone-status-card" style={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            backdropFilter: 'blur(8px)',
+                            padding: '16px 20px',
+                            borderRadius: '16px',
+                            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.08)',
+                            border: '1px solid rgba(102, 187, 106, 0.3)',
+                            minWidth: '220px',
+                            textAlign: 'right'
                         }}>
                             {!isEditingPhone ? (
                                 <>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                        <span style={{ fontSize: '0.85rem', fontWeight: '600', color: '#64748b' }}>{t('farmer.phoneNumber')}</span>
+                                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                                        <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#166534', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                            📞 {t('farmer.phoneNumber')}
+                                        </span>
                                         <button
                                             onClick={() => setIsEditingPhone(true)}
-                                            style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', fontSize: '0.85rem' }}
+                                            style={{ background: '#f0fdf4', border: '1px solid #dcfce7', color: '#15803d', padding: '2px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem', fontWeight: '700' }}
                                         >
                                             {t('farmer.edit')}
                                         </button>
                                     </div>
                                     <div>
-                                        <div style={{ fontWeight: '700', color: '#1e293b' }}>📞 {user.phone || 'Not added'}</div>
-                                        <div style={{ fontSize: '0.85rem', color: '#64748b' }}>{t('farmer.primaryContact')}</div>
+                                        <div style={{ fontWeight: '800', color: '#1e293b', fontSize: '1.1rem' }}>{user.phone || '—'}</div>
+                                        <div style={{ fontSize: '0.85rem', color: '#475569' }}>{t('farmer.primaryContact')}</div>
                                     </div>
                                 </>
                             ) : (
-                                <div>
-                                    <div style={{ fontSize: '0.85rem', fontWeight: '600', color: '#64748b', marginBottom: '10px' }}>{t('farmer.updatePhone')}</div>
+                                <div style={{ textAlign: 'left' }}>
+                                    <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#64748b', marginBottom: '8px' }}>{t('farmer.updatePhone')}:</div>
                                     <input
                                         type="text"
                                         value={newPhone}
                                         onChange={(e) => setNewPhone(e.target.value)}
-                                        placeholder={t('farmer.enterPhone')}
-                                        style={{ width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                                        placeholder="0XXXXXXXXX"
+                                        style={{ width: '100%', padding: '6px', marginBottom: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
                                     />
-                                    <div style={{ display: 'flex', gap: '10px' }}>
-                                        <button
-                                            onClick={handleUpdateProfile}
-                                            disabled={saving}
-                                            style={{ backgroundColor: '#10b981', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', flex: 1 }}
-                                        >
+                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                        <button onClick={handleUpdateProfile} disabled={saving} style={{ backgroundColor: '#10b981', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', flex: 1, fontSize: '0.8rem', fontWeight: '600' }}>
                                             {saving ? '...' : t('common.save')}
                                         </button>
-                                        <button
-                                            onClick={() => { setIsEditingPhone(false); setNewPhone(user.phone || ''); }}
-                                            disabled={saving}
-                                            style={{ backgroundColor: '#cbd5e1', color: '#334155', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', flex: 1 }}
-                                        >
+                                        <button onClick={() => { setIsEditingPhone(false); setNewPhone(user.phone || ''); }} disabled={saving} style={{ backgroundColor: '#f1f5f9', color: '#475569', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', flex: 1, fontSize: '0.8rem' }}>
                                             {t('common.cancel')}
                                         </button>
                                     </div>

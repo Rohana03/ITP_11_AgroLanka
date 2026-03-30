@@ -309,6 +309,23 @@ const ASCDashboard = () => {
                         .status-badge.pending { background-color: #fef9c3; color: #854d0e; }
                         .status-badge.rejected { background-color: #fee2e2; color: #991b1b; }
                         
+                        /* Fix for 6 cards layout (3x2) */
+                        .action-grid {
+                            grid-template-columns: repeat(3, 1fr) !important;
+                        }
+                        
+                        @media (max-width: 1024px) {
+                            .action-grid {
+                                grid-template-columns: repeat(2, 1fr) !important;
+                            }
+                        }
+                        
+                        @media (max-width: 640px) {
+                            .action-grid {
+                                grid-template-columns: 1fr !important;
+                            }
+                        }
+                        
                         @media print {
                             body * { visibility: hidden; }
                             .data-section, .data-section * { visibility: visible; }

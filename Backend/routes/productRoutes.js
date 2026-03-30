@@ -11,20 +11,30 @@ router.get("/available", protect, async (req, res) => {
         let query = { status: "Active" };
 
         if (user.role === 'FARMER') {
-            // Auth middleware already populates assignedAsc — read district directly
-            const district = user.assignedAsc?.district;
-            if (!district) return res.json([]);
+            let district = user.assignedAsc?.district;
+            
+            // Debugging: If population failed, assignedAsc might be a string ID
+            if (!district && typeof user.assignedAsc === 'string') {
+                const User = require("../models/User"); // Re-import to be safe
+                const populatedUser = await User.findById(user._id).populate('assignedAsc');
+                district = populatedUser.assignedAsc?.district;
+            }
 
+            console.log(`[ProductAPI] Role: FARMER, User: ${user.name}, District: ${district}`);
+            
+            if (!district) {
+                console.warn(`[ProductAPI] Farmer ${user.name} has no detected district. assignedAsc:`, user.assignedAsc);
+                return res.json([]);
+            }
+
+            // More lenient matching for districts array
             query = {
                 ...query,
-                districts: district,
-                sellerRole: 'PRODUCT_MANAGER'
+                districts: { $in: [district, district.toLowerCase(), district.toUpperCase(), new RegExp(`^${district}$`, 'i')] }
             };
         } else if (user.role === 'PRODUCT_MANAGER') {
-            // Product Managers see products from FARMERS in their service districts
             const districts = user.serviceDistricts;
             if (!districts || districts.length === 0) return res.json([]);
-
             query = {
                 ...query,
                 districts: { $in: districts },
@@ -32,9 +42,13 @@ router.get("/available", protect, async (req, res) => {
             };
         }
 
+        console.log(`[ProductAPI] Final MongoDB Query:`, JSON.stringify(query));
+        
         const products = await Product.find(query)
-            .populate("seller", "name email");
+            .populate("seller", "name email")
+            .populate("manager", "name email");
 
+        console.log(`[ProductAPI] Products Found: ${products.length}`);
         res.json(products);
     } catch (error) {
         res.status(500).json({ message: error.message });

@@ -84,8 +84,11 @@ const MyCrops = () => {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
             const data = await res.json();
-            if (res.ok) setCrops(data);
-            else setError(data.message || t('common.error'));
+            if (res.ok) {
+                // Sort by newest first
+                const sortedData = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                setCrops(sortedData);
+            } else setError(data.message || t('common.error'));
         } catch {
             setError(t('common.error'));
         } finally {
@@ -130,7 +133,7 @@ const MyCrops = () => {
                     </button>
                     <div className="mycrops-title-row">
                         <div>
-                            <h1 className="mycrops-title">🌾 {t('farmer_crop.headerList')}</h1>
+                            <h1 className="mycrops-title">🌾 {user?.name}'s {t('farmer_crop.headerList')}</h1>
                             <p className="mycrops-subtitle">{t('farmer_crop.subtitleList')}</p>
                         </div>
                         <div className="mycrops-header-actions">
@@ -333,10 +336,10 @@ const MyCrops = () => {
                                     )}
 
                                     {/* ASC Center footer */}
-                                    {crop.asc?.name && (
+                                    {crop.assignedAsc?.name && (
                                         <div className="mycrops-card-footer">
                                             <span>🏛️</span>
-                                            <span>{crop.asc.name}</span>
+                                            <span>{crop.assignedAsc.name}</span>
                                         </div>
                                     )}
                                 </div>

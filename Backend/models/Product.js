@@ -40,7 +40,11 @@ const productSchema = new mongoose.Schema(
         seller: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true,
+            required: false, // Legacy support for 'manager' field
+        },
+        manager: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
         },
         sellerRole: {
             type: String,

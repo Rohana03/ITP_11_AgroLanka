@@ -13,7 +13,7 @@ const protect = async (req, res, next) => {
             const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev_secret_123');
 
             // Get user from the token
-            req.user = await User.findById(decoded.id).select('-password').populate('assignedAsc', 'name district');
+            req.user = await User.findById(decoded.id).select('-password').populate('assignedAsc', 'name district code');
 
             next();
         } catch (error) {

@@ -69,12 +69,23 @@ const AgriculturalProducts = () => {
         <div className="farmer-page">
             <Navbar />
             <div className="page-container">
-                <div className="page-header">
+                <div className="page-header" style={{ marginBottom: '24px' }}>
                     <button className="back-btn" onClick={() => navigate('/farmer-dashboard')}>
                         ← {t('common.backToDashboard')}
                     </button>
-                    <h1>🛒 {t('farmer_market.title')}</h1>
-                    <p>{t('farmer_market.subtitleDist')} ({user?.assignedAsc?.district || 'Unknown'})</p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '10px' }}>
+                        <div>
+                            <h1 style={{ margin: '8px 0 4px', fontSize: '2.2rem' }}>🛒 {t('farmer_market.title')}</h1>
+                            <p style={{ margin: 0, color: '#64748b', fontSize: '1rem' }}>
+                                📍 Showing products available in the <strong style={{ color: '#10b981' }}>{user?.assignedAsc?.district || 'General'}</strong> region
+                            </p>
+                        </div>
+                        {user?.assignedAsc?.name && (
+                            <div style={{ padding: '8px 16px', backgroundColor: '#f0fdf4', border: '1px solid #dcfce7', borderRadius: '8px', fontSize: '0.85rem', color: '#166534' }}>
+                                🏛️ Linked to: <strong>{user.assignedAsc.name}</strong>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Search and Filter */}
@@ -121,7 +132,7 @@ const AgriculturalProducts = () => {
                                         {product.description}
                                     </p>
                                     <div style={{ fontSize: '0.8rem', color: '#3b82f6', marginBottom: '10px' }}>
-                                        👤 {t('farmer_market.soldBy')}: {product.seller?.name || 'Authorized Seller'}
+                                        👤 {t('farmer_market.soldBy')}: {product.seller?.name || product.manager?.name || 'Authorized Seller'}
                                     </div>
                                     <div className="product-footer" style={{ borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
                                         <span className="product-price" style={{ fontWeight: '700', color: '#059669' }}>

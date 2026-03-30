@@ -432,19 +432,30 @@ const FinancialAssistance = () => {
                                 <FieldError message={fieldErrors.collateral} />
                             </div>
  
-                            <div className="calculation-section" style={{ margin: '20px 0', padding: '15px', backgroundColor: '#f0f9ff', borderRadius: '8px', border: '1px solid #bae6fd' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div className="calculation-section" style={{ 
+                                margin: '2rem 0', 
+                                padding: '1.5rem', 
+                                background: 'rgba(27, 94, 32, 0.05)', 
+                                borderRadius: '16px', 
+                                border: '1px solid rgba(27, 94, 32, 0.15)',
+                                backdropFilter: 'blur(8px)'
+                            }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                                     <div>
-                                        <h4 style={{ margin: 0, color: '#0369a1' }}>{t('farmer_finance.calculatorTitle')}</h4>
-                                        <p style={{ margin: '5px 0 0 0', fontSize: '14px', color: '#0c4a6e' }}>
+                                        <h4 style={{ margin: 0, color: '#1b5e20', fontSize: '1.1rem', fontWeight: '800' }}>
+                                            {t('farmer_finance.calculatorTitle')}
+                                        </h4>
+                                        <p style={{ margin: '8px 0 0 0', fontSize: '1rem', color: '#374151' }}>
                                             {monthlyInstallment ? (
-                                                <span style={{ fontSize: '18px', fontWeight: 'bold' }}>LKR {monthlyInstallment} / {t('farmer_finance.months')}</span>
+                                                <span style={{ fontSize: '1.25rem', fontWeight: '800', color: '#166534' }}>
+                                                    LKR {Number(monthlyInstallment).toLocaleString()} / {t('farmer_finance.months')}
+                                                </span>
                                             ) : (
                                                 t('farmer_finance.calculatorDesc')
                                             )}
                                         </p>
                                     </div>
-                                    <button type="button" className="btn btn-outline" onClick={calculateInstallment} style={{ padding: '8px 15px', fontSize: '14px' }}>
+                                    <button type="button" className="btn btn-primary" onClick={calculateInstallment} style={{ padding: '10px 20px', fontSize: '0.9rem' }}>
                                         {t('farmer_finance.calculate')}
                                     </button>
                                 </div>
@@ -716,8 +727,10 @@ const FinancialAssistance = () => {
                             <p>{t('farmer_finance.trackHistory')}</p>
                         </div>
  
-                        <div className="history-tabs" style={{ marginBottom: '15px', display: 'flex', gap: '10px' }}>
-                            <small style={{ color: '#6b7280' }}>{t('farmer_finance.showingRegion')}: <strong>{user.assignedAsc?.name || t('common.assignedCenter')}</strong></small>
+                        <div className="history-tabs" style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem' }}>
+                            <small style={{ color: '#ffffff', fontWeight: '600', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
+                                {t('farmer_finance.showingRegion')}: <strong>{user.assignedAsc?.name || t('common.assignedCenter')}</strong>
+                            </small>
                         </div>
  
                         <div className="form-card" style={{ padding: '20px' }}>

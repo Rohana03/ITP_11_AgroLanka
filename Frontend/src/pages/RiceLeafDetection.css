@@ -1,6 +1,10 @@
 .leaf-detection-page {
-    background: linear-gradient(160deg, #f0fdf4 0%, #f8fafc 50%, #eff6ff 100%);
+    /* Inherits background from .farmer-page if we added it there, 
+       but here we'll just align it with the shared farmer style */
     min-height: 100vh;
+    background: linear-gradient(rgba(15, 44, 22, 0.6), rgba(15, 44, 22, 0.85)), 
+                url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
+    background-size: cover;
     padding-bottom: 60px;
 }
 
@@ -10,20 +14,7 @@
     padding: 40px 20px;
 }
 
-.back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: #059669;
-    text-decoration: none;
-    font-weight: 600;
-    margin-bottom: 30px;
-    transition: transform 0.2s;
-}
-
-.back-link:hover {
-    transform: translateX(-5px);
-}
+/* Back Link - Uses shared style from FarmerPages.css */
 
 .detection-header {
     margin-bottom: 40px;
@@ -32,21 +23,25 @@
 
 .detection-header h1 {
     font-size: 2.5rem;
-    color: #1a2e1a;
+    color: #ffffff;
     margin-bottom: 10px;
+    font-weight: 800;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .detection-header p {
-    color: #64748b;
+    color: #d1fae5;
     font-size: 1.1rem;
+    font-weight: 500;
 }
 
 .upload-section {
-    background: white;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
     border-radius: 24px;
     padding: 40px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     display: flex;
     flex-direction: column;
     align-items: center;
