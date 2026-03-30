@@ -41,6 +41,9 @@ const MachineryDashboard = () => {
     // Inventory edit state
     const [editingId, setEditingId] = useState(null);
     const [editCount, setEditCount] = useState('');
+    
+    // Delete modal state
+    const [deleteModal, setDeleteModal] = useState({ isOpen: false, itemId: null, itemName: '' });
 
     const showToast = (type, text) => {
         setToast({ type, text });
@@ -80,6 +83,12 @@ const MachineryDashboard = () => {
 
     const handleAddInventory = async (e) => {
         e.preventDefault();
+        
+        if (Number(newItem.totalCount) < 1) {
+            showToast('error', 'Total count must be at least 1.');
+            return;
+        }
+
         try {
             await axios.post('http://localhost:5000/api/machinery/inventory', newItem, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -87,13 +96,21 @@ const MachineryDashboard = () => {
             showToast('success', 'Inventory item added!');
             setNewItem({ name: '', type: 'Tractor', totalCount: 1 });
             fetchRegionalData();
-        } catch {
-            showToast('error', 'Failed to add inventory item');
+        } catch (err) {
+            const errorMsg = err.response?.data?.message || 'Failed to add inventory item';
+            showToast('error', errorMsg);
         }
     };
 
-    const handleDeleteInventory = async (id) => {
-        if (!window.confirm('Remove this item from inventory?')) return;
+    const triggerDelete = (id, name) => {
+        setDeleteModal({ isOpen: true, itemId: id, itemName: name });
+    };
+
+    const confirmDelete = async () => {
+        const id = deleteModal.itemId;
+        setDeleteModal({ isOpen: false, itemId: null, itemName: '' });
+        if (!id) return;
+
         try {
             await axios.delete(`http://localhost:5000/api/machinery/inventory/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -106,15 +123,29 @@ const MachineryDashboard = () => {
     };
 
     const handleUpdateAvailable = async (id) => {
+        const countValue = Number(editCount);
+        if (isNaN(countValue) || countValue < 0) {
+            showToast('error', 'Available count cannot be negative.');
+            return;
+        }
+
+        // Find the item to check its totalCount
+        const item = data.inventory.find(i => i._id === id);
+        if (item && countValue > item.totalCount) {
+            showToast('error', `Available count cannot exceed total count (${item.totalCount}).`);
+            return;
+        }
+
         try {
-            await axios.patch(`http://localhost:5000/api/machinery/inventory/${id}`, { availableCount: Number(editCount) }, {
+            await axios.patch(`http://localhost:5000/api/machinery/inventory/${id}`, { availableCount: countValue }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             showToast('success', 'Available count updated!');
             setEditingId(null);
             fetchRegionalData();
-        } catch {
-            showToast('error', 'Failed to update count');
+        } catch (err) {
+            const errorMsg = err.response?.data?.message || 'Failed to update count';
+            showToast('error', errorMsg);
         }
     };
 
@@ -585,7 +616,7 @@ const MachineryDashboard = () => {
                                                             <div style={{ fontSize: '0.7rem', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '2px' }}>{item.type}</div>
                                                             <h4 style={{ margin: 0, fontSize: '1.05rem', color: '#111827', fontWeight: '800' }}>{item.name}</h4>
                                                         </div>
-                                                        <button onClick={() => handleDeleteInventory(item._id)}
+                                                        <button onClick={() => triggerDelete(item._id, item.name)}
                                                             style={{ background: '#fef2f2', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '1rem', width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Remove item">🗑️</button>
                                                     </div>
 
@@ -643,6 +674,41 @@ const MachineryDashboard = () => {
                         </>
                     )}
                 </div>
+                {/* Delete Confirmation Modal */}
+                {deleteModal.isOpen && (
+                    <div style={{
+                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                        backgroundColor: 'rgba(15, 23, 42, 0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        zIndex: 1000, backdropFilter: 'blur(4px)'
+                    }}>
+                        <div style={{
+                            backgroundColor: 'white', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '400px',
+                            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                            transform: deleteModal.isOpen ? 'translateY(0)' : 'translateY(-20px)', 
+                            transition: 'all 0.3s ease-in-out', borderTop: '6px solid #dc2626'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#fee2e2', color: '#dc2626', marginBottom: '16px', fontSize: '1.5rem' }}>
+                                ⚠️
+                            </div>
+                            <h3 style={{ margin: '0 0 12px 0', color: '#111827', fontSize: '1.25rem', fontWeight: 'bold' }}>Remove Equipment</h3>
+                            <p style={{ margin: '0 0 24px 0', color: '#4b5563', fontSize: '0.95rem', lineHeight: '1.5' }}>
+                                Are you sure you want to remove <strong>{deleteModal.itemName}</strong> from the inventory? This action cannot be undone.
+                            </p>
+                            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                                <button onClick={() => setDeleteModal({ isOpen: false, itemId: null, itemName: '' })}
+                                    style={{ padding: '10px 16px', backgroundColor: '#f3f4f6', color: '#374151', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', transition: 'background-color 0.2s' }}
+                                    onMouseOver={e => e.currentTarget.style.backgroundColor = '#e5e7eb'} onMouseOut={e => e.currentTarget.style.backgroundColor = '#f3f4f6'}>
+                                    Cancel
+                                </button>
+                                <button onClick={confirmDelete}
+                                    style={{ padding: '10px 16px', backgroundColor: '#dc2626', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', transition: 'background-color 0.2s' }}
+                                    onMouseOver={e => e.currentTarget.style.backgroundColor = '#b91c1c'} onMouseOut={e => e.currentTarget.style.backgroundColor = '#dc2626'}>
+                                    Yes, Remove Item
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -35,7 +35,7 @@ const ProductDashboard = () => {
     const [myPurchases, setMyPurchases] = useState([]);
     const [showAddForm, setShowAddForm] = useState(false);
     const [newProduct, setNewProduct] = useState({
-        name: '', category: 'Agri Equipment', description: '', price: '', unit: 'kg', image: ''
+        name: '', category: 'Agri Equipment', description: '', price: '', unit: 'kg', image: '', districts: []
     });
 
     // Form validation state
@@ -133,6 +133,7 @@ const ProductDashboard = () => {
                             : null,
             unit:        required(newProduct.unit, 'Unit'),
             image:       !newProduct.image ? 'Please select an image (max 2 MB).' : null,
+            districts:   (!newProduct.districts || newProduct.districts.length === 0) ? 'Please select at least one district.' : null,
         };
         setProductFormErrors(errors);
         return Object.values(errors).every(v => !v);
@@ -149,7 +150,7 @@ const ProductDashboard = () => {
             });
             if (res.ok) {
                 setMessage({ type: 'success', text: 'Product listed! (Regulated categories await admin approval)' });
-                setNewProduct({ name: '', category: 'Agri Equipment', description: '', price: '', unit: 'kg', image: '' });
+                setNewProduct({ name: '', category: 'Agri Equipment', description: '', price: '', unit: 'kg', image: '', districts: [] });
                 setImageFile(null);
                 setProductFormErrors({});
                 setShowAddForm(false);
@@ -400,7 +401,14 @@ const ProductDashboard = () => {
                             <>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                                     <h3 style={{ margin: 0, color: '#1e293b', fontSize: '1.25rem', fontWeight: '800' }}>Manage My Listings</h3>
-                                    <button className={`btn ${showAddForm ? 'btn-red' : 'btn-primary'}`} onClick={() => setShowAddForm(!showAddForm)} style={{ padding: '10px 20px', borderRadius: '10px', fontWeight: '700' }}>
+                                    <button className={`btn ${showAddForm ? 'btn-red' : 'btn-primary'}`} 
+                                        onClick={() => {
+                                            if (!showAddForm) {
+                                                setNewProduct(prev => ({ ...prev, districts: user?.serviceDistricts || [] }));
+                                            }
+                                            setShowAddForm(!showAddForm);
+                                        }} 
+                                        style={{ padding: '10px 20px', borderRadius: '10px', fontWeight: '700' }}>
                                         {showAddForm ? '✕ Close Form' : '➕ List New Product'}
                                     </button>
                                 </div>
@@ -469,6 +477,37 @@ const ProductDashboard = () => {
                                                 />
                                                 <FieldError msg={productFormErrors.image} />
                                             </div>
+                                        </div>
+
+                                        <div className="form-group" style={{ marginTop: '20px' }}>
+                                            <label style={{ fontSize: '0.8rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', display: 'block' }}>Available Districts</label>
+                                            <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0', marginBottom: '12px' }}>Pre-filled with your operating regions. You can add more specifically for this listing.</p>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                                {districts.map(d => {
+                                                    const isSelected = newProduct.districts?.includes(d);
+                                                    return (
+                                                        <label key={d} style={{
+                                                            padding: '6px 12px', borderRadius: '20px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: isSelected ? '700' : '500',
+                                                            backgroundColor: isSelected ? '#dbeafe' : '#f1f5f9',
+                                                            color: isSelected ? '#1d4ed8' : '#475569',
+                                                            border: isSelected ? '1px solid #3b82f6' : '1px solid #cbd5e1',
+                                                            display: 'flex', alignItems: 'center', gap: '4px', transition: 'all 0.2s'
+                                                        }}>
+                                                            <input type="checkbox" checked={isSelected || false} onChange={(e) => {
+                                                                const current = newProduct.districts || [];
+                                                                if (e.target.checked) {
+                                                                    setNewProduct(prev => ({ ...prev, districts: [...current, d] }));
+                                                                } else {
+                                                                    setNewProduct(prev => ({ ...prev, districts: current.filter(x => x !== d) }));
+                                                                }
+                                                                setProductFormErrors(p => ({ ...p, districts: null }));
+                                                            }} style={{ display: 'none' }} />
+                                                            {isSelected && <span style={{ marginRight: '4px' }}>✓</span>} {d}
+                                                        </label>
+                                                    );
+                                                })}
+                                            </div>
+                                            <FieldError msg={productFormErrors.districts} />
                                         </div>
 
                                         {['Crop Protection', 'Crop Nutrients', 'Animal Health & Nutrition'].includes(newProduct.category) && (

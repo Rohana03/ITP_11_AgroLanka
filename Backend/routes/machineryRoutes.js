@@ -281,7 +281,16 @@ router.patch("/inventory/:id", protect, authorize("MACHINERY_OFFICER", "ASC_OFFI
         const item = await Machinery.findById(req.params.id);
         if (!item) return res.status(404).json({ message: "Item not found" });
 
-        if (availableCount !== undefined) item.availableCount = availableCount;
+        if (availableCount !== undefined) {
+            const count = Number(availableCount);
+            if (isNaN(count) || count < 0) {
+                return res.status(400).json({ message: "Available count cannot be negative." });
+            }
+            if (count > item.totalCount) {
+                return res.status(400).json({ message: `Available count cannot exceed total count (${item.totalCount}).` });
+            }
+            item.availableCount = count;
+        }
         await item.save();
         res.json({ message: "Inventory updated!", item });
     } catch (error) {
