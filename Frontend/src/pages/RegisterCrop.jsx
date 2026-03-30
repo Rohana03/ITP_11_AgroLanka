@@ -163,7 +163,7 @@ const RegisterCrop = () => {
                     {success && <div className="alert-success">{success}</div>}
                     {error && <div className="alert-error">{error}</div>}
 
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmit} noValidate>
                         <div className="form-row">
                             <div className="form-group">
                                 <label>{t('farmer_crop.cropType')} *</label>
@@ -207,6 +207,7 @@ const RegisterCrop = () => {
                                     value={formData.landSize}
                                     onChange={handleChange}
                                     step="0.1"
+                                    min="0.1"
                                     placeholder="e.g., 2.5"
                                     required
                                 />

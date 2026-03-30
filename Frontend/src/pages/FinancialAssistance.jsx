@@ -533,8 +533,8 @@ const FinancialAssistance = () => {
                                         <p style={{ fontSize: '14px', color: '#4b5563', margin: '0 0 15px 0' }}>{t('farmer_finance.period')}: {loan.repaymentPeriod} {t('farmer_finance.months')} @ {loan.interestRate}%</p>
  
                                         {loan.monthlyInstallment && (
-                                            <p style={{ margin: '0 0 10px 0', fontSize: '14px' }}>
-                                                <strong>{t('farmer_finance.monthlyInstallment')}:</strong> LKR {loan.monthlyInstallment.toLocaleString()}
+                                            <p style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#4b5563' }}>
+                                                <strong style={{ color: '#1f2937' }}>{t('farmer_finance.monthlyInstallment') !== 'farmer_finance.monthlyInstallment' ? t('farmer_finance.monthlyInstallment') : 'Monthly Installment'}:</strong> LKR {loan.monthlyInstallment.toLocaleString()}
                                             </p>
                                         )}
  
@@ -553,9 +553,9 @@ const FinancialAssistance = () => {
                                                     </div>
                                                 </div>
  
-                                                <div style={{ padding: '10px', backgroundColor: loan.isOverdue ? '#fee2e2' : '#f9fafb', borderRadius: '6px', marginBottom: '15px', fontSize: '13px' }}>
-                                                    <p style={{ margin: '0 0 5px 0' }}><strong>{t('farmer_finance.nextPayment')}:</strong> {new Date(loan.nextPaymentDate).toLocaleDateString()}</p>
-                                                    {loan.isOverdue && <p style={{ margin: 0, color: '#b91c1c', fontWeight: '500' }}>{t('farmer_finance.overdueWarning')}</p>}
+                                                <div style={{ padding: '10px', backgroundColor: loan.isOverdue ? '#fee2e2' : '#f8fafc', borderRadius: '8px', marginBottom: '15px', fontSize: '13px', color: '#1e293b', border: loan.isOverdue ? '1px solid #fca5a5' : '1px solid #e2e8f0' }}>
+                                                    <p style={{ margin: '0 0 5px 0', color: '#1e293b' }}><strong style={{ color: '#1e293b' }}>{t('farmer_finance.nextPayment') !== 'farmer_finance.nextPayment' ? t('farmer_finance.nextPayment') : 'Next Payment Due'}:</strong> <span style={{ color: '#1e293b', fontWeight: 'bold' }}>{loan.nextPaymentDate ? new Date(loan.nextPaymentDate).toLocaleDateString() : 'N/A'}</span></p>
+                                                    {loan.isOverdue && <p style={{ margin: 0, color: '#b91c1c', fontWeight: '900', fontSize: '15px', textAlign: 'center' }}>{t('farmer_finance.overdueWarning') !== 'farmer_finance.overdueWarning' ? t('farmer_finance.overdueWarning') : 'OVERDUE'}</p>}
                                                 </div>
  
                                                 <button
@@ -618,13 +618,14 @@ const FinancialAssistance = () => {
                                         name="incidentDate"
                                         value={compensationData.incidentDate}
                                         onChange={handleCompensationChange}
+                                        max={new Date().toISOString().split("T")[0]}
                                         required
                                     />
                                     <FieldError message={fieldErrors.incidentDate} />
                                 </div>
  
                                 <div className="form-group">
-                                    <label>{t('farmer_finance.affectedArea')} ({t('farmer_crop.acres')}) *</label>
+                                    <label>{t('farmer_finance.affectedArea') !== 'farmer_finance.affectedArea' ? t('farmer_finance.affectedArea') : 'Affected Area'} ({t('farmer_crop.acres') !== 'farmer_crop.acres' ? t('farmer_crop.acres') : 'Acres'}) *</label>
                                     <input
                                         type="number"
                                         name="affectedArea"

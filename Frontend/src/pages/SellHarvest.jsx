@@ -10,6 +10,14 @@ import './FarmerPages.css';
 const FieldError = ({ msg }) =>
     msg ? <small style={{ color: '#dc2626', display: 'block', marginTop: '4px', fontSize: '0.78rem' }}>{msg}</small> : null;
  
+const sriLankaDistricts = [
+    "Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", 
+    "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", 
+    "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", 
+    "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", 
+    "Trincomalee", "Vavuniya"
+];
+
 const SellHarvest = () => {
     const { user, token } = useAuth();
     const { t } = useLanguage();
@@ -24,7 +32,7 @@ const SellHarvest = () => {
     const [imageFile, setImageFile] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [newListing, setNewListing] = useState({
-        name: '', category: 'Other', description: '', price: '', unit: 'kg', image: ''
+        name: '', category: 'Other', description: '', price: '', unit: 'kg', image: '', districts: []
     });
  
     useEffect(() => {
@@ -76,6 +84,7 @@ const SellHarvest = () => {
             description: (!newListing.description || newListing.description.trim().length < 10)
                             ? 'Description must be at least 10 characters.'
                             : null,
+            districts:   newListing.districts.length === 0 ? 'Please select at least one district to list this product.' : null,
             image:       !newListing.image ? 'Please select an image (max 2 MB).' : null,
         };
         setFormErrors(errors);
@@ -97,7 +106,7 @@ const SellHarvest = () => {
             });
             if (res.ok) {
                 setSuccessMessage(t('farmer_market.listingPublished'));
-                setNewListing({ name: '', category: 'Other', description: '', price: '', unit: 'kg', image: '' });
+                setNewListing({ name: '', category: 'Other', description: '', price: '', unit: 'kg', image: '', districts: [] });
                 setImageFile(null);
                 setFormErrors({});
                 setShowForm(false);
@@ -228,26 +237,30 @@ const SellHarvest = () => {
                                                 <FieldError msg={formErrors.name} />
                                             </div>
                                             <div className="form-group">
-                                                <label>{t('farmer_market.price')} (LKR)</label>
+                                                <label>{t('farmer_market.price')} (LKR per 1kg)</label>
                                                 <input
                                                     type="number"
                                                     value={newListing.price}
                                                     onChange={e => { setNewListing({ ...newListing, price: e.target.value }); setFormErrors(p => ({ ...p, price: null })); }}
                                                     style={formErrors.price ? { borderColor: '#dc2626' } : {}}
-                                                    placeholder="e.g. 5000"
+                                                    placeholder="e.g. 250"
                                                     min="1"
                                                 />
                                                 <FieldError msg={formErrors.price} />
                                             </div>
                                             <div className="form-group">
-                                                <label>{t('farmer_market.unit')} / Quantity</label>
-                                                <input
-                                                    type="text"
-                                                    value={newListing.unit}
-                                                    onChange={e => { setNewListing({ ...newListing, unit: e.target.value }); setFormErrors(p => ({ ...p, unit: null })); }}
-                                                    style={formErrors.unit ? { borderColor: '#dc2626' } : {}}
-                                                    placeholder="e.g. 500kg, 20 Tons"
-                                                />
+                                                <label>{t('farmer_market.unit')} / Total Quantity (kg)</label>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                    <input
+                                                        type="number"
+                                                        value={newListing.unit.replace(/kg/i, '').trim()}
+                                                        onChange={e => { setNewListing({ ...newListing, unit: `${e.target.value}kg` }); setFormErrors(p => ({ ...p, unit: null })); }}
+                                                        style={{ ...(formErrors.unit ? { borderColor: '#dc2626' } : {}), flex: 1 }}
+                                                        placeholder="e.g. 500"
+                                                        min="1"
+                                                    />
+                                                    <span style={{ fontWeight: '600', color: '#64748b' }}>kg</span>
+                                                </div>
                                                 <FieldError msg={formErrors.unit} />
                                             </div>
                                             <div className="form-group">
@@ -272,8 +285,30 @@ const SellHarvest = () => {
                                             />
                                             <FieldError msg={formErrors.description} />
                                         </div>
+                                        <div className="form-group" style={{ marginTop: '20px' }}>
+                                            <label>{t('farmer_market.targetDistricts') !== 'farmer_market.targetDistricts' ? t('farmer_market.targetDistricts') : 'Target Districts'} * <span style={{ color: '#64748b', fontSize: '0.8rem' }}>(Select where to show)</span></label>
+                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '8px', marginTop: '8px', padding: '15px', backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', maxHeight: '180px', overflowY: 'auto' }}>
+                                                {sriLankaDistricts.map(d => (
+                                                    <label key={d} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem', color: '#334155' }}>
+                                                        <input 
+                                                            type="checkbox" 
+                                                            checked={newListing.districts.includes(d)}
+                                                            onChange={(e) => {
+                                                                const updated = e.target.checked 
+                                                                    ? [...newListing.districts, d]
+                                                                    : newListing.districts.filter(existing => existing !== d);
+                                                                setNewListing({ ...newListing, districts: updated });
+                                                                setFormErrors(p => ({ ...p, districts: null }));
+                                                            }}
+                                                        />
+                                                        {d}
+                                                    </label>
+                                                ))}
+                                            </div>
+                                            <FieldError msg={formErrors.districts} />
+                                        </div>
                                         <button type="submit" className="btn btn-primary" style={{ marginTop: '10px' }} disabled={isSubmitting}>
-                                            {isSubmitting ? t('common.processing') || "Publishing..." : t('farmer_market.postListing')}
+                                            {isSubmitting ? (t('common.processing') !== 'common.processing' ? t('common.processing') : 'Publishing...') : (t('farmer_market.postListing') !== 'farmer_market.postListing' ? t('farmer_market.postListing') : 'Post Listing')}
                                         </button>
                                     </form>
                             )}

@@ -91,16 +91,20 @@ router.post("/", protect, authorize("PRODUCT_MANAGER", "FARMER"), async (req, re
             return res.status(400).json({ message: "Unit is required (e.g. kg, pack, 500ml)." });
         }
 
-        let districts = [];
-        if (user.role === 'PRODUCT_MANAGER') {
-            districts = user.serviceDistricts;
-        } else if (user.role === 'FARMER') {
-            // Auth middleware already populates assignedAsc
-            districts = [user.assignedAsc?.district];
+        let districts = req.body.districts;
+
+        // If not provided in body, fallback to user's assigned districts
+        if (!districts || !Array.isArray(districts) || districts.length === 0) {
+            if (user.role === 'PRODUCT_MANAGER') {
+                districts = user.serviceDistricts;
+            } else if (user.role === 'FARMER') {
+                // Auth middleware already populates assignedAsc
+                districts = user.assignedAsc?.district ? [user.assignedAsc.district] : [];
+            }
         }
 
         if (!districts || districts.length === 0 || !districts[0]) {
-            return res.status(400).json({ message: "You must have a district assigned to list products." });
+            return res.status(400).json({ message: "You must have a district assigned or select at least one district to list products." });
         }
 
         // Regulated categories only for PMs (though Farmers listing crops shouldn't usually hit these)
