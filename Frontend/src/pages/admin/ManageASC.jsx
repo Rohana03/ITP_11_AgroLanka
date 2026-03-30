@@ -87,78 +87,92 @@ const ManageASC = () => {
                     </div>
 
                     {loading ? (
-                        <div className="dashboard-section" style={{ backgroundColor: '#fff', padding: '40px', textAlign: 'center', borderRadius: '16px' }}>
-                            <p>Loading Agrarian Service Centers...</p>
+                        <div className="dashboard-section" style={{ backgroundColor: 'rgba(255,255,255,0.9)', padding: '60px', textAlign: 'center', borderRadius: '16px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+                            <p style={{ color: '#059669', fontWeight: '700', fontSize: '1.1rem' }}>🔄 Loading Agrarian Service Centers...</p>
                         </div>
                     ) : (
                         <div className="dashboard-section" style={{ 
-                            backgroundColor: '#fff', 
-                            padding: '24px', 
+                            backgroundColor: 'white', 
+                            padding: '0', 
                             borderRadius: '16px', 
-                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                            overflow: 'hidden',
+                            border: '1px solid #f1f5f9'
                         }}>
                             <div className="data-table-container" style={{ overflowX: 'auto' }}>
-                                <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                                     <thead>
-                                        <tr style={{ backgroundColor: '#f8fafc', borderBottom: '2px solid #e2e8f0', textAlign: 'left' }}>
-                                            <th style={{ padding: '16px', color: '#1e293b', fontWeight: '700' }}>Code</th>
-                                            <th style={{ padding: '16px', color: '#1e293b', fontWeight: '700' }}>Name</th>
-                                            <th style={{ padding: '16px', color: '#1e293b', fontWeight: '700' }}>District</th>
-                                            <th style={{ padding: '16px', color: '#1e293b', fontWeight: '700' }}>Assigned Officers</th>
-                                            <th style={{ padding: '16px', color: '#1e293b', fontWeight: '700' }}>Actions</th>
+                                        <tr style={{ backgroundColor: '#064e3b', color: 'white' }}>
+                                            <th style={{ padding: '20px 16px', fontWeight: '800', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'center', width: '12%' }}>Code</th>
+                                            <th style={{ padding: '20px 16px', fontWeight: '800', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'center', width: '25%' }}>Name</th>
+                                            <th style={{ padding: '20px 16px', fontWeight: '800', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'center', width: '15%' }}>District</th>
+                                            <th style={{ padding: '20px 16px', fontWeight: '800', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'center', width: '35%' }}>Assigned Officers</th>
+                                            <th style={{ padding: '20px 16px', fontWeight: '800', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'center', width: '13%' }}>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {filteredASCs.length > 0 ? (
-                                            filteredASCs.map(asc => (
-                                                <tr key={asc._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                                    <td style={{ padding: '16px', fontWeight: '600', color: '#2563eb' }}>{asc.code}</td>
-                                                    <td style={{ padding: '16px', fontWeight: '500', color: '#1e293b' }}>{asc.name}</td>
-                                                    <td style={{ padding: '16px', color: '#64748b' }}>{asc.district}</td>
-                                                    <td style={{ padding: '16px' }}>
+                                            filteredASCs.map((asc, index) => (
+                                                <tr key={asc._id} style={{ 
+                                                    backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9fafb',
+                                                    borderBottom: '1px solid #f1f5f9',
+                                                    transition: 'all 0.2s'
+                                                }}>
+                                                    <td style={{ padding: '18px 16px', fontWeight: '800', color: '#059669', textAlign: 'center' }}>{asc.code}</td>
+                                                    <td style={{ padding: '18px 16px', fontWeight: '700', color: '#111827', textAlign: 'center' }}>{asc.name}</td>
+                                                    <td style={{ padding: '18px 16px', color: '#4b5563', fontWeight: '600', textAlign: 'center' }}>{asc.district}</td>
+                                                    <td style={{ padding: '18px 16px', textAlign: 'center' }}>
                                                         {asc.assignedOfficers && asc.assignedOfficers.length > 0 ? (
-                                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
                                                                 {asc.assignedOfficers.map(off => (
-                                                                    <span key={off._id} className="badge badge-info" style={{
+                                                                    <span key={off._id} style={{
                                                                         fontSize: '0.75rem',
-                                                                        fontWeight: '600',
-                                                                        backgroundColor: '#eff6ff',
-                                                                        color: '#1d4ed8',
-                                                                        padding: '4px 10px',
+                                                                        fontWeight: '700',
+                                                                        backgroundColor: '#ecfdf5',
+                                                                        color: '#065f46',
+                                                                        padding: '4px 12px',
                                                                         borderRadius: '9999px',
-                                                                        border: '1px solid #dbeafe'
+                                                                        border: '1px solid #d1fae5'
                                                                     }}>
-                                                                        {off.name}
+                                                                        👨‍💼 {off.name}
                                                                     </span>
                                                                 ))}
                                                             </div>
                                                         ) : (
-                                                            <span style={{ color: '#94a3b8', fontSize: '0.85rem', fontStyle: 'italic' }}>No staff assigned</span>
+                                                            <span style={{ color: '#9ca3af', fontSize: '0.85rem', fontStyle: 'italic' }}>No staff assigned</span>
                                                         )}
                                                     </td>
-                                                    <td style={{ padding: '16px' }}>
+                                                    <td style={{ padding: '18px 16px', textAlign: 'center' }}>
                                                         <button 
                                                             className="btn-outline" 
-                                                            style={{ fontSize: '0.8rem', padding: '6px 14px' }}
+                                                            style={{ 
+                                                                fontSize: '0.75rem', 
+                                                                padding: '8px 16px',
+                                                                borderRadius: '8px',
+                                                                fontWeight: '700',
+                                                                backgroundColor: 'white',
+                                                                color: '#064e3b',
+                                                                border: '1.5px solid #064e3b'
+                                                            }}
                                                         >
-                                                            View Details
+                                                            View Meta
                                                         </button>
                                                     </td>
                                                 </tr>
                                             ))
                                         ) : (
                                             <tr>
-                                                <td colSpan="5" style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
-                                                    No ASCs found matching criteria
+                                                <td colSpan="5" style={{ padding: '60px', textAlign: 'center', color: '#9ca3af', fontWeight: '600', fontSize: '1.1rem' }}>
+                                                    📭 No ASCs found matching criteria
                                                 </td>
                                             </tr>
                                         )}
                                     </tbody>
                                 </table>
                             </div>
-                            <div style={{ marginTop: '1.5rem', color: '#64748b', fontSize: '0.9rem', display: 'flex', justifyContent: 'space-between' }}>
-                                <span>Showing {filteredASCs.length} center(s)</span>
-                                <span style={{ fontWeight: '500' }}>Total: {ascs.length} records</span>
+                            <div style={{ padding: '20px 32px', backgroundColor: '#f9fafb', color: '#6b7280', fontSize: '0.85rem', display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9' }}>
+                                <span>Showing <strong>{filteredASCs.length}</strong> center(s)</span>
+                                <span>Database Total: <strong>{ascs.length}</strong> records</span>
                             </div>
                         </div>
                     )}

@@ -5,6 +5,7 @@ import {
     validatePrice, validateImageFile,
     validateCardNumber, validateExpiry, validateCVV, required
 } from '../utils/validators';
+import './AdminDashboard.css';
 import './FarmerDashboard.css';
 
 /* Inline error helper */
@@ -305,10 +306,11 @@ const ProductDashboard = () => {
 
     const getStatusStyle = (s) => {
         const map = {
-            'Pending': { backgroundColor: '#fef3c7', color: '#92400e' },
-            'Active': { backgroundColor: '#dcfce7', color: '#166534' },
-            'Rejected': { backgroundColor: '#fee2e2', color: '#991b1b' },
-            'Out of Stock': { backgroundColor: '#f1f5f9', color: '#475569' },
+            'Pending': { backgroundColor: '#fef3c7', color: '#92400e', border: '1px solid #fcd34d' },
+            'Active': { backgroundColor: '#dcfce7', color: '#166534', border: '1px solid #86efac' },
+            'Rejected': { backgroundColor: '#fee2e2', color: '#991b1b', border: '1px solid #fecaca' },
+            'Out of Stock': { backgroundColor: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1' },
+            'APPROVED': { backgroundColor: '#dcfce7', color: '#166534', border: '1px solid #86efac' },
         };
         return map[s] || { backgroundColor: '#f1f5f9', color: '#475569' };
     };
@@ -323,35 +325,70 @@ const ProductDashboard = () => {
     };
 
     return (
-        <div className="farmer-dashboard-page">
+        <div className="admin-dashboard">
             <style>{printStyle}</style>
             <Navbar />
             <div className="dashboard-container">
                 <header className="dashboard-header">
-                    <div className="header-info">
-                        <h1>Product Manager Dashboard 🛒</h1>
-                        <p>Welcome, {user?.name}! Manage inventory and source crops from farmers.</p>
-                        <div style={{ marginTop: '15px', padding: '10px 20px', backgroundColor: '#eff6ff', borderRadius: '8px', border: '1px solid #3b82f6', display: 'inline-block' }}>
-                            <span style={{ color: '#1e40af', fontWeight: '600' }}>📍 Operating Districts: </span>
-                            <span style={{ color: '#1d4ed8' }}>
-                                {user?.serviceDistricts?.length > 0 ? user.serviceDistricts.join(', ') : 'No districts selected'}
+                    <div className="header-left">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '8px' }}>
+                            <h1 style={{ margin: 0, fontSize: '2rem', color: '#1e3a8a' }}>Product Management 🛒</h1>
+                            <span className="role-badge" style={{ backgroundColor: '#1d4ed8', color: 'white', padding: '4px 12px' }}>
+                                PRODUCT MANAGER
                             </span>
+                        </div>
+                        <p className="welcome-text" style={{ fontSize: '1.2rem', margin: 0 }}>
+                            Welcome back, <strong style={{ color: '#1d4ed8' }}>{user?.name}</strong>! Manage inventory and source crops from farmers.
+                        </p>
+                    </div>
+
+                    <div className="header-right">
+                        <div style={{ padding: '16px 24px', backgroundColor: '#eff6ff', borderRadius: '16px', border: '1px solid #dbeafe', display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                            <div style={{ color: '#1e40af', fontWeight: '800', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>📍 OPERATING DISTRICTS</div>
+                            <div style={{ color: '#1e3a8a', fontSize: '1rem', fontWeight: 'bold', maxWidth: '300px', textAlign: 'right' }}>
+                                {user?.serviceDistricts?.length > 0 ? user.serviceDistricts.join(', ') : 'None Selected'}
+                            </div>
                         </div>
                     </div>
                 </header>
+
+                <div className="stats-grid" style={{ marginBottom: '32px' }}>
+                    <div className="stat-card">
+                        <div className="card-icon">📦</div>
+                        <div className="stat-label">My Listings</div>
+                        <div className="stat-value">{myProducts.length}</div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="card-icon">🌾</div>
+                        <div className="stat-label">Marketplace Items</div>
+                        <div className="stat-value">{marketplaceProducts.length}</div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="card-icon">🧾</div>
+                        <div className="stat-label">Total Purchases</div>
+                        <div className="stat-value">{myPurchases.length}</div>
+                    </div>
+                    <div className="stat-card" style={{ borderTop: '4px solid #10b981' }}>
+                        <div className="card-icon">🏘️</div>
+                        <div className="stat-label">Service Regions</div>
+                        <div className="stat-value">{user?.serviceDistricts?.length || 0} <span style={{ fontSize: '1rem', fontWeight: '400', color: '#64748b' }}>Districts</span></div>
+                    </div>
+                </div>
 
                 <div className="dashboard-grid">
                     {/* ── Main Content Card ── */}
                     <div className="dashboard-panel" style={{ gridColumn: '1 / -1' }}>
                         {/* Tabs */}
-                        <div style={{ display: 'flex', gap: '20px', marginBottom: '20px', borderBottom: '1px solid #e2e8f0' }}>
-                            {[['inventory', '📦 My Inventory'], ['marketplace', '🌾 Source from Farmers'], ['purchases', '🧾 My Purchases']].map(([key, label]) => (
+                        <div style={{ display: 'flex', gap: '8px', marginBottom: '32px', borderBottom: '2px solid #f1f5f9' }}>
+                            {[['inventory', '📦 My Inventory'], ['marketplace', '🌾 Marketplace'], ['purchases', '🧾 Purchases']].map(([key, label]) => (
                                 <button key={key} onClick={() => setActiveTab(key)}
                                     style={{
-                                        padding: '10px 5px', border: 'none', background: 'none', cursor: 'pointer',
-                                        borderBottom: activeTab === key ? '3px solid #3b82f6' : 'none',
-                                        fontWeight: activeTab === key ? '600' : '400',
-                                        color: activeTab === key ? '#1e40af' : '#64748b'
+                                        padding: '12px 24px', border: 'none', background: 'none', cursor: 'pointer',
+                                        borderBottom: activeTab === key ? '4px solid #3b82f6' : '4px solid transparent',
+                                        fontWeight: activeTab === key ? '800' : '500',
+                                        color: activeTab === key ? '#1e40af' : '#64748b',
+                                        transition: 'all 0.2s',
+                                        fontSize: '0.95rem'
                                     }}>
                                     {label}
                                 </button>
@@ -361,123 +398,166 @@ const ProductDashboard = () => {
                         {/* ── Inventory Tab ── */}
                         {activeTab === 'inventory' && (
                             <>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                                    <h3>My Product Listings</h3>
-                                    <button className="btn btn-primary btn-sm" onClick={() => setShowAddForm(!showAddForm)}>
-                                        {showAddForm ? 'Cancel' : '+ Add New Product'}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                                    <h3 style={{ margin: 0, color: '#1e293b', fontSize: '1.25rem', fontWeight: '800' }}>Manage My Listings</h3>
+                                    <button className={`btn ${showAddForm ? 'btn-red' : 'btn-primary'}`} onClick={() => setShowAddForm(!showAddForm)} style={{ padding: '10px 20px', borderRadius: '10px', fontWeight: '700' }}>
+                                        {showAddForm ? '✕ Close Form' : '➕ List New Product'}
                                     </button>
                                 </div>
 
                                 {showAddForm && (
-                                    <form onSubmit={handleAddProduct} style={{ backgroundColor: '#f9fafb', padding: '20px', borderRadius: '12px', marginBottom: '20px', border: '1px solid #e5e7eb' }}>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                                            <div className="form-group">
-                                                <label>Product Name</label>
+                                    <form onSubmit={handleAddProduct} style={{
+                                        backgroundColor: '#ffffff',
+                                        padding: '32px',
+                                        borderRadius: '16px',
+                                        marginBottom: '32px',
+                                        border: '1px solid #e2e8f0',
+                                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+                                    }}>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
+                                            <div className="form-group" style={{ margin: 0 }}>
+                                                <label style={{ fontSize: '0.8rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', display: 'block' }}>Product Name</label>
                                                 <input
                                                     type="text"
                                                     value={newProduct.name}
                                                     onChange={e => { setNewProduct({ ...newProduct, name: e.target.value }); setProductFormErrors(p => ({ ...p, name: null })); }}
-                                                    style={productFormErrors.name ? { borderColor: '#dc2626' } : {}}
+                                                    style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: productFormErrors.name ? '1.5px solid #ef4444' : '1.5px solid #e2e8f0', fontSize: '0.95rem' }}
                                                     placeholder="e.g. Urea Fertilizer"
                                                 />
                                                 <FieldError msg={productFormErrors.name} />
                                             </div>
-                                            <div className="form-group">
-                                                <label>Category</label>
-                                                <select value={newProduct.category} onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}>
+                                            <div className="form-group" style={{ margin: 0 }}>
+                                                <label style={{ fontSize: '0.8rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', display: 'block' }}>Category</label>
+                                                <select
+                                                    value={newProduct.category}
+                                                    onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}
+                                                    style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1.5px solid #e2e8f0', fontSize: '0.95rem', backgroundColor: 'white' }}
+                                                >
                                                     {categories.map(c => <option key={c} value={c}>{c}</option>)}
                                                 </select>
-                                                {['Crop Protection', 'Crop Nutrients', 'Animal Health & Nutrition'].includes(newProduct.category) && (
-                                                    <div style={{ marginTop: '8px', padding: '10px 14px', backgroundColor: '#fffbeb', border: '1px solid #f59e0b', borderRadius: '8px', color: '#92400e', fontSize: '0.82rem', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                                                        <span style={{ fontSize: '1rem' }}>⚠️</span>
-                                                        <span><strong>Admin Approval Required</strong> — This is a regulated category. Your listing will be held as <em>Pending</em> and will only go live after an admin reviews and approves it.</span>
-                                                    </div>
-                                                )}
                                             </div>
-                                            <div className="form-group">
-                                                <label>Price (LKR)</label>
+                                            <div className="form-group" style={{ margin: 0 }}>
+                                                <label style={{ fontSize: '0.8rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', display: 'block' }}>Price (LKR)</label>
                                                 <input
                                                     type="number"
                                                     value={newProduct.price}
                                                     onChange={e => { setNewProduct({ ...newProduct, price: e.target.value }); setProductFormErrors(p => ({ ...p, price: null })); }}
-                                                    style={productFormErrors.price ? { borderColor: '#dc2626' } : {}}
+                                                    style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: productFormErrors.price ? '1.5px solid #ef4444' : '1.5px solid #e2e8f0', fontSize: '0.95rem' }}
                                                     placeholder="e.g. 2500"
                                                     min="1"
                                                 />
                                                 <FieldError msg={productFormErrors.price} />
                                             </div>
-                                            <div className="form-group">
-                                                <label>Unit</label>
+                                            <div className="form-group" style={{ margin: 0 }}>
+                                                <label style={{ fontSize: '0.8rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', display: 'block' }}>Unit</label>
                                                 <input
                                                     type="text"
                                                     value={newProduct.unit}
                                                     onChange={e => { setNewProduct({ ...newProduct, unit: e.target.value }); setProductFormErrors(p => ({ ...p, unit: null })); }}
-                                                    style={productFormErrors.unit ? { borderColor: '#dc2626' } : {}}
+                                                    style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: productFormErrors.unit ? '1.5px solid #ef4444' : '1.5px solid #e2e8f0', fontSize: '0.95rem' }}
                                                     placeholder="e.g. kg, 500ml, pack"
                                                 />
                                                 <FieldError msg={productFormErrors.unit} />
                                             </div>
-                                            <div className="form-group">
-                                                <label>Product Image <span style={{ color: '#64748b', fontSize: '0.8rem' }}>(max 2 MB)</span></label>
+                                            <div className="form-group" style={{ margin: 0, gridColumn: 'span 1' }}>
+                                                <label style={{ fontSize: '0.8rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', display: 'block' }}>Product Image</label>
                                                 <input
                                                     type="file"
                                                     accept="image/*"
                                                     onChange={handleImageChange}
-                                                    style={productFormErrors.image ? { borderColor: '#dc2626' } : {}}
+                                                    style={{ width: '100%', fontSize: '0.85rem' }}
                                                 />
                                                 <FieldError msg={productFormErrors.image} />
                                             </div>
                                         </div>
-                                        <div className="form-group" style={{ marginTop: '15px' }}>
-                                            <label>Description <span style={{ color: '#64748b', fontSize: '0.8rem' }}>(min 20 chars)</span></label>
+
+                                        {['Crop Protection', 'Crop Nutrients', 'Animal Health & Nutrition'].includes(newProduct.category) && (
+                                            <div style={{ marginTop: '20px', padding: '16px', backgroundColor: '#fffbeb', border: '1px solid #fcd34d', borderRadius: '12px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                                <span style={{ fontSize: '1.5rem' }}>🛡️</span>
+                                                <p style={{ margin: 0, fontSize: '0.85rem', color: '#92400e', fontWeight: '600' }}>
+                                                    Regulated category detected. Listing will require administrator approval before going live.
+                                                </p>
+                                            </div>
+                                        )}
+
+                                        <div className="form-group" style={{ marginTop: '20px' }}>
+                                            <label style={{ fontSize: '0.8rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', display: 'block' }}>Description (min 20 chars)</label>
                                             <textarea
                                                 value={newProduct.description}
                                                 onChange={e => { setNewProduct({ ...newProduct, description: e.target.value }); setProductFormErrors(p => ({ ...p, description: null })); }}
-                                                style={productFormErrors.description ? { borderColor: '#dc2626' } : {}}
+                                                style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: productFormErrors.description ? '1.5px solid #ef4444' : '1.5px solid #e2e8f0', fontSize: '0.95rem', minHeight: '100px' }}
                                                 placeholder="Provide details about quality, usage, grade..."
-                                                rows="3"
                                             />
                                             <FieldError msg={productFormErrors.description} />
                                         </div>
-                                        <button type="submit" className="btn btn-primary" style={{ marginTop: '10px' }}>Publish Listing</button>
+                                        <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+                                            <button type="submit" className="btn btn-primary" style={{ backgroundColor: '#064e3b', border: 'none', padding: '14px 32px', borderRadius: '10px', fontWeight: '800', fontSize: '0.95rem' }}>🚀 Publish Listing</button>
+                                            <button type="button" className="btn" onClick={() => setShowAddForm(false)} style={{ background: '#f1f5f9', color: '#475569', padding: '14px 32px', borderRadius: '10px', fontWeight: '700' }}>Cancel</button>
+                                        </div>
                                     </form>
                                 )}
 
-                                <div className="data-table-container">
-                                    <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                <div className="data-table-container" style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                                    <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                                         <thead>
-                                            <tr style={{ textAlign: 'left', borderBottom: '2px solid #e2e8f0' }}>
-                                                <th style={{ padding: '12px' }}>Product</th>
-                                                <th style={{ padding: '12px' }}>Category</th>
-                                                <th style={{ padding: '12px' }}>Price</th>
-                                                <th style={{ padding: '12px' }}>Status</th>
-                                                <th style={{ padding: '12px' }}>Action</th>
+                                            <tr style={{ backgroundColor: '#064e3b', color: 'white' }}>
+                                                {['Product', 'Category', 'Price', 'Status', 'Action'].map((h, i) => (
+                                                    <th key={h} style={{
+                                                        padding: '18px 24px',
+                                                        textAlign: i === 0 ? 'left' : 'center',
+                                                        fontWeight: '700',
+                                                        fontSize: '0.75rem',
+                                                        textTransform: 'uppercase',
+                                                        letterSpacing: '0.1em',
+                                                        width: i === 0 ? '35%' : '16%'
+                                                    }}>{h}</th>
+                                                ))}
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {myProducts.map(p => (
-                                                <tr key={p._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                                    <td style={{ padding: '12px' }}>
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                            {p.image ? <img src={p.image} alt="" style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} /> : <span>📦</span>}
+                                            {myProducts.map((p, index) => (
+                                                <tr key={p._id} style={{
+                                                    backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9fafb',
+                                                    borderBottom: '1px solid #f1f5f9',
+                                                    transition: 'background 0.2s'
+                                                }}>
+                                                    <td style={{ padding: '16px 24px' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                                            <div style={{ width: '48px', height: '48px', borderRadius: '10px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                                                                {p.image ? <img src={p.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: '1.5rem' }}>📦</span>}
+                                                            </div>
                                                             <div>
-                                                                <div style={{ fontWeight: '600' }}>{p.name}</div>
-                                                                <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{p.unit}</div>
+                                                                <div style={{ fontWeight: '700', color: '#111827', fontSize: '1rem' }}>{p.name}</div>
+                                                                <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>per {p.unit}</div>
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td style={{ padding: '12px' }}>{p.category}</td>
-                                                    <td style={{ padding: '12px' }}>LKR {p.price}</td>
-                                                    <td style={{ padding: '12px' }}>
-                                                        <span style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '10px', ...getStatusStyle(p.status) }}>{p.status}</span>
+                                                    <td style={{ padding: '16px 24px', textAlign: 'center' }}>
+                                                        <span style={{ fontSize: '0.85rem', color: '#475569', fontWeight: '500' }}>{p.category}</span>
                                                     </td>
-                                                    <td style={{ padding: '12px' }}>
-                                                        <button onClick={() => handleDeleteProduct(p._id)} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}>Delete</button>
+                                                    <td style={{ padding: '16px 24px', textAlign: 'center' }}>
+                                                        <div style={{ fontWeight: '800', color: '#064e3b' }}>LKR {Number(p.price).toLocaleString()}</div>
+                                                    </td>
+                                                    <td style={{ padding: '16px 24px', textAlign: 'center' }}>
+                                                        <span style={{
+                                                            fontSize: '0.7rem',
+                                                            padding: '4px 12px',
+                                                            borderRadius: '20px',
+                                                            fontWeight: '800',
+                                                            textTransform: 'uppercase',
+                                                            ...getStatusStyle(p.status)
+                                                        }}>{p.status}</span>
+                                                    </td>
+                                                    <td style={{ padding: '16px 24px', textAlign: 'center' }}>
+                                                        <button onClick={() => handleDeleteProduct(p._id)} style={{ color: '#ef4444', background: '#fef2f2', border: 'none', cursor: 'pointer', padding: '8px 12px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: '700' }}>🗑️ Delete</button>
                                                     </td>
                                                 </tr>
                                             ))}
                                             {myProducts.length === 0 && (
-                                                <tr><td colSpan="5" style={{ textAlign: 'center', padding: '30px', color: '#64748b' }}>No products listed yet.</td></tr>
+                                                <tr><td colSpan="5" style={{ textAlign: 'center', padding: '60px', color: '#94a3b8', fontSize: '0.95rem' }}>
+                                                    <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📭</div>
+                                                    No products listed yet. Click "+ List New Product" to start.
+                                                </td></tr>
                                             )}
                                         </tbody>
                                     </table>
@@ -492,48 +572,70 @@ const ProductDashboard = () => {
                                     <h3>Marketplace: Crops from Farmers</h3>
                                     <p style={{ fontSize: '0.9rem', color: '#64748b' }}>Crops available for purchase in your service districts.</p>
                                 </div>
-                                <div className="data-table-container">
-                                    <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                <div className="data-table-container" style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                                    <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                                         <thead>
-                                            <tr style={{ textAlign: 'left', borderBottom: '2px solid #e2e8f0' }}>
-                                                <th style={{ padding: '12px' }}>Harvest Details</th>
-                                                <th style={{ padding: '12px' }}>Farmer</th>
-                                                <th style={{ padding: '12px' }}>Districts</th>
-                                                <th style={{ padding: '12px' }}>Price / Qty</th>
-                                                <th style={{ padding: '12px' }}>Action</th>
+                                            <tr style={{ backgroundColor: '#064e3b', color: 'white' }}>
+                                                {['Harvest Details', 'Farmer', 'Districts', 'Pricing', 'Action'].map((h, i) => (
+                                                    <th key={h} style={{
+                                                        padding: '18px 24px',
+                                                        textAlign: i === 0 || i === 1 ? 'left' : 'center',
+                                                        fontWeight: '700',
+                                                        fontSize: '0.75rem',
+                                                        textTransform: 'uppercase',
+                                                        letterSpacing: '0.1em',
+                                                        width: i === 0 ? '30%' : i === 1 ? '20%' : i === 4 ? '15%' : '17.5%'
+                                                    }}>{h}</th>
+                                                ))}
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {marketplaceProducts.map(p => (
-                                                <tr key={p._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                                    <td style={{ padding: '12px' }}>
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                            {p.image ? <img src={p.image} alt="" style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} /> : <span>🌾</span>}
+                                            {marketplaceProducts.map((p, index) => (
+                                                <tr key={p._id} style={{
+                                                    backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9fafb',
+                                                    borderBottom: '1px solid #f1f5f9',
+                                                    transition: 'background 0.2s'
+                                                }}>
+                                                    <td style={{ padding: '16px 24px' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                                            <div style={{ width: '48px', height: '48px', borderRadius: '10px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                                                                {p.image ? <img src={p.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: '1.5rem' }}>🌾</span>}
+                                                            </div>
                                                             <div>
-                                                                <div style={{ fontWeight: '600' }}>{p.name}</div>
-                                                                <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{p.description?.substring(0, 30)}...</div>
+                                                                <div style={{ fontWeight: '700', color: '#111827', fontSize: '1rem' }}>{p.name}</div>
+                                                                <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{p.description?.substring(0, 40)}...</div>
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td style={{ padding: '12px' }}>
-                                                        <div style={{ fontWeight: '500' }}>{p.seller?.name}</div>
-                                                        <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{p.seller?.email}</div>
+                                                    <td style={{ padding: '16px 24px' }}>
+                                                        <div style={{ fontWeight: '700', color: '#1f2937' }}>{p.seller?.name}</div>
+                                                        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{p.seller?.email}</div>
                                                     </td>
-                                                    <td style={{ padding: '12px' }}>{p.districts?.join(', ')}</td>
-                                                    <td style={{ padding: '12px' }}>LKR {p.price} / {p.unit}</td>
-                                                    <td style={{ padding: '12px' }}>
+                                                    <td style={{ padding: '16px 24px', textAlign: 'center' }}>
+                                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', justifyContent: 'center' }}>
+                                                            {p.districts?.map(d => <span key={d} style={{ fontSize: '0.7rem', padding: '2px 8px', backgroundColor: '#eff6ff', color: '#1e40af', borderRadius: '4px', fontWeight: '600' }}>{d}</span>)}
+                                                        </div>
+                                                    </td>
+                                                    <td style={{ padding: '16px 24px', textAlign: 'center' }}>
+                                                        <div style={{ fontWeight: '800', color: '#059669' }}>LKR {p.price}</div>
+                                                        <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase' }}>per {p.unit}</div>
+                                                    </td>
+                                                    <td style={{ padding: '16px 24px', textAlign: 'center' }}>
                                                         <button
-                                                            className="btn btn-primary btn-sm"
-                                                            style={{ backgroundColor: '#059669' }}
+                                                            className="btn btn-primary"
+                                                            style={{ backgroundColor: '#059669', padding: '8px 16px', fontSize: '0.85rem' }}
                                                             onClick={() => openBuyModal(p)}
                                                         >
-                                                            🛒 Buy
+                                                            🛒 Purchase
                                                         </button>
                                                     </td>
                                                 </tr>
                                             ))}
                                             {marketplaceProducts.length === 0 && (
-                                                <tr><td colSpan="5" style={{ padding: '30px', textAlign: 'center', color: '#64748b' }}>No farmer crops available in your districts.</td></tr>
+                                                <tr><td colSpan="5" style={{ padding: '60px', textAlign: 'center', color: '#94a3b8' }}>
+                                                    <div style={{ fontSize: '2rem', marginBottom: '8px' }}>🌾</div>
+                                                    No farmer crops available in your districts.
+                                                </td></tr>
                                             )}
                                         </tbody>
                                     </table>
@@ -548,38 +650,51 @@ const ProductDashboard = () => {
                                     <h3>My Purchase History</h3>
                                     <p style={{ fontSize: '0.9rem', color: '#64748b' }}>All crops you have purchased from farmers.</p>
                                 </div>
-                                <div className="data-table-container">
-                                    <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                <div className="data-table-container" style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                                    <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                                         <thead>
-                                            <tr style={{ textAlign: 'left', borderBottom: '2px solid #e2e8f0' }}>
-                                                <th style={{ padding: '12px' }}>Receipt #</th>
-                                                <th style={{ padding: '12px' }}>Crop</th>
-                                                <th style={{ padding: '12px' }}>Farmer</th>
-                                                <th style={{ padding: '12px' }}>Amount</th>
-                                                <th style={{ padding: '12px' }}>Method</th>
-                                                <th style={{ padding: '12px' }}>Date</th>
-                                                <th style={{ padding: '12px' }}>Receipt</th>
+                                            <tr style={{ backgroundColor: '#064e3b', color: 'white' }}>
+                                                {['Receipt #', 'Crop', 'Farmer', 'Amount', 'Method', 'Date', 'Action'].map((h, i) => (
+                                                    <th key={h} style={{
+                                                        padding: '18px 24px',
+                                                        textAlign: i === 1 || i === 2 ? 'left' : 'center',
+                                                        fontWeight: '700',
+                                                        fontSize: '0.75rem',
+                                                        textTransform: 'uppercase',
+                                                        letterSpacing: '0.1em',
+                                                        width: i === 0 ? '12%' : i === 1 ? '18%' : i === 2 ? '20%' : '12.5%'
+                                                    }}>{h}</th>
+                                                ))}
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {myPurchases.map(p => (
-                                                <tr key={p._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                                    <td style={{ padding: '12px', fontFamily: 'monospace', fontSize: '0.8rem', color: '#3b82f6' }}>{p.receiptNumber}</td>
-                                                    <td style={{ padding: '12px', fontWeight: '500' }}>{p.productName}</td>
-                                                    <td style={{ padding: '12px' }}>
-                                                        <div>{p.seller?.name}</div>
-                                                        <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{p.seller?.email}</div>
+                                            {myPurchases.map((p, index) => (
+                                                <tr key={p._id} style={{
+                                                    backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9fafb',
+                                                    borderBottom: '1px solid #f1f5f9',
+                                                    transition: 'background 0.2s'
+                                                }}>
+                                                    <td style={{ padding: '16px 24px', textAlign: 'center', fontFamily: 'monospace', fontSize: '0.8rem', color: '#3b82f6', fontWeight: 'bold' }}>{p.receiptNumber}</td>
+                                                    <td style={{ padding: '16px 24px', textAlign: 'left', fontWeight: '700', color: '#111827' }}>{p.productName}</td>
+                                                    <td style={{ padding: '16px 24px', textAlign: 'left' }}>
+                                                        <div style={{ fontWeight: '600' }}>{p.seller?.name}</div>
+                                                        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{p.seller?.email}</div>
                                                     </td>
-                                                    <td style={{ padding: '12px', fontWeight: '600', color: '#059669' }}>LKR {p.amount?.toLocaleString()}</td>
-                                                    <td style={{ padding: '12px' }}>{p.paymentMethod}</td>
-                                                    <td style={{ padding: '12px', color: '#64748b', fontSize: '0.85rem' }}>{new Date(p.createdAt).toLocaleDateString()}</td>
-                                                    <td style={{ padding: '12px' }}>
-                                                        <button onClick={() => handlePrintPurchaseReceipt(p)} className="btn btn-outline btn-sm" style={{ fontSize: '0.8rem' }}>🖨️ Print</button>
+                                                    <td style={{ padding: '16px 24px', textAlign: 'center', fontWeight: '800', color: '#059669' }}>LKR {p.amount?.toLocaleString()}</td>
+                                                    <td style={{ padding: '16px 24px', textAlign: 'center' }}>
+                                                        <span style={{ fontSize: '0.8rem', padding: '4px 10px', backgroundColor: '#f1f5f9', borderRadius: '6px', fontWeight: '600' }}>{p.paymentMethod}</span>
+                                                    </td>
+                                                    <td style={{ padding: '16px 24px', textAlign: 'center', color: '#64748b', fontSize: '0.85rem' }}>{new Date(p.createdAt).toLocaleDateString()}</td>
+                                                    <td style={{ padding: '16px 24px', textAlign: 'center' }}>
+                                                        <button onClick={() => handlePrintPurchaseReceipt(p)} className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.8rem', fontWeight: '700' }}>🖨️ Receipt</button>
                                                     </td>
                                                 </tr>
                                             ))}
                                             {myPurchases.length === 0 && (
-                                                <tr><td colSpan="7" style={{ textAlign: 'center', padding: '30px', color: '#64748b' }}>No purchases yet.</td></tr>
+                                                <tr><td colSpan="7" style={{ textAlign: 'center', padding: '60px', color: '#94a3b8' }}>
+                                                    <div style={{ fontSize: '2rem', marginBottom: '8px' }}>🧾</div>
+                                                    No purchases yet.
+                                                </td></tr>
                                             )}
                                         </tbody>
                                     </table>
@@ -589,91 +704,45 @@ const ProductDashboard = () => {
                     </div>
 
                     {/* ── District Selector ── */}
-                    <div className="dashboard-panel" style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px', marginBottom: '15px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <div className="card-icon" style={{ fontSize: '1.8rem', marginBottom: 0 }}>📍</div>
-                                <h3 style={{ margin: 0 }}>Manage Service Districts</h3>
-                                <p style={{ margin: 0, fontSize: '0.9rem', color: '#64748b' }}>(Select the regions where you source and sell crops)</p>
+                    <div className="dashboard-panel" style={{ gridColumn: '1 / -1', marginTop: '32px', padding: '32px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '24px', marginBottom: '32px' }}>
+                            <div>
+                                <h3 style={{ margin: 0, color: '#1e293b', fontSize: '1.25rem', fontWeight: '800' }}>📍 Manage Service Districts</h3>
+                                <p style={{ margin: '4px 0 0 0', fontSize: '0.9rem', color: '#64748b' }}>Select the regions where you source crops and sell products.</p>
                             </div>
                             
-                            <div style={{ display: 'flex', gap: '10px' }}>
-                                <button 
-                                    type="button"
-                                    className="btn-outline" 
-                                    style={{ fontSize: '0.8rem', padding: '8px 16px' }}
-                                    onClick={() => setSelectedDistricts(districts)}
-                                >
-                                    Select All
-                                </button>
-                                <button 
-                                    type="button"
-                                    className="btn-outline" 
-                                    style={{ fontSize: '0.8rem', padding: '8px 16px' }}
-                                    onClick={() => setSelectedDistricts([])}
-                                >
-                                    Clear All
-                                </button>
-                                <button 
-                                    className="btn btn-primary" 
-                                    style={{ 
-                                        padding: '8px 20px', 
-                                        borderRadius: '8px', 
-                                        fontSize: '0.9rem',
-                                        minWidth: '150px',
-                                        backgroundColor: isUpdating ? '#94a3b8' : '#3b82f6'
-                                    }} 
-                                    onClick={handleUpdateDistricts} 
-                                    disabled={isUpdating}
-                                >
-                                    {isUpdating ? 'Updating...' : 'Save Changes'}
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                                <button type="button" className="btn" onClick={() => setSelectedDistricts(districts)}
+                                    style={{ background: '#f8fafc', border: '1px solid #e2e8f0', color: '#444', padding: '8px 16px', borderRadius: '8px', fontWeight: '600', fontSize: '0.85rem' }}>Select All</button>
+                                <button type="button" className="btn" onClick={() => setSelectedDistricts([])}
+                                    style={{ background: '#f8fafc', border: '1px solid #e2e8f0', color: '#444', padding: '8px 16px', borderRadius: '8px', fontWeight: '600', fontSize: '0.85rem' }}>Clear All</button>
+                                <button className="btn btn-primary" onClick={handleUpdateDistricts} disabled={isUpdating}
+                                    style={{ backgroundColor: '#1d4ed8', border: 'none', padding: '10px 24px', borderRadius: '10px', fontWeight: '800', fontSize: '0.9rem' }}>
+                                    {isUpdating ? 'Saving...' : '💾 Save Changes'}
                                 </button>
                             </div>
                         </div>
 
                         {message.text && (
-                            <div style={{ padding: '10px', textAlign: 'center', borderRadius: '8px', marginBottom: '15px', backgroundColor: message.type === 'success' ? '#ecfdf5' : '#fef2f2', color: message.type === 'success' ? '#059669' : '#991b1b', border: `1px solid ${message.type === 'success' ? '#10b981' : '#f87171'}`, fontWeight: '600' }}>
-                                {message.type === 'success' ? '✓ ' : '⚠️ '}{message.text}
+                            <div style={{ padding: '12px 20px', borderRadius: '12px', marginBottom: '24px', backgroundColor: message.type === 'success' ? '#ecfdf5' : '#fef2f2', color: message.type === 'success' ? '#166534' : '#991b1b', border: `1px solid ${message.type === 'success' ? '#10b981' : '#ef4444'}`, fontWeight: '700', textAlign: 'center' }}>
+                                {message.type === 'success' ? '✅ ' : '⚠️ '}{message.text}
                             </div>
                         )}
 
-                        <div style={{ 
-                            display: 'grid', 
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', 
-                            gap: '12px', 
-                            padding: '20px', 
-                            backgroundColor: '#f8fafc', 
-                            borderRadius: '12px', 
-                            border: '1px solid #e2e8f0', 
-                            maxHeight: '400px', 
-                            overflowY: 'auto',
-                            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
-                        }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '12px', padding: '24px', backgroundColor: '#f9fafb', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
                             {districts.map(d => (
                                 <label key={d} style={{ 
-                                    display: 'flex', 
-                                    alignItems: 'center', 
-                                    gap: '10px', 
-                                    cursor: 'pointer', 
-                                    fontSize: '0.9rem',
-                                    padding: '8px 12px',
-                                    borderRadius: '8px',
-                                    transition: 'all 0.2s',
-                                    backgroundColor: selectedDistricts.includes(d) ? '#eff6ff' : '#fff',
+                                    display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', fontSize: '0.9rem', padding: '12px 16px', borderRadius: '12px', transition: 'all 0.2s',
+                                    backgroundColor: selectedDistricts.includes(d) ? '#eff6ff' : '#ffffff',
                                     color: selectedDistricts.includes(d) ? '#1e40af' : '#475569',
-                                    fontWeight: selectedDistricts.includes(d) ? '600' : '400',
-                                    border: selectedDistricts.includes(d) ? '2px solid #3b82f6' : '1px solid #e2e8f0',
-                                    boxShadow: selectedDistricts.includes(d) ? '0 4px 6px -1px rgba(59, 130, 246, 0.1)' : 'none'
+                                    fontWeight: selectedDistricts.includes(d) ? '800' : '500',
+                                    border: selectedDistricts.includes(d) ? '2px solid #3b82f6' : '1px solid #f1f5f9',
+                                    boxShadow: selectedDistricts.includes(d) ? '0 4px 6px -1px rgba(59, 130, 246, 0.1)' : '0 1px 2px rgba(0,0,0,0.03)'
                                 }}>
-                                    <input 
-                                        type="checkbox" 
-                                        checked={selectedDistricts.includes(d)} 
-                                        onChange={(e) => {
+                                    <input type="checkbox" checked={selectedDistricts.includes(d)} onChange={(e) => {
                                             if (e.target.checked) setSelectedDistricts([...selectedDistricts, d]);
                                             else setSelectedDistricts(selectedDistricts.filter(x => x !== d));
-                                        }} 
-                                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                                    />
+                                        }} style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: '#3b82f6' }} />
                                     {d}
                                 </label>
                             ))}

@@ -127,16 +127,33 @@ const ManageOfficers = () => {
                         </div>
                     </div>
 
-                    <div className="dashboard-section">
-                        <h2>Assigned Staff Members</h2>
-                        <div className="data-table-container">
-                            <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                    <div className="dashboard-section" style={{ 
+                        backgroundColor: 'white', 
+                        padding: '0', 
+                        borderRadius: '16px', 
+                        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                        overflow: 'hidden',
+                        border: '1px solid #f1f5f9'
+                    }}>
+                        <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h2 style={{ margin: 0, color: '#064e3b', fontSize: '1.25rem', fontWeight: '800' }}>Assigned Staff Members</h2>
+                            <div style={{ color: '#6b7280', fontSize: '0.85rem' }}>
+                                Total Matching: <strong>{officers.filter(off => {
+                                    const matchesSearch = off.name.toLowerCase().includes(searchTerm.toLowerCase()) || off.email.toLowerCase().includes(searchTerm.toLowerCase());
+                                    const matchesRole = roleFilter === 'ALL' || off.role === roleFilter;
+                                    const matchesStatus = statusFilter === 'ALL' || (statusFilter === 'ALLOCATED' ? off.assignedAsc : !off.assignedAsc);
+                                    return matchesSearch && matchesRole && matchesStatus;
+                                }).length}</strong>
+                            </div>
+                        </div>
+                        <div className="data-table-container" style={{ overflowX: 'auto' }}>
+                            <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                                 <thead>
-                                    <tr style={{ backgroundColor: '#f8fafc', borderBottom: '2px solid #e2e8f0', textAlign: 'left' }}>
-                                        <th style={{ padding: '16px' }}>Name</th>
-                                        <th style={{ padding: '16px' }}>Role</th>
-                                        <th style={{ padding: '16px' }}>Current Region</th>
-                                        <th style={{ padding: '16px' }}>Reallocate To</th>
+                                    <tr style={{ backgroundColor: '#064e3b', color: 'white' }}>
+                                        <th style={{ padding: '20px 16px', fontWeight: '800', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'center', width: '28%' }}>Name</th>
+                                        <th style={{ padding: '20px 16px', fontWeight: '800', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'center', width: '22%' }}>Role</th>
+                                        <th style={{ padding: '20px 16px', fontWeight: '800', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'center', width: '25%' }}>Current Region</th>
+                                        <th style={{ padding: '20px 16px', fontWeight: '800', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'center', width: '25%' }}>Reallocate To</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -149,33 +166,57 @@ const ManageOfficers = () => {
                                                 (statusFilter === 'ALLOCATED' ? officer.assignedAsc : !officer.assignedAsc);
                                             return matchesSearch && matchesRole && matchesStatus;
                                         })
-                                        .map(officer => (
-                                            <tr key={officer._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                                <td style={{ padding: '16px' }}>
-                                                    <div style={{ fontWeight: '600', color: '#1e293b' }}>{officer.name}</div>
-                                                    <div style={{ fontSize: '0.85rem', color: '#64748b' }}>{officer.email}</div>
+                                        .map((officer, index) => (
+                                            <tr key={officer._id} style={{ 
+                                                backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9fafb',
+                                                borderBottom: '1px solid #f1f5f9',
+                                                transition: 'all 0.2s'
+                                            }}>
+                                                <td style={{ padding: '18px 16px', textAlign: 'center' }}>
+                                                    <div style={{ fontWeight: '800', color: '#111827' }}>{officer.name}</div>
+                                                    <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>{officer.email}</div>
                                                 </td>
-                                                <td style={{ padding: '16px' }}>
-                                                    <span style={{ fontSize: '0.75rem', fontWeight: '700', padding: '4px 10px', borderRadius: '9999px', backgroundColor: '#f1f5f9', color: '#475569' }}>
+                                                <td style={{ padding: '18px 16px', textAlign: 'center' }}>
+                                                    <span style={{ 
+                                                        fontSize: '0.75rem', 
+                                                        fontWeight: '800', 
+                                                        padding: '4px 12px', 
+                                                        borderRadius: '9999px', 
+                                                        backgroundColor: '#ecfdf5', 
+                                                        color: '#065f46',
+                                                        border: '1px solid #d1fae5',
+                                                        textTransform: 'uppercase'
+                                                    }}>
                                                         {officer.role.replace('_', ' ')}
                                                     </span>
                                                 </td>
-                                                <td style={{ padding: '16px' }}>
+                                                <td style={{ padding: '18px 16px', textAlign: 'center' }}>
                                                     {officer.assignedAsc ? (
-                                                        <div style={{ color: '#059669', fontWeight: '500' }}>
+                                                        <div style={{ color: '#059669', fontWeight: '700' }}>
                                                             📍 {officer.assignedAsc.name}
-                                                            <div style={{ fontSize: '0.8rem', color: '#64748b', marginLeft: '20px' }}>{officer.assignedAsc.district} District</div>
+                                                            <div style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: '500' }}>{officer.assignedAsc.district} District</div>
                                                         </div>
                                                     ) : (
-                                                        <span style={{ color: '#94a3b8 italic' }}>Unallocated</span>
+                                                        <span style={{ color: '#9ca3af', fontWeight: '600', fontStyle: 'italic' }}>⚠️ Unallocated</span>
                                                     )}
                                                 </td>
-                                                <td style={{ padding: '16px' }}>
+                                                <td style={{ padding: '18px 16px', textAlign: 'center' }}>
                                                     <select
                                                         className="form-control"
                                                         value={officer.assignedAsc?._id || ''}
                                                         onChange={(e) => handleAssign(officer._id, e.target.value)}
-                                                        style={{ padding: '8px', borderRadius: '6px', border: '1px solid #e2e8f0', width: '100%', maxWidth: '220px' }}
+                                                        style={{ 
+                                                            padding: '10px', 
+                                                            borderRadius: '8px', 
+                                                            border: '1.5px solid #e2e8f0', 
+                                                            width: '100%', 
+                                                            maxWidth: '240px',
+                                                            fontSize: '0.85rem',
+                                                            fontWeight: '600',
+                                                            backgroundColor: 'white',
+                                                            color: '#374151',
+                                                            cursor: 'pointer'
+                                                        }}
                                                     >
                                                         <option value="">-- Unallocate Staff --</option>
                                                         {ascs.map(asc => (
@@ -197,8 +238,8 @@ const ManageOfficers = () => {
                                         return matchesSearch && matchesRole && matchesStatus;
                                     }).length === 0 && (
                                             <tr>
-                                                <td colSpan="4" style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
-                                                    No officers match the current filters.
+                                                <td colSpan="4" style={{ padding: '60px', textAlign: 'center', color: '#9ca3af', fontWeight: '700', fontSize: '1.1rem' }}>
+                                                    📭 No officers match the current filters.
                                                 </td>
                                             </tr>
                                         )}

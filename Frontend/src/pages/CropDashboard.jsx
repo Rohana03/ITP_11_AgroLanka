@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
+import './AdminDashboard.css';
 import './FarmerDashboard.css';
 
 const CropDashboard = () => {
@@ -56,102 +57,118 @@ const CropDashboard = () => {
     };
 
     return (
-        <div className="farmer-dashboard-page">
+        <div className="admin-dashboard">
             <Navbar />
             <div className="dashboard-container">
                 <header className="dashboard-header">
-                    <div className="header-info">
-                        <h1>Crop Officer Dashboard 🌾</h1>
-                        <p>Welcome, {user?.name}! {user?.specialization ? `Specialist in: ${user.specialization}` : 'Monitor and manage crop registration requests.'}</p>
+                    <div className="header-left">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '8px' }}>
+                            <h1 style={{ margin: 0, fontSize: '2rem', color: '#1e3a8a' }}>Crop Management 🌾</h1>
+                            <span className="role-badge" style={{ backgroundColor: '#15803d', color: 'white', padding: '4px 12px' }}>
+                                CROP OFFICER
+                            </span>
+                        </div>
+                        <p className="welcome-text" style={{ fontSize: '1.2rem', margin: 0 }}>
+                            Welcome back, <strong style={{ color: '#15803d' }}>{user?.name}</strong>! {user?.specialization ? `Specialist in: ${user.specialization}` : 'Monitor and manage crop registrations.'}
+                        </p>
+                    </div>
+
+                    <div className="header-right">
                         {user?.assignedAsc ? (
-                            <div className="allocation-info" style={{ marginTop: '15px', padding: '10px 20px', backgroundColor: '#ecfdf5', borderRadius: '8px', border: '1px solid #10b981', display: 'inline-block' }}>
-                                <span style={{ color: '#065f46', fontWeight: '600' }}>📍 Assigned Center: </span>
-                                <span style={{ color: '#047857' }}>{user.assignedAsc.name} - {user.assignedAsc.district} District</span>
+                            <div style={{ padding: '16px 24px', backgroundColor: '#f0fdf4', borderRadius: '16px', border: '1px solid #dcfce7', display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                                <div style={{ color: '#166534', fontWeight: '800', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>📍 ASSIGNED CENTER</div>
+                                <div style={{ color: '#14532d', fontSize: '1.1rem', fontWeight: 'bold' }}>{user.assignedAsc.name}</div>
+                                <div style={{ color: '#166534', fontSize: '0.9rem' }}>{user.assignedAsc.district} District</div>
                             </div>
                         ) : (
-                            <div className="allocation-info" style={{ marginTop: '15px', padding: '10px 20px', backgroundColor: '#fff7ed', borderRadius: '8px', border: '1px solid #f97316', display: 'inline-block' }}>
-                                <span style={{ color: '#9a3412', fontWeight: '500' }}>⚠️ No ASC Center allocated yet. Please contact Admin.</span>
+                            <div style={{ padding: '12px 20px', backgroundColor: '#fff7ed', borderRadius: '12px', border: '1px solid #ffedd5' }}>
+                                <span style={{ color: '#9a3412', fontWeight: '600' }}>⚠️ NO CENTER ALLOCATED</span>
                             </div>
                         )}
                     </div>
                 </header>
 
-                <div className="dashboard-grid">
-                    <div className="dashboard-card">
+                <div className="stats-grid">
+                    <div className="stat-card">
                         <div className="card-icon">📋</div>
-                        <h3>Total Requests</h3>
-                        <p style={{ fontSize: '2rem', fontWeight: 'bold', margin: '10px 0' }}>{crops.length}</p>
-                        <p>Crop registrations in {user?.assignedAsc?.name || 'your center'}.</p>
+                        <div className="stat-label">Total Requests</div>
+                        <div className="stat-value">{crops.length} <span style={{ fontSize: '1rem', fontWeight: '600', color: '#9ca3af' }}>Regs</span></div>
                     </div>
-                    <div className="dashboard-card">
+                    <div className="stat-card" style={{ borderTop: '4px solid #10b981' }}>
                         <div className="card-icon">🏗️</div>
-                        <h3>Your Side</h3>
-                        <p style={{ fontSize: '1.2rem', fontWeight: '600', color: '#059669', margin: '10px 0' }}>{user?.specialization || 'Not Specified'}</p>
-                        <p>Your specialized agricultural focus.</p>
+                        <div className="stat-label">Specialization</div>
+                        <div className="stat-value" style={{ fontSize: '1.4rem' }}>{user?.specialization || 'Generalist'}</div>
+                        <div style={{ fontSize: '0.8rem', color: '#64748b' }}>Assigned Focus</div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="card-icon">🌾</div>
+                        <div className="stat-label">Pending Approval</div>
+                        <div className="stat-value" style={{ color: '#d97706' }}>{crops.filter(c => c.status === 'PENDING').length}</div>
                     </div>
                 </div>
 
-                <div className="data-section" style={{ marginTop: '40px' }}>
-                    <h2>Recent Crop Registrations</h2>
-                    <div className="table-container" style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', marginTop: '20px' }}>
+                <div className="data-section dashboard-panel" style={{ marginTop: '40px', padding: '0', borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(255, 255, 255, 0.5)' }}>
+                    <div style={{ padding: '24px 32px', borderBottom: '1px solid #f3f4f6' }}>
+                        <h2 style={{ margin: 0, color: '#064e3b', fontSize: '1.5rem', fontWeight: '800' }}>Recent Crop Registrations</h2>
+                    </div>
+                    <div style={{ overflowX: 'auto' }}>
                         {loading ? (
                             <p>Loading crop requests...</p>
                         ) : crops.length > 0 ? (
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                                 <thead>
-                                    <tr style={{ textAlign: 'left', borderBottom: '2px solid #f1f5f9' }}>
-                                        <th style={{ padding: '12px' }}>Farmer</th>
-                                        <th style={{ padding: '12px' }}>Crop Type</th>
-                                        <th style={{ padding: '12px' }}>Variety</th>
-                                        <th style={{ padding: '12px' }}>Land Size</th>
-                                        <th style={{ padding: '12px' }}>Season</th>
-                                        <th style={{ padding: '12px' }}>Soil Type</th>
-                                        <th style={{ padding: '12px' }}>Status</th>
-                                        <th style={{ padding: '12px' }}>Actions</th>
+                                    <tr style={{ backgroundColor: '#064e3b', color: 'white' }}>
+                                        {['Farmer', 'Crop', 'Variety', 'Land Size', 'Season', 'Soil', 'Status', 'Actions'].map((h, i) => (
+                                            <th key={h} style={{
+                                                padding: '20px 24px',
+                                                textAlign: i === 0 ? 'left' : 'center',
+                                                fontWeight: '700',
+                                                fontSize: '0.8rem',
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '0.12em',
+                                                width: i === 0 ? '25%' : i === 7 ? '18%' : '11%'
+                                            }}>{h}</th>
+                                        ))}
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {crops.map(crop => (
-                                        <tr key={crop._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                            <td style={{ padding: '12px' }}>
-                                                <div>{crop.farmer?.name}</div>
-                                                <small style={{ color: '#64748b' }}>{crop.farmer?.nic}</small>
+                                    {crops.map((crop, index) => (
+                                        <tr key={crop._id} style={{
+                                            backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9fafb',
+                                            borderBottom: '1px solid #f1f5f9',
+                                            transition: 'background 0.2s'
+                                        }}>
+                                            <td style={{ padding: '18px 24px', textAlign: 'left' }}>
+                                                <div style={{ fontWeight: '700', color: '#111827' }}>{crop.farmer?.name}</div>
+                                                {crop.farmer?.nic && <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>🆔 {crop.farmer.nic}</div>}
                                             </td>
-                                            <td style={{ padding: '12px', textTransform: 'capitalize' }}>{crop.cropType}</td>
-                                            <td style={{ padding: '12px' }}>{['rice', 'vegetables', 'fruits', 'spices', 'other'].includes(crop.cropType) ? crop.variety : '-'}</td>
-                                            <td style={{ padding: '12px' }}>{crop.landSize} Acres</td>
-                                            <td style={{ padding: '12px' }}>{crop.season === 'N/A' ? '-' : crop.season}</td>
-                                            <td style={{ padding: '12px', textTransform: 'capitalize' }}>{crop.soilType}</td>
-                                            <td style={{ padding: '12px' }}>
+                                            <td style={{ padding: '18px 24px', textAlign: 'center', textTransform: 'capitalize', fontWeight: '600' }}>{crop.cropType}</td>
+                                            <td style={{ padding: '18px 24px', textAlign: 'center' }}>{crop.variety || '-'}</td>
+                                            <td style={{ padding: '18px 24px', textAlign: 'center', fontWeight: '600' }}>{crop.landSize} <span style={{ fontSize: '0.7rem', color: '#9ca3af' }}>Ac</span></td>
+                                            <td style={{ padding: '18px 24px', textAlign: 'center' }}>{crop.season || '-'}</td>
+                                            <td style={{ padding: '18px 24px', textAlign: 'center', textTransform: 'capitalize' }}>{crop.soilType}</td>
+                                            <td style={{ padding: '18px 24px', textAlign: 'center' }}>
                                                 <span style={{
-                                                    padding: '4px 8px',
-                                                    borderRadius: '4px',
-                                                    fontSize: '0.8rem',
+                                                    padding: '4px 12px',
+                                                    borderRadius: '20px',
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: '700',
+                                                    textTransform: 'uppercase',
                                                     backgroundColor: crop.status === 'PENDING' ? '#fef3c7' : crop.status === 'APPROVED' ? '#d1fae5' : '#fee2e2',
                                                     color: crop.status === 'PENDING' ? '#92400e' : crop.status === 'APPROVED' ? '#065f46' : '#991b1b'
                                                 }}>
                                                     {crop.status}
                                                 </span>
                                             </td>
-                                            <td style={{ padding: '12px' }}>
+                                            <td style={{ padding: '18px 24px', textAlign: 'center' }}>
                                                 {crop.status === 'PENDING' ? (
-                                                    <div style={{ display: 'flex', gap: '8px' }}>
-                                                        <button
-                                                            onClick={() => handleStatusUpdate(crop._id, 'APPROVED')}
-                                                            style={{ padding: '4px 12px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}
-                                                        >
-                                                            Approve
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleStatusUpdate(crop._id, 'REJECTED')}
-                                                            style={{ padding: '4px 12px', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}
-                                                        >
-                                                            Reject
-                                                        </button>
+                                                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                                                        <button onClick={() => handleStatusUpdate(crop._id, 'APPROVED')}
+                                                            style={{ padding: '6px 12px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '700' }}>✓</button>
+                                                        <button onClick={() => handleStatusUpdate(crop._id, 'REJECTED')}
+                                                            style={{ padding: '6px 12px', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '700' }}>✕</button>
                                                     </div>
-                                                ) : (
-                                                    <span style={{ color: '#64748b', fontSize: '0.8rem italic' }}>Decision Made</span>
-                                                )}
+                                                ) : <span style={{ color: '#94a3b8', fontSize: '0.8rem', fontStyle: 'italic' }}>Reviewed</span>}
                                             </td>
                                         </tr>
                                     ))}
