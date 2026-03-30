@@ -36,8 +36,8 @@ router.post("/requests", protect, authorize("FARMER"), async (req, res) => {
         if (!requestDate) {
             return res.status(400).json({ message: "Request date is required." });
         }
-        if (!duration || isNaN(Number(duration)) || Number(duration) <= 0) {
-            return res.status(400).json({ message: "Duration must be a positive number of days." });
+        if (!duration || !["Half Day", "Full Day", "2 Days", "3 Days", "1 Week", "Custom"].includes(duration.trim())) {
+            return res.status(400).json({ message: "Duration must be a valid selection (e.g. Full Day, 1 Week)." });
         }
         if (!location || !location.trim()) {
             return res.status(400).json({ message: "Location / field address is required." });
@@ -193,7 +193,29 @@ router.patch("/requests/:id", protect, authorize("MACHINERY_OFFICER", "ASC_OFFIC
         const request = await MachineryRequest.findById(req.params.id);
         if (!request) return res.status(404).json({ message: "Request not found" });
 
+        const previousStatus = request.status;
         request.status = status;
+        
+        // Handle inventory lock/unlock
+        if (previousStatus !== "APPROVED" && status === "APPROVED") {
+            const machinery = await Machinery.findById(request.machinery);
+            if (machinery && machinery.availableCount > 0) {
+                machinery.availableCount -= 1;
+                await machinery.save();
+            } else {
+                return res.status(400).json({ message: "Machinery is out of stock and cannot be approved." });
+            }
+        } else if (previousStatus === "APPROVED" && (status === "REJECTED" || status === "COMPLETED" || status === "PENDING")) {
+            const machinery = await Machinery.findById(request.machinery);
+            if (machinery) {
+                // Ensure it doesn't exceed totalCount
+                if (machinery.availableCount < machinery.totalCount) {
+                    machinery.availableCount += 1;
+                    await machinery.save();
+                }
+            }
+        }
+
         await request.save();
 
         res.json({ message: "Request status updated!", request });

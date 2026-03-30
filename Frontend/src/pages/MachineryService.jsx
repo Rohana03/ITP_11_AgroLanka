@@ -284,7 +284,7 @@ const MachineryService = () => {
                             <div className="form-row">
                                 <div className="form-group">
                                     <label>{t('farmer_machinery.reqDate')} *</label>
-                                    <input type="date" value={machineryForm.requestDate} onChange={(e) => setMachineryForm({ ...machineryForm, requestDate: e.target.value })} required />
+                                    <input type="date" value={machineryForm.requestDate} min={new Date().toISOString().split("T")[0]} onChange={(e) => setMachineryForm({ ...machineryForm, requestDate: e.target.value })} required />
                                     <FieldError message={fieldErrors.requestDate} />
                                 </div>
                                 <div className="form-group">
@@ -355,7 +355,7 @@ const MachineryService = () => {
                             <div className="form-row">
                                 <div className="form-group">
                                     <label>Preferred Date *</label>
-                                    <input type="date" value={serviceForm.requestDate} onChange={(e) => setServiceForm({ ...serviceForm, requestDate: e.target.value })} required />
+                                    <input type="date" value={serviceForm.requestDate} min={new Date().toISOString().split("T")[0]} onChange={(e) => setServiceForm({ ...serviceForm, requestDate: e.target.value })} required />
                                     <FieldError message={fieldErrors.requestDate} />
                                 </div>
                                 <div className="form-group">
@@ -406,8 +406,17 @@ const MachineryService = () => {
 
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label>{t('farmer_machinery.rentPerDay')} (LKR) *</label>
-                                    <input type="number" value={rentalForm.rentPerDay} onChange={(e) => setRentalForm({ ...rentalForm, rentPerDay: e.target.value })} required />
+                                    <label>{t('farmer_machinery.rentPerDay') !== 'farmer_machinery.rentPerDay' ? t('farmer_machinery.rentPerDay') : 'Rent Per Day (LKR)'} *</label>
+                                    <input 
+                                        type="text" 
+                                        value={rentalForm.rentPerDay ? rentalForm.rentPerDay.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : ''} 
+                                        onChange={(e) => {
+                                            const rawValue = e.target.value.replace(/[^0-9.]/g, '');
+                                            setRentalForm({ ...rentalForm, rentPerDay: rawValue });
+                                        }} 
+                                        placeholder="e.g. 15 000"
+                                        required 
+                                    />
                                     <FieldError message={fieldErrors.rentPerDay} />
                                 </div>
                                 <div className="form-group">
