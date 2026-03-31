@@ -16,7 +16,7 @@ const generateReceiptNumber = () => {
 // @route   POST /api/purchases
 router.post("/", protect, authorize("PRODUCT_MANAGER"), async (req, res) => {
     try {
-        const { productId, paymentMethod } = req.body;
+        const { productId, paymentMethod, purchaseQty } = req.body;
 
         const product = await Product.findById(productId).populate("seller", "name email");
         if (!product) {
@@ -26,20 +26,35 @@ router.post("/", protect, authorize("PRODUCT_MANAGER"), async (req, res) => {
             return res.status(400).json({ message: "This product is not a farmer listing" });
         }
 
+        const qty = Number(purchaseQty) || 1;
         const purchase = await Purchase.create({
             buyer: req.user._id,
             seller: product.seller._id,
             product: product._id,
             productName: product.name,
-            amount: product.price,
-            quantity: product.unit,
+            amount: product.price * qty,
+            quantity: `${qty} ${product.unit.replace(/\d+/g, '').trim() || 'unit'}`,
             paymentMethod,
             receiptNumber: generateReceiptNumber(),
             status: "Completed",
         });
 
-        // Optionally mark product as sold (Out of Stock)
-        product.status = "Out of Stock";
+        // Parse the available quantity from product.unit
+        const match = product.unit.match(/(\d+)/);
+        if (match) {
+            const availableQty = parseInt(match[1], 10);
+            if (qty > availableQty) {
+                return res.status(400).json({ message: `Cannot purchase more than available quantity (${availableQty})` });
+            }
+            const remaining = availableQty - qty;
+            const updatedUnitStr = product.unit.replace(/\d+/, remaining);
+            product.unit = updatedUnitStr;
+            if (remaining <= 0) {
+                product.status = "Out of Stock";
+            }
+        } else {
+            product.status = "Out of Stock"; // Fallback for non-numeric units
+        }
         await product.save();
 
         const populatedPurchase = await Purchase.findById(purchase._id)

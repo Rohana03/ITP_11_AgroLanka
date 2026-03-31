@@ -12,26 +12,28 @@ router.get("/available", protect, async (req, res) => {
 
         if (user.role === 'FARMER') {
             let district = user.assignedAsc?.district;
-            
+
             // Debugging: If population failed, assignedAsc might be a string ID
             if (!district && typeof user.assignedAsc === 'string') {
-                const User = require("../models/User"); // Re-import to be safe
+                const User = require("../models/User");
                 const populatedUser = await User.findById(user._id).populate('assignedAsc');
                 district = populatedUser.assignedAsc?.district;
             }
 
-            console.log(`[ProductAPI] Role: FARMER, User: ${user.name}, District: ${district}`);
-            
-            if (!district) {
-                console.warn(`[ProductAPI] Farmer ${user.name} has no detected district. assignedAsc:`, user.assignedAsc);
-                return res.json([]);
+            if (district) {
+                // For Farmers, show items listed by Product Managers in their district
+                query = {
+                    ...query,
+                    sellerRole: 'PRODUCT_MANAGER',
+                    districts: { $in: [district, district.toLowerCase(), district.toUpperCase(), new RegExp(`^${district}$`, 'i')] }
+                };
+            } else {
+                // Fallback: If no district is assigned, show all PM products
+                query = {
+                    ...query,
+                    sellerRole: 'PRODUCT_MANAGER'
+                };
             }
-
-            // More lenient matching for districts array
-            query = {
-                ...query,
-                districts: { $in: [district, district.toLowerCase(), district.toUpperCase(), new RegExp(`^${district}$`, 'i')] }
-            };
         } else if (user.role === 'PRODUCT_MANAGER') {
             const districts = user.serviceDistricts;
             if (!districts || districts.length === 0) return res.json([]);
@@ -43,10 +45,10 @@ router.get("/available", protect, async (req, res) => {
         }
 
         console.log(`[ProductAPI] Final MongoDB Query:`, JSON.stringify(query));
-        
+
         const products = await Product.find(query)
-            .populate("seller", "name email")
-            .populate("manager", "name email");
+            .populate("seller", "name email phone")
+            .populate("manager", "name email phone");
 
         console.log(`[ProductAPI] Products Found: ${products.length}`);
         res.json(products);

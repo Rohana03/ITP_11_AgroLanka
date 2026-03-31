@@ -294,13 +294,23 @@ const MyCrops = () => {
                                         </div>
                                     </div>
 
-                                    {/* Expandable details */}
-                                    <button
-                                        className="mycrops-expand-btn"
-                                        onClick={() => setExpandedCard(isExpanded ? null : crop._id)}
-                                    >
-                                        {isExpanded ? '▲ Hide details' : '▼ More details'}
-                                    </button>
+                                    {/* Actions */}
+                                    <div style={{ display: 'flex', gap: '10px', padding: '10px 18px', borderTop: '1px solid #f1f5f9' }}>
+                                        <button
+                                            className="mycrops-expand-btn"
+                                            onClick={() => setExpandedCard(isExpanded ? null : crop._id)}
+                                            style={{ flex: 1, borderTop: 'none', padding: '8px 0', textAlign: 'center', background: '#f8fafc', borderRadius: '8px' }}
+                                        >
+                                            {isExpanded ? '▲ Hide details' : '▼ More details'}
+                                        </button>
+                                        <button
+                                            className="btn btn-primary"
+                                            onClick={() => navigate(`/farmer/edit-crop/${crop._id}`)}
+                                            style={{ flex: 1, padding: '8px 0', borderRadius: '8px', fontSize: '0.85rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}
+                                        >
+                                            ✏️ Update
+                                        </button>
+                                    </div>
 
                                     {isExpanded && (
                                         <div className="mycrops-card-details">

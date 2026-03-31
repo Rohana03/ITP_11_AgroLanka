@@ -44,6 +44,7 @@ const ProductDashboard = () => {
 
     // Payment modal state
     const [buyTarget, setBuyTarget] = useState(null);        // product being purchased
+    const [purchaseQty, setPurchaseQty] = useState(1);
     const [payStep, setPayStep] = useState('confirm');        // 'confirm' | 'payment' | 'receipt'
     const [payMethod, setPayMethod] = useState('Card');
     const [cardFields, setCardFields] = useState({ number: '', expiry: '', cvv: '', name: '' });
@@ -180,6 +181,7 @@ const ProductDashboard = () => {
     /* ── BUY FLOW ── */
     const openBuyModal = (product) => {
         setBuyTarget(product);
+        setPurchaseQty(1);
         setPayStep('confirm');
         setPayMethod('Card');
         setCardFields({ number: '', expiry: '', cvv: '', name: '' });
@@ -224,7 +226,7 @@ const ProductDashboard = () => {
             const res = await fetch('http://localhost:5000/api/purchases', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ productId: buyTarget._id, paymentMethod: payMethod })
+                body: JSON.stringify({ productId: buyTarget._id, paymentMethod: payMethod, purchaseQty })
             });
             const data = await res.json();
             if (res.ok) {
@@ -806,12 +808,43 @@ const ProductDashboard = () => {
                                     {buyTarget.image && <img src={buyTarget.image} alt="" style={{ width: '100%', height: '160px', objectFit: 'cover', borderRadius: '8px', marginBottom: '16px' }} />}
                                     <table style={{ width: '100%' }}>
                                         <tbody>
-                                            {[['Crop', buyTarget.name], ['Farmer', buyTarget.seller?.name], ['Quantity', buyTarget.unit], ['Price', `LKR ${Number(buyTarget.price).toLocaleString()}`]].map(([l, v]) => (
-                                                <tr key={l}>
-                                                    <td style={{ color: '#64748b', padding: '6px 0', width: '40%' }}>{l}</td>
-                                                    <td style={{ fontWeight: '600', padding: '6px 0' }}>{v}</td>
-                                                </tr>
-                                            ))}
+                                            <tr>
+                                                <td style={{ color: '#64748b', padding: '6px 0', width: '40%' }}>Crop</td>
+                                                <td style={{ fontWeight: '600', padding: '6px 0' }}>{buyTarget.name}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style={{ color: '#64748b', padding: '6px 0', width: '40%' }}>Farmer</td>
+                                                <td style={{ fontWeight: '600', padding: '6px 0' }}>{buyTarget.seller?.name}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style={{ color: '#64748b', padding: '6px 0', width: '40%' }}>Unit Price</td>
+                                                <td style={{ fontWeight: '600', padding: '6px 0' }}>LKR {Number(buyTarget.price).toLocaleString()} per {buyTarget.unit.replace(/\d+/g, '').trim() || 'unit'}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style={{ color: '#64748b', padding: '6px 0', width: '40%' }}>Order Quantity</td>
+                                                <td style={{ fontWeight: '600', padding: '6px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                    <input 
+                                                        type="number" min="1" 
+                                                        max={parseInt(buyTarget.unit.match(/\d+/) ? buyTarget.unit.match(/\d+/)[0] : Infinity, 10)}
+                                                        value={purchaseQty} 
+                                                        onChange={(e) => {
+                                                            const maxQ = parseInt(buyTarget.unit.match(/\d+/) ? buyTarget.unit.match(/\d+/)[0] : Infinity, 10);
+                                                            let val = parseInt(e.target.value) || 1;
+                                                            if (val > maxQ) val = maxQ;
+                                                            if (val < 1) val = 1;
+                                                            setPurchaseQty(val);
+                                                        }} 
+                                                        style={{ width: '80px', padding: '4px 8px', borderRadius: '6px', border: '1px solid #cbd5e1' }} 
+                                                    /> 
+                                                    <span>{buyTarget.unit.replace(/\d+/g, '').trim() || 'unit'}s (Max: {parseInt(buyTarget.unit.match(/\d+/) ? buyTarget.unit.match(/\d+/)[0] : 'N/A')})</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style={{ color: '#64748b', padding: '12px 0 0 0', width: '40%', borderTop: '1px dashed #cbd5e1', marginTop: '8px' }}>Total Payout</td>
+                                                <td style={{ fontWeight: '800', color: '#059669', padding: '12px 0 0 0', fontSize: '1.2rem', borderTop: '1px dashed #cbd5e1', marginTop: '8px' }}>
+                                                    LKR {(buyTarget.price * purchaseQty).toLocaleString()}
+                                                </td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -827,7 +860,7 @@ const ProductDashboard = () => {
                         {payStep === 'payment' && (
                             <>
                                 <h2 style={{ marginBottom: '5px' }}>💳 Payment Portal</h2>
-                                <p style={{ color: '#64748b', marginBottom: '20px' }}>Amount: <strong style={{ color: '#059669', fontSize: '1.2rem' }}>LKR {Number(buyTarget.price).toLocaleString()}</strong></p>
+                                <p style={{ color: '#64748b', marginBottom: '20px' }}>Total Amount: <strong style={{ color: '#059669', fontSize: '1.2rem' }}>LKR {(buyTarget.price * purchaseQty).toLocaleString()}</strong></p>
 
                                 {/* Method selector */}
                                 <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
@@ -891,7 +924,7 @@ const ProductDashboard = () => {
                                     <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
                                         <button type="button" onClick={() => { setPayStep('confirm'); setPayError(''); }} className="btn btn-outline" style={{ flex: 1 }}>Back</button>
                                         <button type="submit" className="btn btn-primary" style={{ flex: 1, backgroundColor: '#059669' }} disabled={processing}>
-                                            {processing ? 'Processing...' : `Pay LKR ${Number(buyTarget.price).toLocaleString()}`}
+                                            {processing ? 'Processing...' : `Pay LKR ${(buyTarget.price * purchaseQty).toLocaleString()}`}
                                         </button>
                                     </div>
                                 </form>

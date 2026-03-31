@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import Navbar from '../components/Navbar';
 import './FarmerPages.css';
@@ -9,6 +9,8 @@ const RegisterCrop = () => {
     const { user } = useAuth();
     const { t } = useLanguage();
     const navigate = useNavigate();
+    const { id } = useParams();
+    const isEditMode = !!id;
     const [formData, setFormData] = useState({
         cropType: '',
         variety: '',
@@ -82,8 +84,8 @@ const RegisterCrop = () => {
                 const uniqueDistricts = [...new Set(data.map(asc => asc.district))].sort();
                 setDistricts(uniqueDistricts);
 
-                // If user has an assigned ASC, pre-fill it
-                if (user?.assignedAsc) {
+                // If user has an assigned ASC and NOT in edit mode, pre-fill it
+                if (user?.assignedAsc && !isEditMode) {
                     setFormData(prev => ({
                         ...prev,
                         assignedAsc: user.assignedAsc._id || user.assignedAsc,
@@ -95,7 +97,37 @@ const RegisterCrop = () => {
             }
         };
         fetchAscs();
-    }, [user]);
+    }, [user, isEditMode]);
+
+    React.useEffect(() => {
+        if (id) {
+            const fetchCrop = async () => {
+                try {
+                    const response = await fetch(`http://localhost:5000/api/crops/${id}`, {
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        setFormData({
+                            cropType: data.cropType || '',
+                            variety: data.variety || '',
+                            landSize: data.landSize || '',
+                            season: data.season || '',
+                            location: data.location || '',
+                            soilType: data.soilType || '',
+                            assignedAsc: data.assignedAsc?._id || data.assignedAsc || ''
+                        });
+                        if (data.location) setSelectedDistrict(data.location);
+                    } else {
+                        setError('Failed to load crop details');
+                    }
+                } catch (err) {
+                    setError('Error loading crop details');
+                }
+            };
+            fetchCrop();
+        }
+    }, [id]);
 
     const handleChange = (e) => {
         setFormData({
@@ -117,8 +149,11 @@ const RegisterCrop = () => {
 
         setIsSubmitting(true);
         try {
-            const response = await fetch('http://localhost:5000/api/crops', {
-                method: 'POST',
+            const url = isEditMode ? `http://localhost:5000/api/crops/${id}` : 'http://localhost:5000/api/crops';
+            const method = isEditMode ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -129,7 +164,7 @@ const RegisterCrop = () => {
             const data = await response.json();
 
             if (response.ok) {
-                setSuccess(t('farmer_crop.successReg'));
+                setSuccess(isEditMode ? 'Crop updated successfully. It is now pending review.' : (t('farmer_crop.successReg') || 'Crop registered successfully!'));
                 setFieldErrors({});
                 setTimeout(() => {
                     navigate('/farmer-dashboard');
@@ -152,8 +187,8 @@ const RegisterCrop = () => {
                     <button className="back-btn" onClick={() => navigate('/farmer-dashboard')}>
                         ← {t('common.back')}
                     </button>
-                    <h1>🌱 {t('farmer_crop.title')}</h1>
-                    <p>{t('farmer_crop.subtitle')}</p>
+                    <h1>🌱 {isEditMode ? 'Update Crop' : t('farmer_crop.title')}</h1>
+                    <p>{isEditMode ? 'Update your crop registration details below' : t('farmer_crop.subtitle')}</p>
                     <button className="view-btn" onClick={() => navigate('/farmer/my-crops')}>
                         {t('farmer_crop.viewRequests')} →
                     </button>
@@ -182,7 +217,44 @@ const RegisterCrop = () => {
                                 <FieldError message={fieldErrors.cropType} />
                             </div>
 
-                            {['rice', 'vegetables', 'fruits', 'spices', 'other'].includes(formData.cropType) && (
+                            {formData.cropType === 'rice' ? (
+                                <div className="form-group">
+                                    <label>{t('farmer_crop.variety')} *</label>
+                                    <select
+                                        name="variety"
+                                        value={formData.variety}
+                                        onChange={handleChange}
+                                        required
+                                    >
+                                        <option value="">Select Rice Variety</option>
+                                        <optgroup label="Samba Types">
+                                            <option value="Samba">Samba</option>
+                                            <option value="Keeri Samba">Keeri Samba</option>
+                                            <option value="Sudu Samba">Sudu Samba</option>
+                                        </optgroup>
+                                        <optgroup label="Nadu Types">
+                                            <option value="Nadu">Nadu</option>
+                                            <option value="Sudu Nadu">Sudu Nadu</option>
+                                            <option value="Rathu Nadu">Rathu Nadu</option>
+                                        </optgroup>
+                                        <optgroup label="Traditional Types">
+                                            <option value="Suwandel">Suwandel</option>
+                                            <option value="Kalu Heenati">Kalu Heenati</option>
+                                            <option value="Pachchaperumal">Pachchaperumal</option>
+                                            <option value="Kuruluthuda">Kuruluthuda</option>
+                                            <option value="Maa Wee">Maa Wee</option>
+                                            <option value="Madathawalu">Madathawalu</option>
+                                        </optgroup>
+                                        <optgroup label="Improved Varieties">
+                                            <option value="Bg Varieties">Bg Varieties (Batalagoda)</option>
+                                            <option value="At Varieties">At Varieties (Ambalantota)</option>
+                                            <option value="Ld Varieties">Ld Varieties (Bombuwela)</option>
+                                        </optgroup>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    <FieldError message={fieldErrors.variety} />
+                                </div>
+                            ) : ['vegetables', 'fruits', 'spices', 'other'].includes(formData.cropType) && (
                                 <div className="form-group">
                                     <label>{t('farmer_crop.variety')} *</label>
                                     <input
@@ -289,7 +361,7 @@ const RegisterCrop = () => {
                                 {t('common.cancel')}
                             </button>
                             <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-                                {isSubmitting ? t('common.processing') || "Processing..." : t('common.save')}
+                                {isSubmitting ? (t('common.processing') || "Processing...") : (isEditMode ? 'Update' : (t('common.save') || "Save"))}
                             </button>
                         </div>
                     </form>

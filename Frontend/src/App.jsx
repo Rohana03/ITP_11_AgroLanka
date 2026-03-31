@@ -54,6 +54,7 @@ function App() {
             {/* Farmer routes */}
             <Route path="/farmer-dashboard" element={<ProtectedRoute><FarmerDashboard /></ProtectedRoute>} />
             <Route path="/farmer/register-crop" element={<ProtectedRoute><RegisterCrop /></ProtectedRoute>} />
+            <Route path="/farmer/edit-crop/:id" element={<ProtectedRoute><RegisterCrop /></ProtectedRoute>} />
             <Route path="/farmer/my-crops" element={<ProtectedRoute><MyCrops /></ProtectedRoute>} />
             <Route path="/farmer/financial-aid" element={<ProtectedRoute><FinancialAssistance /></ProtectedRoute>} />
             <Route path="/farmer/machinery" element={<ProtectedRoute><MachineryService /></ProtectedRoute>} />

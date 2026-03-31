@@ -128,4 +128,90 @@ router.patch("/:id/status", protect, authorize("CROP_OFFICER", "ASC_OFFICER"), a
     }
 });
 
+// @desc    Get a single crop by ID
+// @route   GET /api/crops/:id
+// @access  Private (Farmer or authorized officer)
+router.get("/:id", protect, async (req, res) => {
+    try {
+        const crop = await Crop.findById(req.params.id)
+            .populate("farmer", "name email nic")
+            .populate("assignedAsc", "name district");
+
+        if (!crop) {
+            return res.status(404).json({ message: "Crop not found" });
+        }
+
+        // Check authorization: if user is farmer, they must own it
+        if (req.user.role === "FARMER" && crop.farmer._id.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: "Not authorized to access this crop" });
+        }
+        res.json(crop);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// @desc    Update a crop registration
+// @route   PUT /api/crops/:id
+// @access  Private (Farmer only)
+router.put("/:id", protect, authorize("FARMER"), async (req, res) => {
+    try {
+        const crop = await Crop.findById(req.params.id);
+
+        if (!crop) {
+            return res.status(404).json({ message: "Crop not found" });
+        }
+
+        // Only the farmer who created the crop can update it
+        if (crop.farmer.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: "Not authorized to update this crop" });
+        }
+
+        const {
+            cropType,
+            variety,
+            landSize,
+            plantingDate,
+            expectedHarvest,
+            location,
+            soilType,
+            assignedAsc,
+            season
+        } = req.body;
+
+        // Validation Guards
+        if (!cropType) return res.status(400).json({ message: "Crop type is required." });
+        if (!variety || !variety.trim()) return res.status(400).json({ message: "Variety is required." });
+        if (!landSize || isNaN(parseFloat(landSize)) || parseFloat(landSize) <= 0) {
+            return res.status(400).json({ message: "Land size must be a positive number." });
+        }
+        if (!location) return res.status(400).json({ message: "Location is required." });
+        if (!soilType) return res.status(400).json({ message: "Soil type is required." });
+        if (!assignedAsc) return res.status(400).json({ message: "Assigned ASC is required." });
+        if (cropType === 'rice' && (!season || season === 'N/A' || !['Yala', 'Maha'].includes(season))) {
+            return res.status(400).json({ message: "Please select a valid season (Yala or Maha) for rice." });
+        }
+
+        // Update fields
+        crop.cropType = cropType;
+        crop.variety = variety.trim();
+        crop.landSize = parseFloat(landSize);
+        if (plantingDate) crop.plantingDate = plantingDate;
+        if (expectedHarvest) crop.expectedHarvest = expectedHarvest;
+        crop.location = location;
+        crop.soilType = soilType;
+        crop.assignedAsc = assignedAsc;
+        crop.season = season || "N/A";
+        
+        // Reset status to pending so officer can review the updated crop
+        crop.status = "PENDING";
+
+        await crop.save();
+
+        res.json(crop);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 module.exports = router;

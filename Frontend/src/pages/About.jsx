@@ -47,25 +47,7 @@ const About = () => {
                 </div>
             </section>
 
-            {/* Team Section */}
-            <section className="about-section">
-                <div className="section-title">
-                    <h2>{t('about_page.teamTitle')}</h2>
-                </div>
-                <div className="team-grid">
-                    {team.map((member, index) => (
-                        <div className="team-card" key={index}>
-                            <div className="team-img-wrapper">
-                                <img src={member.img} alt={member.name} />
-                            </div>
-                            <div className="team-info">
-                                <h3>{member.name}</h3>
-                                <p>{member.role}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
+
 
             {/* Tech Stack Section */}
             <section className="about-section" style={{ textAlign: 'center' }}>

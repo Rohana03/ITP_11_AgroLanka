@@ -13,6 +13,8 @@ const AgriculturalProducts = () => {
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [showContactModal, setShowContactModal] = useState(false);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -138,7 +140,13 @@ const AgriculturalProducts = () => {
                                         <span className="product-price" style={{ fontWeight: '700', color: '#059669' }}>
                                             LKR {product.price} <span style={{ fontSize: '0.7rem', color: '#64748b' }}>/ {product.unit || t('farmer_market.unit')}</span>
                                         </span>
-                                        <button className="btn btn-primary btn-sm">
+                                        <button 
+                                            className="btn btn-primary btn-sm"
+                                            onClick={() => {
+                                                setSelectedProduct(product);
+                                                setShowContactModal(true);
+                                            }}
+                                        >
                                             {t('farmer_market.contactSeller')}
                                         </button>
                                     </div>
@@ -152,6 +160,77 @@ const AgriculturalProducts = () => {
                     )}
                 </div>
             </div>
+
+            {/* Contact Seller Modal */}
+            {showContactModal && selectedProduct && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center',
+                    justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)'
+                }}>
+                    <div style={{
+                        backgroundColor: 'white', padding: '30px', borderRadius: '16px',
+                        width: '90%', maxWidth: '400px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
+                        position: 'relative', animation: 'modalSlideUp 0.3s ease-out'
+                    }}>
+                        <button 
+                            onClick={() => setShowContactModal(false)}
+                            style={{ position: 'absolute', top: '15px', right: '15px', border: 'none', background: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#64748b' }}
+                        >×</button>
+                        
+                        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                            <div style={{ fontSize: '3rem', marginBottom: '10px' }}>👤</div>
+                            <h2 style={{ margin: '0 0 5px 0', color: '#1e293b' }}>{selectedProduct.seller?.name || selectedProduct.manager?.name || 'Seller'}</h2>
+                            <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>{selectedProduct.sellerRole === 'PRODUCT_MANAGER' ? 'Product Manager' : 'Farmer'}</p>
+                        </div>
+
+                        <div style={{ display: 'grid', gap: '12px' }}>
+                            <a 
+                                href={`mailto:${selectedProduct.seller?.email || selectedProduct.manager?.email}?subject=AgroLanka Inquiry: ${selectedProduct.name}`}
+                                style={{
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+                                    padding: '12px', backgroundColor: '#f0fdf4', color: '#166534',
+                                    borderRadius: '10px', textDecoration: 'none', fontWeight: '600',
+                                    border: '1px solid #dcfce7', transition: 'all 0.2s'
+                                }}
+                            >
+                                📧 Send Email
+                            </a>
+                            
+                            {(selectedProduct.seller?.phone || selectedProduct.manager?.phone) && (
+                                <a 
+                                    href={`tel:${selectedProduct.seller?.phone || selectedProduct.manager?.phone}`}
+                                    style={{
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+                                        padding: '12px', backgroundColor: '#eff6ff', color: '#1e40af',
+                                        borderRadius: '10px', textDecoration: 'none', fontWeight: '600',
+                                        border: '1px solid #dbeafe', transition: 'all 0.2s'
+                                    }}
+                                >
+                                    📞 Call Seller
+                                </a>
+                            )}
+                            
+                            {!selectedProduct.seller?.phone && !selectedProduct.manager?.phone && (
+                                <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '0.8rem', marginTop: '5px' }}>
+                                    Phone number not shared by seller.
+                                </div>
+                            )}
+                        </div>
+
+                        <p style={{ marginTop: '20px', fontSize: '0.8rem', color: '#94a3b8', textAlign: 'center' }}>
+                            Inquiring about: <strong>{selectedProduct.name}</strong>
+                        </p>
+                    </div>
+                </div>
+            )}
+            
+            <style>{`
+                @keyframes modalSlideUp {
+                    from { transform: translateY(20px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+            `}</style>
         </div>
     );
 };
