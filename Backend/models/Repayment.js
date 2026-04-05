@@ -31,6 +31,9 @@ const repaymentSchema = new mongoose.Schema(
         },
         adminNotes: {
             type: String
+        },
+        farmerNotes: {
+            type: String
         }
     },
     { timestamps: true }

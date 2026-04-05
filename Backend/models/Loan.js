@@ -55,6 +55,26 @@ const loanSchema = new mongoose.Schema({
     },
     approvedDate: {
         type: Date
+    },
+    loanDeadline: {
+        type: Date
+    },
+    loanImage: {
+        type: String,
+        default: null
+    },
+    officerNotes: {
+        type: String,
+        default: null
+    },
+    officerMessage: {
+        type: String,
+        default: null
+    },
+    reviewedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: null
     }
 }, { timestamps: true });
 
