@@ -1,0 +1,23 @@
+{
+  "name": "crop-product-server",
+  "version": "6.4.2",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "*",
+    "dotenv": "*",
+    "express": "*",
+    "mongoose": "*",
+    "morgan": "*",
+    "multer": "*",
+    "pdf-lib": "*",
+    "exceljs": "*"
+  },
+  "devDependencies": {
+    "nodemon": "*"
+  }
+}
